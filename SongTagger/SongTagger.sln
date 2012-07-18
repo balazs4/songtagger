@@ -160,6 +160,12 @@ Global
 		$27.MessageStyle = $28
 		$28.LineAlign = 0
 		$27.inheritsSet = Mono
+		$0.TextStylePolicy = $29
+		$29.FileWidth = 120
+		$29.TabsToSpaces = False
+		$29.inheritsSet = VisualStudio
+		$29.inheritsScope = text/plain
+		$29.scope = text/plain
 		description = http://songtagger.codeplex.com/
 		outputpath = bin
 	EndGlobalSection
