@@ -25,6 +25,7 @@ using System.Collections.Generic;
 
 namespace SongTagger.Core
 {
+
 	public interface IArtist : IEntity
 	{
 		IList<String> Genres { get; }
@@ -32,10 +33,10 @@ namespace SongTagger.Core
 
 	internal class Artist : IArtist
 	{
-		public Artist()
+		public Artist ()
 		{
 			Id = Guid.Empty;
-			Genres = new List<String>();
+			Genres = new List<String> ();
 		}
 
 		#region IEntity implementation
@@ -51,7 +52,7 @@ namespace SongTagger.Core
 
 	internal class UnknowArtist : IArtist
 	{
-		public UnknowArtist()
+		public UnknowArtist ()
 		{
 			Id = Guid.Empty;
 			Genres = new List<String> 
