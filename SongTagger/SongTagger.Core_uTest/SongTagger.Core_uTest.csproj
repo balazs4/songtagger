@@ -35,4 +35,16 @@
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Services\WebServicesTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
+      <Project>{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}</Project>
+      <Name>SongTagger.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
