@@ -24,6 +24,7 @@ using System;
 using System.Net;
 using System.Xml.Linq;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace SongTagger.Core
 {
@@ -35,6 +36,7 @@ namespace SongTagger.Core
 
     public static class WebServices
     {
+        #region Private init methods
         private static Dictionary<ServiceName,IWebService> serviceCollection;
 
         private static IWebService CreateNewInstance(ServiceName serviceKey)
@@ -57,10 +59,28 @@ namespace SongTagger.Core
             return service;
         }
 
+        private static readonly String userAgentInfo;
+
+        private static String GetUserAgentInfo()
+        {
+            String appName = Assembly.GetExecutingAssembly().GetName().Name;
+            Version appVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            String runtimeInformation = String.Format(".Net {0}; {1}", Environment.Version, Environment.OSVersion.VersionString);
+
+            return String.Format("{0}/{1} ({2})",
+                                          appName,
+                                          appVersion,
+                                          runtimeInformation
+            );
+
+        }
+
         static WebServices()
         {
             serviceCollection = new Dictionary<ServiceName,IWebService>();
+            userAgentInfo = GetUserAgentInfo();                       
         }
+        #endregion
 
         public static IWebService Instance(ServiceName serviceKey)
         {
@@ -72,18 +92,55 @@ namespace SongTagger.Core
             return serviceCollection [serviceKey];
         }
 
+        internal delegate String DownloadContentDelegate(Uri queryUrl);
 
-        #region Private helper methods
-        private static String DownloadResult(Uri queryUrl)
+        #region Helper methods
+        /// <summary>
+        /// Downloads the content.
+        /// </summary>
+        /// <returns>
+        /// The content.
+        /// </returns>
+        /// <param name='queryUrl'>
+        /// Query URL.
+        /// </param>
+        /// <exception cref="ArgumentNullException">If <param name="queryUrl"> is null</exception>
+        internal static String DownloadContent(Uri queryUrl)
         {
+            if (queryUrl == null)
+                throw new ArgumentNullException("queryUrl", "Url could not be null");
+            
             String data = String.Empty;
+            try
+            {
+                using (WebClient client = new WebClient())
+                {
+                    client.Headers.Add("user-agent", userAgentInfo); //http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
+                    data = client.DownloadString(queryUrl);
+                }
 
-            using (WebClient client = new WebClient())
-            {   
-                data = client.DownloadString(queryUrl);
+            } catch (WebException e)
+            {
+                Console.Error.WriteLine(e.ToString());
             }
             return data;
         }
+
+        internal static Uri BuildUri(Uri baseUrl, string queryString)
+        {
+            if (baseUrl == null)
+                throw new ArgumentNullException("baseUrl", "Base url could not be null");
+
+            if (String.IsNullOrWhiteSpace(queryString))
+                throw new ArgumentNullException("queryString", "Query string could not be null or empty");
+
+
+            UriBuilder builder = new UriBuilder(baseUrl);
+            builder.Query += queryString;
+
+            return builder.Uri;
+        }
+
         #endregion
     }
 }

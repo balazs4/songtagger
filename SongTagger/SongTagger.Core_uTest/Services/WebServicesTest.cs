@@ -44,8 +44,9 @@ namespace SongTagger.Core.Unittest
         {
             Assert.DoesNotThrow(() => 
             {
-                IWebService actual = WebServices.Instance(service);
-            });
+                WebServices.Instance(service);
+            }
+            );
         }
 
         [TestCase(ServiceName.MusicBrainz)]
@@ -63,6 +64,75 @@ namespace SongTagger.Core.Unittest
             }
 
         }
+       
+        [Test]
+        public void DownloadContent_ArgumentCheck_ArgumentNullException_Expected()
+        {
+            Assert.Throws(typeof(ArgumentNullException), () => 
+            { 
+                WebServices.DownloadContent(null);
+            }
+            );
+        }
+
+        [Test]
+        public void DownloadContent_ValidUrl_DoesNotThrowException()
+        {
+            Uri validUrl = new Uri("http://localhost");
+            Assert.DoesNotThrow(() => 
+            {
+                WebServices.DownloadContent(validUrl);
+            }
+            );
+        }
+
+        [Test]
+        //TODO: iTest or Expicit test...
+        public void DownloadContent_ValidUrl_ResultNotEmptyOrNull()
+        {
+            Uri googleCom = new Uri("http://google.com");
+            String content = WebServices.DownloadContent(googleCom);
+            Assert.IsFalse(String.IsNullOrWhiteSpace(content),
+                           String.Format("Content was empty from {0}", googleCom.ToString()));
+        }
+
+        [Test]
+        public void DownloadContent_InvalidUrl_DoesNotThrowException()
+        {
+            Uri unreachableUrl = new Uri("htt://foobar.p");
+            Assert.DoesNotThrow(() => 
+            {
+                WebServices.DownloadContent(unreachableUrl);
+            }
+            );
+        }
+
+        [TestCase(null,null)]
+        [TestCase(null,"")]
+        [TestCase("http://localhost","")]
+        [TestCase("http://localhost",null)]
+        public void BuildUri_ArgumentCheck_ArgumentNullException_Expected(String url, String query)
+        {
+            Uri testUri = url != null ? new Uri(url) : null;
+            Assert.Throws(typeof(ArgumentNullException), () =>
+            {
+                WebServices.BuildUri(testUri, query);
+            }
+            );
+        }
+
+
+        [TestCase("http://localhost/","artist")]
+        [TestCase("http://localhost/service","query=foobar")]
+        [TestCase("http://localhost/service","query=foobar&condition=8")]
+        [TestCase("http://localhost/service","query=foobar&condition=8&sort")]
+        public void BuildUri_GetUrl(String url, String query)
+        {
+            String expected = String.Format("{0}?{1}", url, query);
+            Uri actual = WebServices.BuildUri(new Uri(url), query);
+            Assert.AreEqual(expected, actual.ToString());
+        }
+
     }
 }
 
