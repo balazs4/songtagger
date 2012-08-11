@@ -27,26 +27,42 @@ using SongTagger.Core;
 
 namespace SongTagger.Core.Unittest
 {
-	[TestFixture()]
-	public class WebServicesTest
-	{
-		[TestCase(ServiceName.MusicBrainz)]
-		[TestCase(ServiceName.LastFm)]
-		public void GetInstance_IsNotNull(ServiceName service)
-		{
-			IWebService actual = WebServices.Instance(service);
-			Assert.IsNotNull(actual);
-		}
+    [TestFixture()]
+    public class WebServicesTest
+    {
+        [TestCase(ServiceName.MusicBrainz)]
+        [TestCase(ServiceName.LastFm)]
+        public void GetInstance_IsNotNull(ServiceName service)
+        {
+            IWebService actual = WebServices.Instance(service);
+            Assert.IsNotNull(actual);
+        }
 
-		[TestCase(ServiceName.MusicBrainz)]
-		[TestCase(ServiceName.LastFm)]
-		public void GetInstance_DoesNotThrowException(ServiceName service)
-		{
-			Assert.DoesNotThrow(() => 
-			{
-				IWebService actual = WebServices.Instance(service);
-			});
-		}
-	}
+        [TestCase(ServiceName.MusicBrainz)]
+        [TestCase(ServiceName.LastFm)]
+        public void GetInstance_DoesNotThrowException(ServiceName service)
+        {
+            Assert.DoesNotThrow(() => 
+            {
+                IWebService actual = WebServices.Instance(service);
+            });
+        }
+
+        [TestCase(ServiceName.MusicBrainz)]
+        [TestCase(ServiceName.LastFm)]
+        public void GetInstance_CheckIfInstanceIsSingleton(ServiceName service)
+        {
+            int checkCount = 3;
+            IWebService serviceOne = WebServices.Instance(service);
+
+            for (int i = 0; i < checkCount; i++)
+            {
+                IWebService serviceCurrent = WebServices.Instance(service);
+                Assert.AreEqual(serviceOne, serviceCurrent);
+                Assert.AreSame(serviceOne, serviceCurrent);
+            }
+
+        }
+    }
 }
 
