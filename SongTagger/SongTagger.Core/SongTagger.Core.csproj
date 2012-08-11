@@ -12,14 +12,15 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>..\bin\Debug</OutputPath>
     <WarningLevel>4</WarningLevel>
-    <DebugSymbols>True</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>TEST;DEBUG</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>False</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>..\bin\Release</OutputPath>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -27,7 +28,7 @@
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
-        <Deployment.LinuxDeployData generateScript="False" />
+        <Deployment.LinuxDeployData generateScript="false" />
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
@@ -47,6 +48,7 @@
     <Compile Include="Services\WebServices.cs" />
     <Compile Include="Services\IWebService.cs" />
     <Compile Include="Services\LastFm.cs" />
+    <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />

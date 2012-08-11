@@ -22,31 +22,60 @@
 //
 using System;
 using System.Net;
+using System.Xml.Linq;
+using System.Threading;
+using System.Diagnostics;
 
 namespace SongTagger.Core
 {
     internal class MusicBrainz : IWebService
     {
-        internal static Uri WebService
-        {
-            get;
-            private set;
-        }
+        private static readonly Object lockObject;
+        internal static readonly TimeSpan WAIT_TIME_BETWEEN_QUERIES; //http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
+        internal static readonly Uri baseUrl;
 
         static MusicBrainz()
         {
-            WebService = new Uri("http://musicbrainz.org/ws/2/");
+            baseUrl = new Uri("http://musicbrainz.org/ws/2/");
+            WAIT_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 2);
+            lockObject = new Object();
         }
 
         internal MusicBrainz()
         {
+
         }
 
+        internal static String DownloadContentSafely(Uri queryUrl, WebServices.DownloadContentDelegate downloadAction)
+        {
+            String content = String.Empty;
+            lock (lockObject)
+            {
+                Stopwatch timer = Stopwatch.StartNew();
+
+                content = downloadAction(queryUrl);
+
+                timer.Stop();
+
+                if (timer.Elapsed < WAIT_TIME_BETWEEN_QUERIES)
+                    Thread.Sleep(WAIT_TIME_BETWEEN_QUERIES - timer.Elapsed);
+            }
+            return content;
+        }
+
+       
 
         #region IWebService implementation
-        public System.Xml.Linq.XDocument ExecuteQuery(string queryString)
+        public XDocument ExecuteQuery(string queryString)
         {
-            throw new NotImplementedException();
+            Uri queryUrl = WebServices.BuildUri(baseUrl, queryString);
+
+            String content = DownloadContentSafely(queryUrl, WebServices.DownloadContent);
+
+            if (String.IsNullOrWhiteSpace(content))
+                return null;
+
+            return XDocument.Parse(content);
         }
         #endregion
     }

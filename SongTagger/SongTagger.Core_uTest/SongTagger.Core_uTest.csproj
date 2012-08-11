@@ -7,32 +7,33 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C6BAEDA5-4C6C-4108-BB3E-D5CA93702277}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SongTagger.Core_uTest</RootNamespace>
+    <RootNamespace>SongTagger.Core.Unittest</RootNamespace>
     <AssemblyName>SongTagger.Core_uTest</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>..\bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>True</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>..\bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="nunit.framework">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Core" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -40,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Services\WebServicesTest.cs" />
+    <Compile Include="Services\MusicBrainzTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
