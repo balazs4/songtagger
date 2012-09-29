@@ -30,7 +30,7 @@ using System.Threading;
 namespace SongTagger.Core.Unittest
 {
     [TestFixture()]
-    public class MusicBrainzTest
+    public class MusicBrainzTests
     {
         private WebServices.DownloadContentDelegate fakeDownloadAction;
         private Uri fakeUri;

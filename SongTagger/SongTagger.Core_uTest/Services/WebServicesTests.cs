@@ -28,7 +28,7 @@ using SongTagger.Core;
 namespace SongTagger.Core.Unittest
 {
     [TestFixture()]
-    public class WebServicesTest
+    public class WebServicesTests
     {
         [TestCase(ServiceName.MusicBrainz)]
         [TestCase(ServiceName.LastFm)]

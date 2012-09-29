@@ -40,8 +40,9 @@
     <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Services\WebServicesTest.cs" />
-    <Compile Include="Services\MusicBrainzTest.cs" />
+    <Compile Include="Services\LastFmTests.cs" />
+    <Compile Include="Services\MusicBrainzTests.cs" />
+    <Compile Include="Services\WebServicesTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">

@@ -21,20 +21,46 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 using System;
+using System.Xml.Linq;
 
 namespace SongTagger.Core
 {
     internal class LastFm : IWebService
     {
+        //api_key='b25b959554ed76058ac220b7b2e0a026'
+        //http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=$api_key&artist=$artist&album=$album
+
+        private Uri baseUri;
+        private readonly string LastFmApiKey = "b25b959554ed76058ac220b7b2e0a026";
+
+        internal Uri LastFmBaseUrl
+        {
+            get { return baseUri;}
+        }
+
         internal LastFm()
         {
+            UriBuilder uriBuilder = new UriBuilder("http://ws.audioscrobbler.com/2.0/") 
+            {
+                Query = String.Format("api_key={0}", LastFmApiKey)
+            };
+
+
+            baseUri = uriBuilder.Uri;
         }
 
         #region IWebService implementation
 
         public System.Xml.Linq.XDocument ExecuteQuery(string queryString)
         {
-            throw new NotImplementedException();
+            Uri queryUri = WebServices.BuildUri(baseUri, queryString);
+
+            String content = WebServices.DownloadContent(queryUri);
+
+            if (String.IsNullOrWhiteSpace(content))
+                return null;
+
+            return XDocument.Parse(content);
         }
 
         #endregion
