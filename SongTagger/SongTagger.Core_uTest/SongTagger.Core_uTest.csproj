@@ -34,20 +34,31 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Services\" />
+    <Folder Include="Providers\" />
+    <Folder Include="inputData\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Services\LastFmTests.cs" />
     <Compile Include="Services\MusicBrainzTests.cs" />
     <Compile Include="Services\WebServicesTests.cs" />
+    <Compile Include="Providers\MusicDataProviderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
       <Project>{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}</Project>
       <Name>SongTagger.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="inputData\MusicBrainzTest.ParseXmlToArtist.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

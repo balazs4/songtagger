@@ -26,6 +26,10 @@ using System.Collections.Generic;
 
 using NUnit.Framework;
 using System.Threading;
+using System.IO;
+using System.Xml.Linq;
+using System.Collections;
+using System.Reflection;
 
 namespace SongTagger.Core.UnitTest
 {
@@ -40,7 +44,7 @@ namespace SongTagger.Core.UnitTest
         {
             fakeDownloadAction = delegate(Uri uri)
             {
-                return DateTime.Now.ToString();
+                return DateTime.Now.ToString("HH:mm:ss");
             };
 
             fakeUri = new Uri("http://localhost");
@@ -82,6 +86,58 @@ namespace SongTagger.Core.UnitTest
 
         }
 
+        //[TestCase("MusicBrainzTest.ParseXmlToArtist.xml","Rise Against","06bf117-494f-4864-891f-09d63ff6aa4b",9)]
+        [Test,TestCaseSource("ParseXmlToArtistTestFactory")]
+        public void ParseXmlToArtistTest_IfXmlIsValid(string xmlFileName, int minimumScore, IArtist expectedArtist)
+        {
+            string xmlPath = Path.Combine("inputData", xmlFileName);
+
+            if (!File.Exists(xmlPath))
+            {
+                Assert.Ignore("{0} file is not available.", xmlPath);
+            }
+
+
+            IArtist artist = null;
+            Assert.That(() => 
+            {
+                artist = MusicBrainz.ParseXmlToArtist(XDocument.Load(xmlPath), minimumScore);
+            }, 
+            Throws.Nothing);
+
+            Assert.That(artist, Is.Not.Null);
+            Assert.That(artist, Is.Not.InstanceOf<UnknowArtist>());
+            Assert.That(artist.Name, Is.EqualTo(expectedArtist.Name));
+            Assert.That(artist.Id, Is.EqualTo(expectedArtist.Id));
+        }
+
+        [Test]
+        public void ParseXmlToArtistTest_IfXDocumentIsNull_UnknowArtistExpected()
+        {
+            IArtist artist = null;
+            Assert.That(() => 
+            {
+                artist = MusicBrainz.ParseXmlToArtist(null, 0);
+            }, 
+            Throws.Nothing);
+
+            Assert.That(artist, Is.Not.Null);
+            Assert.That(artist, Is.InstanceOf<UnknowArtist>());
+        }
+
+        private IEnumerable ParseXmlToArtistTestFactory
+        {
+            get
+            {
+
+                yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.xml", 95, new Artist() 
+                { 
+                    Name="Rise Against", 
+                    Id = new Guid("606bf117-494f-4864-891f-09d63ff6aa4b"), 
+                }
+                );
+            }
+        }
     }
 }
 

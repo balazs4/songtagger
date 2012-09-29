@@ -22,36 +22,66 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace SongTagger.Core
 {
-
-    public class MusicDataProvider : IProvider
+    public class MusicData : IProvider
     {
+        public int MinimumScore { get; set; }
+
         #region Singleton pattern
-        private static MusicDataProvider singletonInstance;
+        private static MusicData singletonInstance;
 
         public static IProvider Provider
         {
             get
             {
                 if (singletonInstance == null)
-                    singletonInstance = new MusicDataProvider();
+                    singletonInstance = new MusicData();
 
                 return singletonInstance as IProvider;
             }
         }
 
-        private MusicDataProvider()
+        private MusicData()
         {
-
+            MinimumScore = 90;
         }
         #endregion
+
+
+        private IWebService MusicBrainzService
+        {
+            get
+            {
+                return WebServices.Instance(ServiceName.MusicBrainz);
+            }
+        }
+
+        private IWebService LastFmService
+        {
+            get
+            {
+                return WebServices.Instance(ServiceName.LastFm);
+            }
+        }
 
         #region IProvider implementation
         public IArtist GetArtist(string nameStub)
         {
-            throw new System.NotImplementedException();
+            #region Argument check
+            if (String.IsNullOrWhiteSpace(nameStub))
+                throw new ArgumentException("Artis name stub could not be null or empty", "nameStub");
+            #endregion
+
+
+            String queryString = String.Format(MusicBrainz.ArtistQueryFormat, Uri.EscapeDataString(nameStub));
+            XDocument result = MusicBrainzService.ExecuteQuery(queryString);
+
+            IArtist artist = MusicBrainz.ParseXmlToArtist(result, MinimumScore);
+
+            return artist;
         }
 
         public IEnumerable<IAlbum> GetReleases(IArtist artist, IEnumerable<ReleaseType> releaseTypeList)
@@ -60,6 +90,10 @@ namespace SongTagger.Core
         }
         #endregion
 
+
+        #region Helper methods
+
+        #endregion
     }
 }
 
