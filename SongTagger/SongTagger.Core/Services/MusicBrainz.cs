@@ -22,6 +22,7 @@
 //
 using System;
 using System.Net;
+using System.Linq;
 using System.Xml.Linq;
 using System.Threading;
 using System.Diagnostics;
@@ -34,6 +35,11 @@ namespace SongTagger.Core
         internal static readonly TimeSpan WAIT_TIME_BETWEEN_QUERIES; //http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
         internal static readonly Uri baseUrl;
 
+        #region Query formats
+        internal static readonly string ArtistQueryFormat = "artist?query={0}";
+        #endregion
+
+        #region C'tors
         static MusicBrainz()
         {
             baseUrl = new Uri("http://musicbrainz.org/ws/2/");
@@ -45,6 +51,7 @@ namespace SongTagger.Core
         {
 
         }
+        #endregion
 
         internal static String DownloadContentSafely(Uri queryUrl, WebServices.DownloadContentDelegate downloadAction)
         {
@@ -62,9 +69,7 @@ namespace SongTagger.Core
             }
             return content;
         }
-
        
-
         #region IWebService implementation
         public XDocument ExecuteQuery(string queryString)
         {
@@ -78,6 +83,53 @@ namespace SongTagger.Core
             return XDocument.Parse(content);
         }
         #endregion
+
+        #region Parse methods
+        internal static IArtist ParseXmlToArtist(XDocument result, int minimumScore)
+        {
+            if (result == null)
+                return new UnknowArtist();
+
+
+            IArtist artist = null;
+            try
+            {
+                XElement artistElement = result
+                    .Descendants("artist")
+                    .TakeWhile(e => e.HasAttributes && Convert.ToInt32(e.Attribute("ext:score").Value) >= minimumScore)
+                    .OrderBy(e => e.Attribute("ext:score").Value)
+                    .FirstOrDefault();
+                                      
+
+                if (artistElement == null)
+                    return new UnknowArtist(); //Todo: Throw expteion....
+
+
+                string rawId = artistElement.Attribute("id").Value;
+                string rawName = artistElement.Element("name").Value;
+
+
+
+                artist = new Artist() 
+                {
+                    Id = new Guid(rawId),
+                    Name = rawName
+                };
+
+                //Todo: Genre
+
+
+            } catch (Exception)
+            {
+                //Todo: log exception
+                return new UnknowArtist();
+            }
+
+            return artist ?? new UnknowArtist();
+        }
+        #endregion
+
+
     }
 
 }

@@ -41,4 +41,10 @@
       <Name>SongTagger.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Providers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Providers\MusicDataProviderTests.cs" />
+  </ItemGroup>
 </Project>

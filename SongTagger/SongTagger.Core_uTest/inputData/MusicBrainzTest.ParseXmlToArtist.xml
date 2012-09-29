@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://musicbrainz.org/ns/mmd-2.0#" xmlns:ext="http://musicbrainz.org/ns/ext#-2.0">
+    <artist-list offset="0" count="142">
+        <artist ext:score="100" type="Group" id="606bf117-494f-4864-891f-09d63ff6aa4b">
+            <name>Rise Against</name>
+            <sort-name>Rise Against</sort-name>
+            <country>US</country>
+            <life-span>
+                <begin>1999</begin>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>Transistor Revolt</alias>
+            </alias-list>
+            <tag-list>
+                <tag count="1">
+                    <name>rock</name>
+                </tag>
+                <tag count="1">
+                    <name>punk</name>
+                </tag>
+                <tag count="1">
+                    <name>american</name>
+                </tag>
+                <tag count="1">
+                    <name>punk rock</name>
+                </tag>
+                <tag count="1">
+                    <name>usa</name>
+                </tag>
+                <tag count="1">
+                    <name>hardcore punk</name>
+                </tag>
+                <tag count="1">
+                    <name>melodic hardcore</name>
+                </tag>
+                <tag count="1">
+                    <name>rock and indie</name>
+                </tag>
+                <tag count="1">
+                    <name>nervous breakdown</name>
+                </tag>
+            </tag-list>
+        </artist>
+        <artist ext:score="58" type="Person" id="157e6a4c-5233-42f8-83f5-e43b0c04641a">
+            <name>Tim McIlrath</name>
+            <sort-name>McIlrath, Tim</sort-name>
+            <gender>male</gender>
+            <country>US</country>
+            <life-span>
+                <begin>1979-11-03</begin>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>Tim McIlrath of Rise Against</alias>
+                <alias>T McIlrath</alias>
+            </alias-list>
+        </artist>
+        <artist ext:score="49" type="Group" id="7b0f1a77-db5e-4028-bab0-f1419f9a2c9f">
+            <name>Rise Robots Rise</name>
+            <sort-name>Rise Robots Rise</sort-name>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>Rise Robot Rise</alias>
+            </alias-list>
+        </artist>
+        <artist ext:score="43" type="Person" id="3f38b68a-6f28-47e5-939f-b92b614e1fd7">
+            <name>Mikael Rise</name>
+            <sort-name>Rise, Mikael</sort-name>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>M Rise</alias>
+            </alias-list>
+        </artist>
+        <artist ext:score="43" type="Person" id="ea7783b6-3bce-4825-88ef-0d5ad9cb7fe9">
+            <name>Mark Rise</name>
+            <sort-name>Rise, Mark</sort-name>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>M Rise</alias>
+            </alias-list>
+        </artist>
+        <artist ext:score="43" type="Group" id="4cc9ad6f-9320-461d-9279-c0ae63a6a5e8">
+            <name>Pressure Rise</name>
+            <sort-name>Pressure Rise</sort-name>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>Pressur Rise</alias>
+            </alias-list>
+        </artist>
+        <artist ext:score="43" type="Group" id="a66ebddc-ff04-46b8-820a-15c63e80dba1">
+            <name>Against Me!</name>
+            <sort-name>Against Me!</sort-name>
+            <country>US</country>
+            <life-span>
+                <begin>1997</begin>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>Against Me</alias>
+            </alias-list>
+            <tag-list>
+                <tag count="1">
+                    <name>pop and chart</name>
+                </tag>
+                <tag count="1">
+                    <name>folk punk rock</name>
+                </tag>
+            </tag-list>
+        </artist>
+        <artist ext:score="40" type="Group" id="04fb0b8f-eaa0-401e-a9b2-7afa104b665a">
+            <name>Rise and Shine Steelband</name>
+            <sort-name>Rise and Shine Steelband</sort-name>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>The Rise and Shine Steel Band</alias>
+                <alias>Rise &amp; Shine Steel Band</alias>
+            </alias-list>
+        </artist>
+        <artist ext:score="40" id="fd9c2c51-d750-4088-b413-fa60a2d1cc31">
+            <name>Rise &amp; Shine</name>
+            <sort-name>Rise &amp; Shine</sort-name>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>Rise N Shine</alias>
+                <alias>Rise and Shine</alias>
+            </alias-list>
+        </artist>
+        <artist ext:score="40" type="Group" id="8233a508-a74c-4b79-9c13-047d33aa62bf">
+            <name>Against</name>
+            <sort-name>Against</sort-name>
+            <disambiguation>Brisbane, Australia hardcore punk band</disambiguation>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="40" type="Group" id="6367c556-4411-4111-b139-6b55ef95af58">
+            <name>AgainST</name>
+            <sort-name>AgainST</sort-name>
+            <country>US</country>
+            <disambiguation>US punk, ex-Sucidal Tendencies</disambiguation>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+            <tag-list>
+                <tag count="1">
+                    <name>punk</name>
+                </tag>
+                <tag count="1">
+                    <name>usa</name>
+                </tag>
+            </tag-list>
+        </artist>
+        <artist ext:score="39" type="Group" id="550db72b-7250-411f-ad40-12f6158945f2">
+            <name>Rise</name>
+            <sort-name>Rise</sort-name>
+            <country>US</country>
+            <disambiguation>US symphonic death metal band</disambiguation>
+            <life-span>
+                <begin>1993</begin>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="39" type="Group" id="8604ead8-9159-4d00-852e-023734cf10f9">
+            <name>Rise</name>
+            <sort-name>Rise</sort-name>
+            <country>GB</country>
+            <disambiguation>Scottish alt-folk band</disambiguation>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="39" type="Person" id="d5e2c790-2ce0-4099-8eb0-48632bf06977">
+            <name>Rise</name>
+            <sort-name>Rise</sort-name>
+            <gender>male</gender>
+            <country>US</country>
+            <disambiguation>US rapper Jean Myrthil, member of Demigodz</disambiguation>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="39" type="Group" id="28a80f0f-833c-47b2-bd72-39b8cb44c144">
+            <name>Rise</name>
+            <sort-name>Rise</sort-name>
+            <disambiguation>Catholic Rock Band</disambiguation>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="39" type="Group" id="74f49aad-fe58-437b-8e04-3894feb4e1d6">
+            <name>Rise</name>
+            <sort-name>Rise</sort-name>
+            <country>US</country>
+            <disambiguation>artist on Merkin Records</disambiguation>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="39" type="Person" id="f4c00093-e989-47af-8cd4-ac0ed7c356eb">
+            <name>Rise</name>
+            <sort-name>Rise</sort-name>
+            <country>AU</country>
+            <disambiguation>Australian rapper, member of Mamas Funk/Rise &amp; Tarkee</disambiguation>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="39" type="Group" id="fa542308-cf6e-4a95-99b1-c99529793f04">
+            <name>Rise</name>
+            <sort-name>Rise</sort-name>
+            <country>GB</country>
+            <disambiguation>trance duo Paul Oakenfold &amp; Steve Osborne "The Single"</disambiguation>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="39" type="Group" id="c7b46f1a-14fc-41cd-994f-72b7046e26d0">
+            <name>Rise</name>
+            <sort-name>Rise</sort-name>
+            <country>CA</country>
+            <disambiguation>punk band</disambiguation>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="34" id="f2ab5402-c591-44ad-b827-a45e0b8ef6b7">
+            <name>Rage Against the Cuisine</name>
+            <sort-name>Rage Against the Cuisine</sort-name>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>Rage Against the C</alias>
+            </alias-list>
+        </artist>
+        <artist ext:score="34" id="fb14fe62-072a-4806-90ad-392f2236a88e">
+            <name>Janitors Against Apartheid</name>
+            <sort-name>Janitors Against Apartheid</sort-name>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+            <alias-list>
+                <alias>The Janitors Against Apartheid</alias>
+            </alias-list>
+        </artist>
+        <artist ext:score="28" type="Group" id="01b9fb3f-14e7-4a8b-bd21-064aa2789c68">
+            <name>Rise Bailey Rise</name>
+            <sort-name>Rise Bailey Rise</sort-name>
+            <country>GB</country>
+            <disambiguation>2010 - Present</disambiguation>
+            <life-span>
+                <begin>2010-02-01</begin>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="25" type="Group" id="dadee2ed-9f6e-4332-ae08-ea9fc6181048">
+            <name>Against Nature</name>
+            <sort-name>Against Nature</sort-name>
+            <country>US</country>
+            <life-span>
+                <begin>2004</begin>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="25" id="a17d5a13-12df-4856-9d5f-04b0027c1256">
+            <name>Against Lupa</name>
+            <sort-name>Against Lupa</sort-name>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+        <artist ext:score="25" id="05e4c9a3-2f6a-4869-acf9-28b6554da8a9">
+            <name>Against Empire</name>
+            <sort-name>Against Empire</sort-name>
+            <life-span>
+                <ended>false</ended>
+            </life-span>
+        </artist>
+    </artist-list>
+</metadata>
