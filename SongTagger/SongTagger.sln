@@ -5,12 +5,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Core", "SongTagg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Core_uTest", "SongTagger.Core_uTest\SongTagger.Core_uTest.csproj", "{C6BAEDA5-4C6C-4108-BB3E-D5CA93702277}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Core_iTest", "SongTagger.Core_iTest\SongTagger.Core_iTest.csproj", "{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C6BAEDA5-4C6C-4108-BB3E-D5CA93702277}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C6BAEDA5-4C6C-4108-BB3E-D5CA93702277}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6BAEDA5-4C6C-4108-BB3E-D5CA93702277}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -49,8 +49,11 @@
     <Compile Include="Services\IWebService.cs" />
     <Compile Include="Services\LastFm.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Providers\MusicDataProvider.cs" />
+    <Compile Include="Providers\IProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
+    <Folder Include="Providers\" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 //
-//  LastFmTests.cs
+//  IProvider.cs
 //
 //  Author:
 //       balazs4 <balazs4web@gmail.com>
@@ -20,24 +20,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
+
 using System;
-using NUnit.Framework;
+using System.Collections.Generic;
 
-namespace SongTagger.Core.UnitTest
+namespace SongTagger.Core
 {
-    [TestFixture()]
-    public class LastFmTests
+    public interface IProvider
     {
-        [Test]
-        public void BaseUrlTest()
-        {
-            IWebService service = WebServices.Instance(ServiceName.LastFm);
-            LastFm lastFmService = service as LastFm;
+        IArtist GetArtist(string nameStub);
 
-            Assert.That(lastFmService, Is.Not.Null);
-            Assert.That(lastFmService.LastFmBaseUrl.ToString(), Contains.Substring("audioscrobbler"));
-            Assert.That(lastFmService.LastFmBaseUrl.ToString(), Contains.Substring("api_key"));
-        }
+        IEnumerable<IAlbum> GetReleases(IArtist artist, IEnumerable<ReleaseType> releaseTypeList);
+
     }
+    
 }
-

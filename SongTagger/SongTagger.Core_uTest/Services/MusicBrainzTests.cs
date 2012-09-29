@@ -27,7 +27,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using System.Threading;
 
-namespace SongTagger.Core.Unittest
+namespace SongTagger.Core.UnitTest
 {
     [TestFixture()]
     public class MusicBrainzTests
