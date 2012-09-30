@@ -48,5 +48,4 @@ using System.Runtime.CompilerServices;
 //[assembly: AssemblyKeyFile("")]
 
 
-[assembly: InternalsVisibleTo("SongTagger.Core_uTest")]
-[assembly: InternalsVisibleTo("SongTagger.Core_iTest")]
+[assembly: InternalsVisibleTo("SongTagger.Core.Test")]

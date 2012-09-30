@@ -5,10 +5,10 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}</ProjectGuid>
+    <ProjectGuid>{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SongTagger.Core.IntegrationTest</RootNamespace>
-    <AssemblyName>SongTagger.Core_iTest</AssemblyName>
+    <RootNamespace>SongTagger.Core.Test</RootNamespace>
+    <AssemblyName>SongTagger.Core.Test</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,8 +33,25 @@
     <Reference Include="nunit.framework">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Unit\" />
+    <Folder Include="Integration\" />
+    <Folder Include="inputData\" />
+    <Folder Include="Unit\Providers\" />
+    <Folder Include="Unit\Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Unit\Providers\MusicDataProviderTests.cs" />
+    <Compile Include="Unit\Services\LastFmTests.cs" />
+    <Compile Include="Unit\Services\MusicBrainzTests.cs" />
+    <Compile Include="Unit\Services\WebServicesTests.cs" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
       <Project>{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}</Project>
@@ -42,9 +59,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Providers\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Providers\MusicDataProviderTests.cs" />
+    <Content Include="inputData\MusicBrainzTest.ParseXmlToArtist.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

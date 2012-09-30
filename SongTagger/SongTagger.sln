@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Core", "SongTagger.Core\SongTagger.Core.csproj", "{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Core_uTest", "SongTagger.Core_uTest\SongTagger.Core_uTest.csproj", "{C6BAEDA5-4C6C-4108-BB3E-D5CA93702277}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Core_iTest", "SongTagger.Core_iTest\SongTagger.Core_iTest.csproj", "{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Core.Test", "SongTagger.Core.Test\SongTagger.Core.Test.csproj", "{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C03A3D44-9A30-4310-8169-FAAA51C2F6B1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C6BAEDA5-4C6C-4108-BB3E-D5CA93702277}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C6BAEDA5-4C6C-4108-BB3E-D5CA93702277}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C6BAEDA5-4C6C-4108-BB3E-D5CA93702277}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C6BAEDA5-4C6C-4108-BB3E-D5CA93702277}.Release|Any CPU.Build.0 = Release|Any CPU
+		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
