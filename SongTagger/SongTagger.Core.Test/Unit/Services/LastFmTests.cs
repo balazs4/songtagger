@@ -1,5 +1,5 @@
 //
-//  MusicDataProviderTests.cs
+//  LastFmTests.cs
 //
 //  Author:
 //       balazs4 <balazs4web@gmail.com>
@@ -23,12 +23,21 @@
 using System;
 using NUnit.Framework;
 
-namespace SongTagger.Core.IntegrationTest
+namespace SongTagger.Core.Test.Unit.Services
 {
     [TestFixture()]
-    public class MusicDataProviderTests
+    public class LastFmTests
     {
+        [Test]
+        public void BaseUrlTest()
+        {
+            IWebService service = WebServices.Instance(ServiceName.LastFm);
+            LastFm lastFmService = service as LastFm;
 
+            Assert.That(lastFmService, Is.Not.Null);
+            Assert.That(lastFmService.LastFmBaseUrl.ToString(), Contains.Substring("audioscrobbler"));
+            Assert.That(lastFmService.LastFmBaseUrl.ToString(), Contains.Substring("api_key"));
+        }
     }
 }
 
