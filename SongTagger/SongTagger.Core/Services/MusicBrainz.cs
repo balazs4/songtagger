@@ -94,6 +94,7 @@ namespace SongTagger.Core
             IArtist artist = null;
             try
             {
+
                 XElement artistElement = result
                     .Descendants("artist")
                     .TakeWhile(e => e.HasAttributes && Convert.ToInt32(e.Attribute("ext:score").Value) >= minimumScore)
