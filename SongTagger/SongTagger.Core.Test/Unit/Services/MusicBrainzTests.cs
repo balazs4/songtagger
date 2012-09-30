@@ -33,6 +33,49 @@ using System.Reflection;
 
 namespace SongTagger.Core.Test.Unit.Services
 {
+    class MusicBrainzTestCaseSource
+    {
+
+        private List<IArtist> artistCollection;
+
+        public MusicBrainzTestCaseSource()
+        {
+            artistCollection = new List<IArtist>();
+
+            {
+                IArtist riseAgainst = new Artist() 
+                { 
+                    Name="Rise Against", 
+                    Id = new Guid("606bf117-494f-4864-891f-09d63ff6aa4b"),
+                };
+
+                riseAgainst.Genres.AddRange(
+                    new List<String> 
+                    {
+                    "rock",
+                    "punk",
+                    "american",
+                    "punk rock",
+                    "usa",
+                    "hardcore punk",
+                    "melodic hardcore",
+                    "rock and indie",
+                    "nervous breakdown"
+                    }
+                );
+                artistCollection.Add(riseAgainst);
+            }
+        }
+
+        internal IEnumerable ParseXmlToArtistTestFactory
+        {
+            get
+            {
+                yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.xml", 99, artistCollection.FirstOrDefault(a => a.Name == "Rise Against"));
+            }       
+        }
+    }
+
     [TestFixture()]
     public class MusicBrainzTests
     {
@@ -86,8 +129,11 @@ namespace SongTagger.Core.Test.Unit.Services
 
         }
 
-        [Test,TestCaseSource("ParseXmlToArtistTestFactory")]
-        public void ParseXmlToArtistTest_IfXmlIsValid(string xmlFileName, int minimumScore, IArtist expectedArtist)
+
+
+        #region Parsing tests
+        [Test,TestCaseSource(typeof(MusicBrainzTestCaseSource),"ParseXmlToArtistTestFactory")]
+        public void ParseXmlToArtistTest(string xmlFileName, int minimumScore, IArtist expectedArtist)
         {
             string xmlPath = TestHelper.GetInputDataFilePath(xmlFileName);
 
@@ -123,37 +169,11 @@ namespace SongTagger.Core.Test.Unit.Services
             Assert.That(artist, Is.Not.Null);
             Assert.That(artist, Is.InstanceOf<UnknowArtist>());
 
+        
         }
+        #endregion
 
-        private IEnumerable ParseXmlToArtistTestFactory
-        {
-            get
-            {
 
-                IArtist riseAgainst = new Artist() 
-                { 
-                    Name="Rise Against", 
-                    Id = new Guid("606bf117-494f-4864-891f-09d63ff6aa4b"),
-                };
-
-                riseAgainst.Genres.AddRange(
-                    new List<String> 
-                    {
-                    "rock",
-                    "punk",
-                    "american",
-                    "punk rock",
-                    "usa",
-                    "hardcore punk",
-                    "melodic hardcore",
-                    "rock and indie",
-                    "nervous breakdown"
-                    }
-                );
-
-                yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.xml", 95, riseAgainst);
-            }
-        }
     }
 }
 
