@@ -26,6 +26,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Threading;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace SongTagger.Core
 {
@@ -94,35 +95,40 @@ namespace SongTagger.Core
             IArtist artist = null;
             try
             {
+                XNamespace mb = XNamespace.Get("http://musicbrainz.org/ns/mmd-2.0#");
+                XNamespace ext = XNamespace.Get("http://musicbrainz.org/ns/ext#-2.0");
 
-                XElement artistElement = result
-                    .Descendants("artist")
-                    .TakeWhile(e => e.HasAttributes && Convert.ToInt32(e.Attribute("ext:score").Value) >= minimumScore)
-                    .OrderBy(e => e.Attribute("ext:score").Value)
-                    .FirstOrDefault();
-                                      
+                #region XName definitions
+                XName xnameArtist = XName.Get("artist", mb.NamespaceName);
+                XName xnameScore = XName.Get("score", ext.NamespaceName);
+                XName xnameId = XName.Get("id");
+                XName xnameName = XName.Get("name", mb.NamespaceName);
+                XName xnameTag = XName.Get("tag", mb.NamespaceName);
+                XName xnameTagName = XName.Get("name", mb.NamespaceName);
+                #endregion
 
-                if (artistElement == null)
-                    return new UnknowArtist(); //Todo: Throw expteion....
+                #region Xml Query
+                XElement artistElement = result.Descendants(xnameArtist)
+                    .First(e => e.HasAttributes && Convert.ToInt32(e.Attribute(xnameScore).Value) >= minimumScore);
 
-
-                string rawId = artistElement.Attribute("id").Value;
-                string rawName = artistElement.Element("name").Value;
-
+                IEnumerable<string> rawGenreList = artistElement
+                        .Descendants(xnameTag)
+                        .Elements(xnameTagName)
+                        .Where(e => !String.IsNullOrWhiteSpace(e.Value))
+                        .Select(e => e.Value);
+                #endregion
 
 
                 artist = new Artist() 
                 {
-                    Id = new Guid(rawId),
-                    Name = rawName
+                    Id = new Guid(artistElement.Attribute(xnameId).Value),
+                    Name = artistElement.Element(xnameName).Value,
                 };
 
-                //Todo: Genre
-
+                artist.Genres.AddRange(rawGenreList);
 
             } catch (Exception)
             {
-                //Todo: log exception
                 return new UnknowArtist();
             }
 
