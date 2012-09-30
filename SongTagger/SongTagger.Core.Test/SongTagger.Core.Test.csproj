@@ -37,6 +37,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Net" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -51,6 +52,7 @@
     <Compile Include="Unit\Services\LastFmTests.cs" />
     <Compile Include="Unit\Services\MusicBrainzTests.cs" />
     <Compile Include="Unit\Services\WebServicesTests.cs" />
+    <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">

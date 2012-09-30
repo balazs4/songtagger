@@ -26,52 +26,52 @@ using System.Collections.Generic;
 namespace SongTagger.Core
 {
 
-	public interface IArtist : IEntity
-	{
-		IList<String> Genres { get; }
-	}
+    public interface IArtist : IEntity
+    {
+        List<String> Genres { get; }
+    }
 
-	internal class Artist : IArtist
-	{
-		public Artist ()
-		{
-			Id = Guid.Empty;
-			Genres = new List<String> ();
-		}
+    internal class Artist : IArtist
+    {
+        public Artist()
+        {
+            Id = Guid.Empty;
+            Genres = new List<String>();
+        }
 
 		#region IEntity implementation
-		public Guid Id{ get; internal set; }
+        public Guid Id{ get; internal set; }
 
-		public string Name{ get; internal set; }
+        public string Name{ get; internal set; }
 		#endregion
 
 		#region IArtist implementation
-		public IList<string> Genres{ get; private set; }
+        public List<string> Genres{ get; private set; }
 		#endregion
-	}
+    }
 
-	internal class UnknowArtist : IArtist
-	{
-		public UnknowArtist ()
-		{
-			Id = Guid.Empty;
-			Genres = new List<String> 
+    internal class UnknowArtist : IArtist
+    {
+        public UnknowArtist()
+        {
+            Id = Guid.Empty;
+            Genres = new List<String> 
 			{
 				"unknow"
 			};
-			Name = "Unknow Artist";
-		}
+            Name = "Unknow Artist";
+        }
 
 
 		#region IEntity implementation
-		public Guid Id{ get; private set; }
+        public Guid Id{ get; private set; }
 
-		public string Name{ get; private set; }
+        public string Name{ get; private set; }
 		#endregion
 
 		#region IArtist implementation
-		public IList<string> Genres{ get; private set; }
+        public List<string> Genres{ get; private set; }
 		#endregion
-	}
+    }
 }
 

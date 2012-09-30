@@ -86,17 +86,15 @@ namespace SongTagger.Core.Test.Unit.Services
 
         }
 
-        //[TestCase("MusicBrainzTest.ParseXmlToArtist.xml","Rise Against","06bf117-494f-4864-891f-09d63ff6aa4b",9)]
         [Test,TestCaseSource("ParseXmlToArtistTestFactory")]
         public void ParseXmlToArtistTest_IfXmlIsValid(string xmlFileName, int minimumScore, IArtist expectedArtist)
         {
-            string xmlPath = Path.Combine("inputData", xmlFileName);
+            string xmlPath = TestHelper.GetInputDataFilePath(xmlFileName);
 
             if (!File.Exists(xmlPath))
             {
                 Assert.Ignore("{0} file is not available.", xmlPath);
             }
-
 
             IArtist artist = null;
             Assert.That(() => 
@@ -109,6 +107,7 @@ namespace SongTagger.Core.Test.Unit.Services
             Assert.That(artist, Is.Not.InstanceOf<UnknowArtist>());
             Assert.That(artist.Name, Is.EqualTo(expectedArtist.Name));
             Assert.That(artist.Id, Is.EqualTo(expectedArtist.Id));
+            Assert.That(artist.Genres, Is.EquivalentTo(expectedArtist.Genres));
         }
 
         [Test]
@@ -123,6 +122,7 @@ namespace SongTagger.Core.Test.Unit.Services
 
             Assert.That(artist, Is.Not.Null);
             Assert.That(artist, Is.InstanceOf<UnknowArtist>());
+
         }
 
         private IEnumerable ParseXmlToArtistTestFactory
@@ -130,12 +130,28 @@ namespace SongTagger.Core.Test.Unit.Services
             get
             {
 
-                yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.xml", 95, new Artist() 
+                IArtist riseAgainst = new Artist() 
                 { 
                     Name="Rise Against", 
-                    Id = new Guid("606bf117-494f-4864-891f-09d63ff6aa4b"), 
-                }
+                    Id = new Guid("606bf117-494f-4864-891f-09d63ff6aa4b"),
+                };
+
+                riseAgainst.Genres.AddRange(
+                    new List<String> 
+                    {
+                    "rock",
+                    "punk",
+                    "american",
+                    "punk rock",
+                    "usa",
+                    "hardcore punk",
+                    "melodic hardcore",
+                    "rock and indie",
+                    "nervous breakdown"
+                    }
                 );
+
+                yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.xml", 95, riseAgainst);
             }
         }
     }
