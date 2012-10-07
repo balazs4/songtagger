@@ -1,5 +1,5 @@
 //
-//  LastFmTests.cs
+//  MusicDataProviderTests.cs
 //
 //  Author:
 //       balazs4 <balazs4web@gmail.com>
@@ -23,28 +23,22 @@
 using System;
 using NUnit.Framework;
 
-namespace SongTagger.Core.Test.Unit.Services
+namespace SongTagger.Core.Test.Integration
 {
     [TestFixture()]
-    public class LastFmTests
+    public class MusicDataProviderTests
     {
-        [Test]
-        public void BaseUrlTest()
+        [TestCase("RiseAgainst")]
+        [TestCase("Korn")]
+        [TestCase("6test")]
+        public void GetArtistTest(string artistName)
         {
-            IWebService service = WebServices.Instance(ServiceName.LastFm);
-            LastFm lastFmService = service as LastFm;
-
-            Assert.That(lastFmService, Is.Not.Null);
-            Assert.That(lastFmService.LastFmBaseUrl.ToString(), Contains.Substring("audioscrobbler"));
-            Assert.That(lastFmService.LastFmBaseUrl.ToString(), Contains.Substring("api_key"));
-        }
-
-        [Test]
-        public void ExcuteQueryArgumentCheckTest()
-        {
-            LastFm instance = new LastFm();
+            IArtist artist = null;
             Assert.That(() => {
-                instance.ExecuteQuery(null);}, Throws.ArgumentException);
+                artist = MusicData.Provider.GetArtist(artistName);
+            }, Throws.Nothing);
+            Assert.That(artist, Is.Not.Null);
+            Assert.That(artist, Is.Not.InstanceOf<UnknowArtist>());
         }
     }
 }

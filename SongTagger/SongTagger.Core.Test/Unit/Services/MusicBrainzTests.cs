@@ -151,6 +151,42 @@ namespace SongTagger.Core.Test.Unit.Services
 
         }
 
+        [Test]
+        public void ExcuteQueryArgumentCheckTest()
+        {
+            MusicBrainz instance = new MusicBrainz();
+            Assert.That(() => {
+                instance.ExecuteQuery(null);}, Throws.ArgumentException);
+        }
+
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("Korn")]
+        [TestCase("Depresszió")]
+        public void ArtistUriTest(string name)
+        {
+            Uri resultUri = null;
+            Assert.That(() =>
+            {
+                resultUri = MusicBrainz.CreateArtistQueryUri(name);
+            }, Throws.Nothing);
+
+            Assert.That(resultUri, Is.Not.Null);
+            string expected = String.Format("http://musicbrainz.org/ws/2/artist?query={0}", name ?? String.Empty);
+            Assert.That(resultUri.ToString(), Is.EqualTo(expected));
+        }
+        [TestCase("RiseAgainst", Result = "http://musicbrainz.org/ws/2/artist?query=Rise+Against")]
+        [TestCase("TheNakedAndFamous", Result = "http://musicbrainz.org/ws/2/artist?query=The+Naked+And+Famous")]
+        public string ArtistUriTest_IfArtistNameIsCamelCase(string name)
+        {
+            Uri resultUri = null;
+            Assert.That(() =>
+            {
+                resultUri = MusicBrainz.CreateArtistQueryUri(name);
+            }, Throws.Nothing);
+
+            return resultUri.ToString();
+        }
 
 
         #region Parsing tests

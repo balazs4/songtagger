@@ -30,7 +30,7 @@ namespace SongTagger.Core
 {
     public interface IWebService
     {
-        XDocument ExecuteQuery(String queryString);
+        XDocument ExecuteQuery(Uri queryUri);
     }
     
 }

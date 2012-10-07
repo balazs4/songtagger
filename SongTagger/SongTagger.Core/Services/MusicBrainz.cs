@@ -27,6 +27,7 @@ using System.Xml.Linq;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace SongTagger.Core
 {
@@ -36,10 +37,7 @@ namespace SongTagger.Core
         internal static readonly TimeSpan WAIT_TIME_BETWEEN_QUERIES; //http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
         internal static readonly Uri baseUrl;
 
-        #region Query formats
-        internal static readonly string ArtistQueryFormat = "artist?query={0}";
-        #endregion
-
+      
         #region C'tors
         static MusicBrainz()
         {
@@ -72,9 +70,12 @@ namespace SongTagger.Core
         }
        
         #region IWebService implementation
-        public XDocument ExecuteQuery(string queryString)
+        public XDocument ExecuteQuery(Uri queryUrl)
         {
-            Uri queryUrl = WebServices.BuildUri(baseUrl, queryString);
+            if (queryUrl == null)
+            {
+                throw new ArgumentException("queryUrl could not be null", "queryUrl");
+            }
 
             String content = DownloadContentSafely(queryUrl, WebServices.DownloadContent);
 
@@ -136,7 +137,39 @@ namespace SongTagger.Core
         }
         #endregion
 
+        #region Uri methods
+        internal static Uri CreateArtistQueryUri(string nameOfArtist)
+        {
 
+            UriBuilder queryUri = new UriBuilder(baseUrl.ToString());
+            queryUri.Path += "artist";
+
+            if (String.IsNullOrWhiteSpace(nameOfArtist))
+            {
+                queryUri.Query = "query=";
+                return queryUri.Uri;
+            }
+
+
+            string parsedName = Regex.Matches(nameOfArtist, "[A-Z][a-z]+")
+                .OfType<Match>()
+                .Select(match => match.Value)
+                .Aggregate((acc, b) => acc + "+" + b)
+                .TrimStart(' ');
+
+
+            queryUri.Query = String.Format("query={0}", parsedName.Trim());
+            
+
+            
+//              #region Query formats
+//        internal static readonly string ArtistQueryFormat = "/artist?query={0}";
+//        #endregion
+
+            return queryUri.Uri;
+        }
+
+        #endregion
     }
 
 }
