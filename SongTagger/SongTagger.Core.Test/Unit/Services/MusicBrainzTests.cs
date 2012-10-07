@@ -66,6 +66,25 @@ namespace SongTagger.Core.Test.Unit.Services
                 artistCollection.Add(riseAgainst);
             }
             #endregion
+
+            #region Artist without genres
+            {
+                IArtist depresszio = new Artist() 
+                {
+                    Name = "Depresszió",
+                    Id = new Guid("79a8d8a6-012a-4dd9-b5e2-ed4b52a5d55e")
+                };
+
+                artistCollection.Add(depresszio);
+            }
+            #endregion
+
+            #region Unknow artist
+            {
+                IArtist unknow = new UnknowArtist();
+                artistCollection.Add(unknow);
+            }
+            #endregion
         }
 
         internal IEnumerable ParseXmlToArtistTestFactory
@@ -73,6 +92,8 @@ namespace SongTagger.Core.Test.Unit.Services
             get
             {
                 yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.ValidArtistWithGenres.xml", 99, artistCollection.FirstOrDefault(a => a.Name == "Rise Against"));
+                yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.ValidArtistWithoutGenres.xml", 100, artistCollection.FirstOrDefault(a => a.Name == "Depresszió"));
+                yield return new TestCaseData("MusicBrainzTest.Error.xml", 0, artistCollection.FirstOrDefault(a => a is UnknowArtist));
             }       
         }
     }
@@ -151,6 +172,7 @@ namespace SongTagger.Core.Test.Unit.Services
             Throws.Nothing);
 
             Assert.That(artist, Is.Not.Null);
+            Assert.That(artist.GetType(), Is.EqualTo(expectedArtist.GetType()));
             Assert.That(artist.Name, Is.EqualTo(expectedArtist.Name));
             Assert.That(artist.Id, Is.EqualTo(expectedArtist.Id));
             Assert.That(artist.Genres, Is.EquivalentTo(expectedArtist.Genres));

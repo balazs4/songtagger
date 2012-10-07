@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<error>
+    <text>Could not retrieve sub-document page from search server. Error: http://10.1.1.247:776/ws/2/artist/?max=25&amp;type=artist&amp;fmt=xml&amp;offset=0&amp;query=Junkies  -&gt; 504 Gateway Time-out</text>
+    <text>For usage, please see: http://musicbrainz.org/development/mmd</text>
+</error>
