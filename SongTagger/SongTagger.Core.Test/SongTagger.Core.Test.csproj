@@ -61,8 +61,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="inputData\MusicBrainzTest.ParseXmlToArtist.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="inputData\MusicBrainzTest.ParseXmlToArtist.ValidArtistWithGenres.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 </Project>
