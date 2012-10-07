@@ -1,5 +1,5 @@
 //
-//  LastFmTests.cs
+//  ArtistTests.cs
 //
 //  Author:
 //       balazs4 <balazs4web@gmail.com>
@@ -22,29 +22,33 @@
 //
 using System;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace SongTagger.Core.Test.Unit.Services
+namespace SongTagger.Core.Test.Unit
 {
     [TestFixture()]
-    public class LastFmTests
+    public class ArtistTests
     {
-        [Test]
-        public void BaseUrlTest()
+        [Test()]
+        public void ToStringTest()
         {
-            IWebService service = WebServices.Instance(ServiceName.LastFm);
-            LastFm lastFmService = service as LastFm;
+            string name = "MurderDolls";
+            Guid fakeId = Guid.NewGuid();
+            string genreList = "horror punk,heavy metal";
 
-            Assert.That(lastFmService, Is.Not.Null);
-            Assert.That(lastFmService.LastFmBaseUrl.ToString(), Contains.Substring("audioscrobbler"));
-            Assert.That(lastFmService.LastFmBaseUrl.ToString(), Contains.Substring("api_key"));
-        }
+            IArtist artist = new Artist() 
+            {
+                Name = name,
+                Id = fakeId,
+            };
+            artist.Genres.AddRange(genreList.Split(',').ToList());
 
-        [Test]
-        public void ExcuteQueryArgumentCheckTest()
-        {
-            LastFm instance = new LastFm();
-            Assert.That(() => {
-                instance.ExecuteQuery(null);}, Throws.ArgumentException);
+
+
+            String expected = string.Format("[Id={0}, Name={1}, Genres={2}]", fakeId, name, genreList);
+
+            Assert.That(artist.ToString(), Is.EqualTo(expected));
         }
     }
 }

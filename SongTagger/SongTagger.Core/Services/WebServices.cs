@@ -126,21 +126,6 @@ namespace SongTagger.Core
             return data;
         }
 
-        internal static Uri BuildUri(Uri baseUrl, string queryString)
-        {
-            if (baseUrl == null)
-                throw new ArgumentNullException("baseUrl", "Base url could not be null");
-
-            if (String.IsNullOrWhiteSpace(queryString))
-                throw new ArgumentNullException("queryString", "Query string could not be null or empty");
-
-
-            UriBuilder builder = new UriBuilder(baseUrl);
-            builder.Query += queryString;
-
-            return builder.Uri;
-        }
-
         #endregion
     }
 }

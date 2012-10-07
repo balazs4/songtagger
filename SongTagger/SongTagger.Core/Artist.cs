@@ -22,6 +22,8 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace SongTagger.Core
 {
@@ -48,9 +50,15 @@ namespace SongTagger.Core
 		#region IArtist implementation
         public List<string> Genres{ get; private set; }
 		#endregion
+
+        public override string ToString()
+        {
+            string genreList = Genres.Aggregate(new StringBuilder(), (current, next) => current.AppendFormat("{0},", next)).ToString().TrimEnd(',').Trim();
+            return string.Format("[Id={0}, Name={1}, Genres={2}]", Id, Name, genreList);
+        }
     }
 
-    internal class UnknowArtist : IArtist
+    public class UnknowArtist : IArtist
     {
         public UnknowArtist()
         {
@@ -59,7 +67,7 @@ namespace SongTagger.Core
 			{
 				"unknow"
 			};
-            Name = "Unknow Artist";
+            Name = "UNKNOW";
         }
 
 
@@ -72,6 +80,11 @@ namespace SongTagger.Core
 		#region IArtist implementation
         public List<string> Genres{ get; private set; }
 		#endregion
+
+        public override string ToString()
+        {
+            return string.Format("[Id={0}, Name={1}]", Id, Name);
+        }
     }
 }
 

@@ -51,9 +51,12 @@ namespace SongTagger.Core
 
         #region IWebService implementation
 
-        public System.Xml.Linq.XDocument ExecuteQuery(string queryString)
+        public System.Xml.Linq.XDocument ExecuteQuery(Uri queryUri)
         {
-            Uri queryUri = WebServices.BuildUri(baseUri, queryString);
+            if (queryUri == null)
+            {
+                throw new ArgumentException("queryUrl could not be null", "queryUrl");
+            }
 
             String content = WebServices.DownloadContent(queryUri);
 

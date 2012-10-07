@@ -21,6 +21,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 using System;
+using System.Collections;
 using NUnit.Framework;
 
 using SongTagger.Core;
@@ -105,32 +106,6 @@ namespace SongTagger.Core.Test.Unit.Services
                 WebServices.DownloadContent(unreachableUrl);
             }
             );
-        }
-
-        [TestCase(null,null)]
-        [TestCase(null,"")]
-        [TestCase("http://localhost","")]
-        [TestCase("http://localhost",null)]
-        public void BuildUri_ArgumentCheck_ArgumentNullException_Expected(String url, String query)
-        {
-            Uri testUri = url != null ? new Uri(url) : null;
-            Assert.Throws(typeof(ArgumentNullException), () =>
-            {
-                WebServices.BuildUri(testUri, query);
-            }
-            );
-        }
-
-
-        [TestCase("http://localhost/","artist")]
-        [TestCase("http://localhost/service","query=foobar")]
-        [TestCase("http://localhost/service","query=foobar&condition=8")]
-        [TestCase("http://localhost/service","query=foobar&condition=8&sort")]
-        public void BuildUri_GetUrl(String url, String query)
-        {
-            String expected = String.Format("{0}?{1}", url, query);
-            Uri actual = WebServices.BuildUri(new Uri(url), query);
-            Assert.AreEqual(expected, actual.ToString());
         }
 
     }

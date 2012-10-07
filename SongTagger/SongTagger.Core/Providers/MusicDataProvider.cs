@@ -75,9 +75,7 @@ namespace SongTagger.Core
                 throw new ArgumentException("Artis name stub could not be null or empty", "nameStub");
             #endregion
 
-
-            String queryString = String.Format(MusicBrainz.ArtistQueryFormat, Uri.EscapeDataString(nameStub));
-            XDocument result = MusicBrainzService.ExecuteQuery(queryString);
+            XDocument result = MusicBrainzService.ExecuteQuery(MusicBrainz.CreateArtistQueryUri(nameStub));
 
             IArtist artist = MusicBrainz.ParseXmlToArtist(result, MinimumScore);
 
