@@ -41,7 +41,7 @@ namespace SongTagger.Core.Test.Unit.Services
         public MusicBrainzTestCaseSource()
         {
             artistCollection = new List<IArtist>();
-
+            #region Artist with genres
             {
                 IArtist riseAgainst = new Artist() 
                 { 
@@ -65,13 +65,14 @@ namespace SongTagger.Core.Test.Unit.Services
                 );
                 artistCollection.Add(riseAgainst);
             }
+            #endregion
         }
 
         internal IEnumerable ParseXmlToArtistTestFactory
         {
             get
             {
-                yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.xml", 99, artistCollection.FirstOrDefault(a => a.Name == "Rise Against"));
+                yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.ValidArtistWithGenres.xml", 99, artistCollection.FirstOrDefault(a => a.Name == "Rise Against"));
             }       
         }
     }
@@ -132,7 +133,7 @@ namespace SongTagger.Core.Test.Unit.Services
 
 
         #region Parsing tests
-        [Test,TestCaseSource(typeof(MusicBrainzTestCaseSource),"ParseXmlToArtistTestFactory")]
+        [TestCaseSource(typeof(MusicBrainzTestCaseSource),"ParseXmlToArtistTestFactory")]
         public void ParseXmlToArtistTest(string xmlFileName, int minimumScore, IArtist expectedArtist)
         {
             string xmlPath = TestHelper.GetInputDataFilePath(xmlFileName);
@@ -150,7 +151,6 @@ namespace SongTagger.Core.Test.Unit.Services
             Throws.Nothing);
 
             Assert.That(artist, Is.Not.Null);
-            Assert.That(artist, Is.Not.InstanceOf<UnknowArtist>());
             Assert.That(artist.Name, Is.EqualTo(expectedArtist.Name));
             Assert.That(artist.Id, Is.EqualTo(expectedArtist.Id));
             Assert.That(artist.Genres, Is.EquivalentTo(expectedArtist.Genres));
