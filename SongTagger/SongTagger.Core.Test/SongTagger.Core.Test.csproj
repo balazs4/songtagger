@@ -64,5 +64,11 @@
     <Content Include="inputData\MusicBrainzTest.ParseXmlToArtist.ValidArtistWithGenres.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="inputData\MusicBrainzTest.ParseXmlToArtist.ValidArtistWithoutGenres.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="inputData\MusicBrainzTest.Error.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>
