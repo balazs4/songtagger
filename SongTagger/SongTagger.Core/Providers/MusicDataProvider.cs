@@ -24,11 +24,12 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
+
 namespace SongTagger.Core
 {
     public class MusicData : IProvider
     {
-        public int MinimumScore { get; set; }
+        private int MinimumScore { get; set; }
 
         #region Singleton pattern
         private static MusicData singletonInstance;
@@ -46,10 +47,9 @@ namespace SongTagger.Core
 
         private MusicData()
         {
-            MinimumScore = 90;
+            MinimumScore = 95;
         }
         #endregion
-
 
         private IWebService MusicBrainzService
         {

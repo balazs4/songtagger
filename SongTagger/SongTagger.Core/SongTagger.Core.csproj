@@ -39,6 +39,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Core" />
+    <Reference Include="NLog">
+      <HintPath>..\bin\Debug\ExternalLibraries\NLog.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Artist.cs" />
@@ -56,5 +59,12 @@
   <ItemGroup>
     <Folder Include="Services\" />
     <Folder Include="Providers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SongTagger.External\SongTagger.External.csproj">
+      <Project>{3AFF090B-B799-4590-92C7-BB6F0F821295}</Project>
+      <Name>SongTagger.External</Name>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
 </Project>
