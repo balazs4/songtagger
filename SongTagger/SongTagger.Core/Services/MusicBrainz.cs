@@ -28,6 +28,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace SongTagger.Core
 {
@@ -82,7 +83,12 @@ namespace SongTagger.Core
             if (String.IsNullOrWhiteSpace(content))
                 return null;
 
-            return XDocument.Parse(content);
+            XDocument result;
+            if (!WebServices.TryParse(content, out result))
+            {
+                return null;
+            }
+            return result;
         }
         #endregion
 
@@ -138,6 +144,24 @@ namespace SongTagger.Core
         #endregion
 
         #region Uri methods
+
+        internal static string SplitArtistName(string rawName)
+        {
+            if (rawName.Contains(" "))
+            {
+                return rawName;
+            }
+
+            string onlyUpperCasePattern = "^[A-Z]+$";
+            if (Regex.Match(rawName, onlyUpperCasePattern).Success)
+            {
+                return Regex.Replace(rawName, "([A-Z])", "$1.", RegexOptions.Compiled).Trim();
+            }
+
+            return Regex.Replace(rawName, "([0-9]+|[A-Z])", " $1", RegexOptions.Compiled).Trim();
+
+        }
+
         internal static Uri CreateArtistQueryUri(string nameOfArtist)
         {
 
@@ -150,21 +174,11 @@ namespace SongTagger.Core
                 return queryUri.Uri;
             }
 
-
-            string parsedName = Regex.Matches(nameOfArtist, "[A-Z][a-z]+")
-                .OfType<Match>()
-                .Select(match => match.Value)
-                .Aggregate((acc, b) => acc + "+" + b)
-                .TrimStart(' ');
+            string encoded = SplitArtistName(nameOfArtist).Replace(' ', '+');
 
 
-            queryUri.Query = String.Format("query={0}", parsedName.Trim());
-            
+            queryUri.Query = String.Format("query={0}", encoded);
 
-            
-//              #region Query formats
-//        internal static readonly string ArtistQueryFormat = "/artist?query={0}";
-//        #endregion
 
             return queryUri.Uri;
         }

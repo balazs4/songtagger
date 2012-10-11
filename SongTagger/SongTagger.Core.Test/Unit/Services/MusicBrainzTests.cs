@@ -159,11 +159,12 @@ namespace SongTagger.Core.Test.Unit.Services
                 instance.ExecuteQuery(null);}, Throws.ArgumentException);
         }
 
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("Korn")]
-        [TestCase("Depresszió")]
-        public void ArtistUriTest(string name)
+        [TestCase(null, "")]
+        [TestCase("","")]
+        [TestCase("Korn","Korn")]
+        [TestCase("Boy","Boy")]
+        [TestCase("RiseAgainst","Rise+Against")]
+        public void ArtistUriTest(string name, string expectedQueryParameter)
         {
             Uri resultUri = null;
             Assert.That(() =>
@@ -172,20 +173,29 @@ namespace SongTagger.Core.Test.Unit.Services
             }, Throws.Nothing);
 
             Assert.That(resultUri, Is.Not.Null);
-            string expected = String.Format("http://musicbrainz.org/ws/2/artist?query={0}", name ?? String.Empty);
+            string expected = String.Format("http://musicbrainz.org/ws/2/artist?query={0}", expectedQueryParameter);
             Assert.That(resultUri.ToString(), Is.EqualTo(expected));
         }
-        [TestCase("RiseAgainst", Result = "http://musicbrainz.org/ws/2/artist?query=Rise+Against")]
-        [TestCase("TheNakedAndFamous", Result = "http://musicbrainz.org/ws/2/artist?query=The+Naked+And+Famous")]
-        public string ArtistUriTest_IfArtistNameIsCamelCase(string name)
+    
+        [TestCase("RiseAgainst", Result = "Rise Against")]
+        [TestCase("TheNakedAndFamous", Result = "The Naked And Famous")]
+        [TestCase("6test", Result = "6test")]
+        [TestCase("4Lyn", Result = "4 Lyn")]
+        [TestCase("12Stones", Result = "12 Stones")]
+        [TestCase("36Crazyfits", Result = "36 Crazyfits")]
+        [TestCase("The69Eyes", Result = "The 69 Eyes")]
+        [TestCase("POD", Result = "P.O.D.")]
+        [TestCase("The Offspring", Result = "The Offspring")]
+        [TestCase("_unknow", Result = "_unknow")]
+        public string ArtistNameSplitterTest(string rawName)
         {
-            Uri resultUri = null;
+            string actual = String.Empty;
             Assert.That(() =>
             {
-                resultUri = MusicBrainz.CreateArtistQueryUri(name);
+                actual = MusicBrainz.SplitArtistName(rawName);
             }, Throws.Nothing);
 
-            return resultUri.ToString();
+            return actual;
         }
 
 

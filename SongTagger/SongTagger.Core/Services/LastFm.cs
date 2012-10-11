@@ -63,7 +63,12 @@ namespace SongTagger.Core
             if (String.IsNullOrWhiteSpace(content))
                 return null;
 
-            return XDocument.Parse(content);
+            XDocument result;
+            if (!WebServices.TryParse(content, out result))
+            {
+                return null;
+            }
+            return result;
         }
 
         #endregion

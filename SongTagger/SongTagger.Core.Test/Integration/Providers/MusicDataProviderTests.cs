@@ -30,7 +30,6 @@ namespace SongTagger.Core.Test.Integration
     {
         [TestCase("RiseAgainst")]
         [TestCase("Korn")]
-        [TestCase("6test")]
         public void GetArtistTest(string artistName)
         {
             IArtist artist = null;
