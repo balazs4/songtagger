@@ -25,11 +25,24 @@ using System;
 
 namespace SongTagger.Core
 {
-	public interface IEntity
-	{
-		Guid Id { get; }
+    public interface IEntity
+    {
+        Guid Id { get; }
 
-		String Name { get; }
-	}
+        String Name { get; }
+    }
+
+
+
+    public class Logger
+    {
+        public static NLog.Logger Instance
+        {
+            get
+            { 
+                return NLog.LogManager.GetCurrentClassLogger();
+            }
+        }
+    }
 	
 }
