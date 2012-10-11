@@ -125,6 +125,22 @@ namespace SongTagger.Core
             }
             return data;
         }
+    
+
+        internal static bool TryParse(string content, out XDocument parsedDocument)
+        {
+            try
+            {
+                parsedDocument = XDocument.Parse(content);
+            } catch
+            {
+                parsedDocument = null;
+                return false;
+            }
+
+            return true;
+        }
+    
 
         #endregion
     }
