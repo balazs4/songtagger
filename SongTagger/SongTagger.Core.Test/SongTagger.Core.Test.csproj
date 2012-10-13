@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,6 +9,10 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SongTagger.Core.Test</RootNamespace>
     <AssemblyName>SongTagger.Core.Test</AssemblyName>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,14 +44,7 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="Unit\" />
-    <Folder Include="Integration\" />
-    <Folder Include="inputData\" />
-    <Folder Include="Unit\Providers\" />
-    <Folder Include="Unit\Services\" />
-    <Folder Include="Integration\Providers\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Compile Include="Unit\Providers\MusicDataProviderTests.cs" />
     <Compile Include="Unit\Services\LastFmTests.cs" />
