@@ -43,7 +43,7 @@ namespace SongTagger.Core.Test.Unit.Services
         [TestCase(ServiceName.LastFm)]
         public void GetInstance_DoesNotThrowException(ServiceName service)
         {
-            Assert.DoesNotThrow(() => 
+            Assert.DoesNotThrow(() =>
             {
                 WebServices.Instance(service);
             }
@@ -65,12 +65,12 @@ namespace SongTagger.Core.Test.Unit.Services
             }
 
         }
-       
+
         [Test]
         public void DownloadContent_ArgumentCheck_ArgumentNullException_Expected()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => 
-            { 
+            Assert.Throws(typeof(ArgumentNullException), () =>
+            {
                 WebServices.DownloadContent(null);
             }
             );
@@ -80,7 +80,7 @@ namespace SongTagger.Core.Test.Unit.Services
         public void DownloadContent_ValidUrl_DoesNotThrowException()
         {
             Uri validUrl = new Uri("http://localhost");
-            Assert.DoesNotThrow(() => 
+            Assert.DoesNotThrow(() =>
             {
                 WebServices.DownloadContent(validUrl);
             }
@@ -93,15 +93,15 @@ namespace SongTagger.Core.Test.Unit.Services
         {
             Uri googleCom = new Uri("http://google.com");
             String content = WebServices.DownloadContent(googleCom);
-            Assert.IsFalse(String.IsNullOrWhiteSpace(content),
-                           String.Format("Content was empty from {0}", googleCom.ToString()));
+            Assert.That(content, Is.Not.Null);
+            Assert.That(content, Is.Not.Empty);
         }
 
         [Test]
         public void DownloadContent_InvalidUrl_DoesNotThrowException()
         {
             Uri unreachableUrl = new Uri("htt://foobar.p");
-            Assert.DoesNotThrow(() => 
+            Assert.DoesNotThrow(() =>
             {
                 WebServices.DownloadContent(unreachableUrl);
             }
