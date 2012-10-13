@@ -45,6 +45,7 @@
     <Reference Include="System.Core" />
     <Reference Include="NLog">
       <HintPath>..\bin\Debug\ExternalLibraries\NLog.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
