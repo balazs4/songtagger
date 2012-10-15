@@ -10,48 +10,25 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.External", "SongTagger.External\SongTagger.External.csproj", "{3AFF090B-B799-4590-92C7-BB6F0F821295}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = SongTagger.Core\\SongTagger.Core.csproj
-		SccProjectName1 = SongTagger.Core
-		SccLocalPath1 = SongTagger.Core
-		SccProjectUniqueName2 = SongTagger.Core.Test\\SongTagger.Core.Test.csproj
-		SccProjectName2 = SongTagger.Core.Test
-		SccLocalPath2 = SongTagger.Core.Test
-		SccProjectUniqueName3 = SongTagger.ArtistDemo\\SongTagger.ArtistDemo.csproj
-		SccProjectName3 = SongTagger.ArtistDemo
-		SccLocalPath3 = SongTagger.ArtistDemo
-		SccProjectUniqueName4 = SongTagger.External\\SongTagger.External.csproj
-		SccProjectName4 = SongTagger.External
-		SccLocalPath4 = SongTagger.External
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Release|Any CPU.Build.0 = Release|Any CPU
 		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E52BEAD-0231-4898-AA0A-29A26F392FA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E52BEAD-0231-4898-AA0A-29A26F392FA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E52BEAD-0231-4898-AA0A-29A26F392FA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E52BEAD-0231-4898-AA0A-29A26F392FA4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3AFF090B-B799-4590-92C7-BB6F0F821295}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3AFF090B-B799-4590-92C7-BB6F0F821295}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AFF090B-B799-4590-92C7-BB6F0F821295}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AFF090B-B799-4590-92C7-BB6F0F821295}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
+		{4E52BEAD-0231-4898-AA0A-29A26F392FA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E52BEAD-0231-4898-AA0A-29A26F392FA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E52BEAD-0231-4898-AA0A-29A26F392FA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = SongTagger.Core\SongTagger.Core.csproj
@@ -224,5 +201,26 @@ Global
 		$31.scope = text/x-csharp
 		description = http://songtagger.codeplex.com/
 		outputpath = bin
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = SongTagger.Core\\SongTagger.Core.csproj
+		SccProjectName1 = SongTagger.Core
+		SccLocalPath1 = SongTagger.Core
+		SccProjectUniqueName2 = SongTagger.Core.Test\\SongTagger.Core.Test.csproj
+		SccProjectName2 = SongTagger.Core.Test
+		SccLocalPath2 = SongTagger.Core.Test
+		SccProjectUniqueName3 = SongTagger.ArtistDemo\\SongTagger.ArtistDemo.csproj
+		SccProjectName3 = SongTagger.ArtistDemo
+		SccLocalPath3 = SongTagger.ArtistDemo
+		SccProjectUniqueName4 = SongTagger.External\\SongTagger.External.csproj
+		SccProjectName4 = SongTagger.External
+		SccLocalPath4 = SongTagger.External
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

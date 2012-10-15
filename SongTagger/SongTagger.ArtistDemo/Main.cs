@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SongTagger.Core;
 using System.Diagnostics;
+using System.IO;
 
 namespace SongTagger.ArtistDemo
 {
@@ -34,7 +35,8 @@ namespace SongTagger.ArtistDemo
 
         public static void Main(string[] args)
         {
-            string rootMusicFolder = "/home/balazs4/Music/Rock"; //ToDo: arg...
+            string rootMusicFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Rock");
+
             IEnumerable<string> rawArtistCollection = GetRawArtistCollection(rootMusicFolder);
 
 

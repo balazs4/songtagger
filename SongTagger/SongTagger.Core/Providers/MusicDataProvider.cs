@@ -47,7 +47,7 @@ namespace SongTagger.Core
 
         private MusicData()
         {
-            MinimumScore = 95;
+            MinimumScore = 100;
         }
         #endregion
 
@@ -88,10 +88,6 @@ namespace SongTagger.Core
         }
         #endregion
 
-
-        #region Helper methods
-
-        #endregion
     }
 }
 
