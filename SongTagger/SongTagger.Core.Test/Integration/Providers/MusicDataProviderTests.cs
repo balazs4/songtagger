@@ -26,6 +26,7 @@ using NUnit.Framework;
 namespace SongTagger.Core.Test.Integration
 {
     [TestFixture()]
+    [Explicit]
     public class MusicDataProviderTests
     {
         [TestCase("RiseAgainst")]
