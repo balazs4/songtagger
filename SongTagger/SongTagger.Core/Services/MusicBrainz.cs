@@ -38,7 +38,7 @@ namespace SongTagger.Core
         internal static readonly TimeSpan WAIT_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 2); //http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
         internal static readonly Uri baseUrl = new Uri("http://musicbrainz.org/ws/2/");
 
-      
+
         #region C'tors
         internal MusicBrainz()
         {
@@ -62,7 +62,7 @@ namespace SongTagger.Core
             }
             return content;
         }
-       
+
         #region IWebService implementation
         public XDocument ExecuteQuery(Uri queryUrl)
         {
@@ -119,7 +119,7 @@ namespace SongTagger.Core
                 #endregion
 
 
-                artist = new Artist() 
+                artist = new Artist()
                 {
                     Id = new Guid(artistElement.Attribute(xnameId).Value),
                     Name = artistElement.Element(xnameName).Value,
@@ -127,7 +127,8 @@ namespace SongTagger.Core
 
                 artist.Genres.AddRange(rawGenreList);
 
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 return new UnknowArtist();
             }
@@ -167,15 +168,15 @@ namespace SongTagger.Core
                 return queryUri.Uri;
             }
 
-            string encoded = SplitArtistName(nameOfArtist).Replace(' ', '+');
+            string encoded = SplitArtistName(nameOfArtist);
 
+            string luceneQuery = String.Format("artist:{0} AND type:group", encoded).Trim();
 
-            queryUri.Query = String.Format("query={0}", encoded);
+            queryUri.Query = String.Format("query={0}", luceneQuery);
 
 
             return queryUri.Uri;
         }
-
         #endregion
     }
 

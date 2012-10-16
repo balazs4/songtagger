@@ -77,6 +77,7 @@ namespace SongTagger.Core.Test.Unit.Services
         }
 
         [Test]
+        [Category("LongRunner")]
         public void DownloadContent_ValidUrl_DoesNotThrowException()
         {
             Uri validUrl = new Uri("http://localhost");
@@ -88,7 +89,8 @@ namespace SongTagger.Core.Test.Unit.Services
         }
 
         [Test]
-        //TODO: iTest or Expicit test...
+        [Category("LongRunner")]
+        [Explicit]
         public void DownloadContent_ValidUrl_ResultNotEmptyOrNull()
         {
             Uri googleCom = new Uri("http://google.com");

@@ -116,6 +116,7 @@ namespace SongTagger.Core.Test.Unit.Services
         }
 
         [Test]
+        [Category("LongRunner")]
         public void DownloadContentSafely_CheckTimeDifferenceBetweenQueries_ExplicitTwoQueries()
         {
             String first = MusicBrainz.DownloadContentSafely(fakeUri, fakeDownloadAction);
@@ -126,6 +127,7 @@ namespace SongTagger.Core.Test.Unit.Services
         }
 
         [Test]
+        [Category("LongRunner")]
         public void DownloadContentSafely_CheckTimeDifferenceBetweenQueries_MultiThreadAccess()
         {
             String first = null;
@@ -163,7 +165,7 @@ namespace SongTagger.Core.Test.Unit.Services
         [TestCase("","")]
         [TestCase("Korn","Korn")]
         [TestCase("Boy","Boy")]
-        [TestCase("RiseAgainst","Rise+Against")]
+        [TestCase("RiseAgainst","Rise Against")]
         public void ArtistUriTest(string name, string expectedQueryParameter)
         {
             Uri resultUri = null;
@@ -173,7 +175,16 @@ namespace SongTagger.Core.Test.Unit.Services
             }, Throws.Nothing);
 
             Assert.That(resultUri, Is.Not.Null);
-            string expected = String.Format("http://musicbrainz.org/ws/2/artist?query={0}", expectedQueryParameter);
+            string expected;
+            if (String.IsNullOrWhiteSpace(expectedQueryParameter))
+            {
+                expected = String.Format("http://musicbrainz.org/ws/2/artist?query=");
+            }
+            else
+            {
+                expected = String.Format("http://musicbrainz.org/ws/2/artist?query=artist:{0} AND type:group", expectedQueryParameter);
+            }
+            
             Assert.That(resultUri.ToString(), Is.EqualTo(expected));
         }
     
