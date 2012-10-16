@@ -34,19 +34,12 @@ namespace SongTagger.Core
 {
     internal class MusicBrainz : IWebService
     {
-        private static readonly Object lockObject;
-        internal static readonly TimeSpan WAIT_TIME_BETWEEN_QUERIES; //http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
-        internal static readonly Uri baseUrl;
+        private static readonly Object lockObject = new Object();
+        internal static readonly TimeSpan WAIT_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 2); //http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
+        internal static readonly Uri baseUrl = new Uri("http://musicbrainz.org/ws/2/");
 
       
         #region C'tors
-        static MusicBrainz()
-        {
-            baseUrl = new Uri("http://musicbrainz.org/ws/2/");
-            WAIT_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 2);
-            lockObject = new Object();
-        }
-
         internal MusicBrainz()
         {
 
