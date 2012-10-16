@@ -55,7 +55,7 @@ namespace SongTagger.Core
         {
             if (queryUri == null)
             {
-                throw new ArgumentException("queryUrl could not be null", "queryUrl");
+                throw new ArgumentException("queryUrl could not be null", "queryUri");
             }
 
             String content = WebServices.DownloadContent(queryUri);

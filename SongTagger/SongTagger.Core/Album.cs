@@ -29,7 +29,7 @@ namespace SongTagger.Core
 	{
 		Unknow = 0,
 		Album,
-		Ep,
+		EP,
 		Live,
 		Single
 	}
