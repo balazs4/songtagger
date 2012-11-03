@@ -31,18 +31,5 @@ namespace SongTagger.Core
 
         String Name { get; }
     }
-
-
-
-    public class Logger
-    {
-        public static NLog.Logger Instance
-        {
-            get
-            { 
-                return NLog.LogManager.GetCurrentClassLogger();
-            }
-        }
-    }
 	
 }
