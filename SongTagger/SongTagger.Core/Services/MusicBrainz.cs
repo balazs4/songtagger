@@ -127,8 +127,7 @@ namespace SongTagger.Core
 
                 artist.Genres.AddRange(rawGenreList);
 
-            }
-            catch (Exception)
+            } catch (Exception)
             {
                 return new UnknowArtist();
             }
@@ -170,7 +169,7 @@ namespace SongTagger.Core
 
             string encoded = SplitArtistName(nameOfArtist);
 
-            string luceneQuery = String.Format("artist:{0} AND type:group", encoded).Trim();
+            string luceneQuery = String.Format("artist:{0}%20AND%20type:group", encoded.Replace(" ", "%20"));
 
             queryUri.Query = String.Format("query={0}", luceneQuery);
 

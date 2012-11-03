@@ -179,8 +179,7 @@ namespace SongTagger.Core.Test.Unit.Services
             if (String.IsNullOrWhiteSpace(expectedQueryParameter))
             {
                 expected = String.Format("http://musicbrainz.org/ws/2/artist?query=");
-            }
-            else
+            } else
             {
                 expected = String.Format("http://musicbrainz.org/ws/2/artist?query=artist:{0} AND type:group", expectedQueryParameter);
             }
