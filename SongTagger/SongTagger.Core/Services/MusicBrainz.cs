@@ -169,7 +169,7 @@ namespace SongTagger.Core
 
             string encoded = SplitArtistName(nameOfArtist);
 
-            string luceneQuery = String.Format("artist:{0}%20AND%20type:group", encoded.Replace(" ", "%20"));
+            string luceneQuery = String.Format("{0}%20AND%20type:group", encoded.Replace(" ", "%20"));
 
             queryUri.Query = String.Format("query={0}", luceneQuery);
 

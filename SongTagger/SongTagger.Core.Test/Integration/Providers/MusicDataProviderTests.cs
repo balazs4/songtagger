@@ -29,16 +29,22 @@ namespace SongTagger.Core.Test.Integration
     [Explicit]
     public class MusicDataProviderTests
     {
-        [TestCase("RiseAgainst")]
-        [TestCase("Korn")]
-        public void GetArtistTest(string artistName)
+
+        [TestCase("Rise Against","606bf117-494f-4864-891f-09d63ff6aa4b")]
+        [TestCase("Korn","ac865b2e-bba8-4f5a-8756-dd40d5e39f46")]
+        [TestCase("4Lyn","03df376e-f696-4df0-a8e4-3bbc9c8c1c5d")]
+        [TestCase("LiveOnRelease","70bd46ea-684a-4a2b-a3b6-4bf825476e25")]
+        public void GetArtistTest(string artistName, string expedtedId)
         {
             IArtist artist = null;
             Assert.That(() => {
                 artist = MusicData.Provider.GetArtist(artistName);
             }, Throws.Nothing);
+
             Assert.That(artist, Is.Not.Null);
             Assert.That(artist, Is.Not.InstanceOf<UnknowArtist>());
+            StringAssert.AreEqualIgnoringCase(artistName, artist.Name);
+            Assert.That(artist.Id.ToString(), Is.EqualTo(expedtedId));
         }
     }
 }

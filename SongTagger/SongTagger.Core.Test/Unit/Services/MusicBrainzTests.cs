@@ -181,7 +181,7 @@ namespace SongTagger.Core.Test.Unit.Services
                 expected = String.Format("http://musicbrainz.org/ws/2/artist?query=");
             } else
             {
-                expected = String.Format("http://musicbrainz.org/ws/2/artist?query=artist:{0} AND type:group", expectedQueryParameter);
+                expected = String.Format("http://musicbrainz.org/ws/2/artist?query={0} AND type:group", expectedQueryParameter);
             }
             
             Assert.That(resultUri.ToString(), Is.EqualTo(expected));
