@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-
 namespace SongTagger.Core
 {
     public class MusicData : IProvider
@@ -85,7 +84,9 @@ namespace SongTagger.Core
 
         public IEnumerable<IAlbum> GetReleases(IArtist artist, IEnumerable<ReleaseType> releaseTypeList)
         {
-            throw new System.NotImplementedException();
+            List<IAlbum> albums = new List<IAlbum>();
+
+            return albums;
         }
         #endregion
 
