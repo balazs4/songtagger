@@ -42,6 +42,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Web" />
     <Reference Include="System.Net" />
+    <Reference Include="Moq">
+      <HintPath>..\bin\Debug\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

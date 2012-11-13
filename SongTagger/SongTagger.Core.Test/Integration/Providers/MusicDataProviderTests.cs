@@ -22,6 +22,10 @@
 //
 using System;
 using NUnit.Framework;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using Moq;
 
 namespace SongTagger.Core.Test.Integration
 {
@@ -30,11 +34,11 @@ namespace SongTagger.Core.Test.Integration
     public class MusicDataProviderTests
     {
 
-        [TestCase("Rise Against","606bf117-494f-4864-891f-09d63ff6aa4b")]
-        [TestCase("Korn","ac865b2e-bba8-4f5a-8756-dd40d5e39f46")]
-        [TestCase("4Lyn","03df376e-f696-4df0-a8e4-3bbc9c8c1c5d")]
-        [TestCase("LiveOnRelease","70bd46ea-684a-4a2b-a3b6-4bf825476e25")]
-        public void GetArtistTest(string artistName, string expedtedId)
+        [TestCase("Rise Against",Result = "606bf117-494f-4864-891f-09d63ff6aa4b")]
+        [TestCase("Korn",Result = "ac865b2e-bba8-4f5a-8756-dd40d5e39f46")]
+        [TestCase("4Lyn",Result = "03df376e-f696-4df0-a8e4-3bbc9c8c1c5d")]
+        [TestCase("LiveOnRelease",Result = "70bd46ea-684a-4a2b-a3b6-4bf825476e25")]
+        public string GetArtistTest(string artistName)
         {
             IArtist artist = null;
             Assert.That(() => {
@@ -44,7 +48,74 @@ namespace SongTagger.Core.Test.Integration
             Assert.That(artist, Is.Not.Null);
             Assert.That(artist, Is.Not.InstanceOf<UnknowArtist>());
             StringAssert.AreEqualIgnoringCase(artistName, artist.Name);
-            Assert.That(artist.Id.ToString(), Is.EqualTo(expedtedId));
+
+            return artist.Id.ToString();
+        }
+
+        [TestCaseSource(typeof(AlbumTestCaseSources),"AlbumSource")]
+        public int GetAlbumTest(IArtist artist, IEnumerable<ReleaseType> types)
+        {
+            IEnumerable<IAlbum> releases = null;
+
+            Assert.That(
+                () => {
+                releases = MusicData.Provider.GetReleases(artist, types);
+            }, Throws.Nothing);
+
+            Assert.That(releases, Is.Not.Null);
+            CollectionAssert.AllItemsAreNotNull(releases);
+            CollectionAssert.AllItemsAreUnique(releases);
+
+            return releases.Count();
+        }
+    }
+
+    class AlbumTestCaseSources
+    {
+
+        private static IArtist CreateMock(string name, string id)
+        {
+            Mock<IArtist> mock = new Mock<IArtist>();
+            mock.Setup(a => a.Id).Returns(new Guid(id));
+            mock.Setup(a => a.Name).Returns(name);
+            return mock.Object as IArtist;
+        }
+
+        private IArtist DefLeppard
+        {
+            get{ return CreateMock("Def Leppard", "7249b899-8db8-43e7-9e6e-22f1e736024e");}
+        }
+        private IArtist RiseAgainst
+        {
+            get{ return CreateMock("Rise Against", "606bf117-494f-4864-891f-09d63ff6aa4b");}
+        }
+        private IArtist Depresszio
+        {
+            get{ return CreateMock("Depresszió", "79a8d8a6-012a-4dd9-b5e2-ed4b52a5d55e");}
+        }
+        private IArtist Deftones
+        {
+            get{ return CreateMock("Deftones", "7527f6c2-d762-4b88-b5e2-9244f1e34c46");}
+        }
+
+        private IEnumerable<ReleaseType> Album
+        {
+            get
+            {
+                return new List<ReleaseType> { ReleaseType.Album};
+            }
+        }
+
+
+        internal IEnumerable AlbumSource
+        {
+            get
+            {
+                yield return new TestCaseData(DefLeppard, Album).Returns(15); // PO....
+                yield return new TestCaseData(RiseAgainst, Album).Returns(10);
+                yield return new TestCaseData(Depresszio, Album).Returns(3);
+                yield return new TestCaseData(Deftones, Album).Returns(13);
+            }
         }
     }
 }
