@@ -23,6 +23,7 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using System.Linq;
 
 namespace SongTagger.Core
 {
@@ -71,7 +72,7 @@ namespace SongTagger.Core
         {
             #region Argument check
             if (String.IsNullOrWhiteSpace(nameStub))
-                throw new ArgumentException("Artis name stub could not be null or empty", "nameStub");
+                throw new ArgumentException("Artist name stub could not be null or empty", "nameStub");
             #endregion
 
             Uri queryUri = MusicBrainz.CreateArtistQueryUri(nameStub);
@@ -82,11 +83,24 @@ namespace SongTagger.Core
             return artist;
         }
 
-        public IEnumerable<IAlbum> GetReleases(IArtist artist, IEnumerable<ReleaseType> releaseTypeList)
+        public IEnumerable<IAlbum> GetReleases(IArtist artist)
         {
-            List<IAlbum> albums = new List<IAlbum>();
+            #region Argument check
+            if (artist == null)
+                throw new ArgumentException("artist", "Artist could not be null");
 
-            return albums;
+            #endregion
+                
+            if (artist is UnknowArtist || artist.Id == Guid.Empty)
+            {
+                return new List<IAlbum>();
+            }
+
+            Uri queryUri = MusicBrainz.CreateAlbumQueryUri(artist.Id);
+            XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
+            IEnumerable<IAlbum> albumList = MusicBrainz.ParseXmlToAlbum(result);
+
+            return albumList ?? new List<IAlbum>();
         }
         #endregion
 

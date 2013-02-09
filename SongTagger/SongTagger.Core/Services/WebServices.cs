@@ -89,7 +89,7 @@ namespace SongTagger.Core
                 IWebService newInstance = CreateNewInstance(serviceKey);
                 serviceCollection.Add(serviceKey, newInstance);
             }
-            return serviceCollection [serviceKey];
+            return serviceCollection[serviceKey];
         }
 
         internal delegate String DownloadContentDelegate(Uri queryUrl);

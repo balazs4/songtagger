@@ -30,7 +30,7 @@ namespace SongTagger.Core
     {
         IArtist GetArtist(string nameStub);
 
-        IEnumerable<IAlbum> GetReleases(IArtist artist, IEnumerable<ReleaseType> releaseTypeList);
+        IEnumerable<IAlbum> GetReleases(IArtist artist);
 
     }
     

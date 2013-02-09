@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://musicbrainz.org/ns/mmd-2.0#">
+   <artist type="Group" id="606bf117-494f-4864-891f-09d63ff6aa4b">
+      <name>Rise Against</name>
+      <sort-name>Rise Against</sort-name>
+      <country>US</country>
+      <life-span>
+         <begin>1999</begin>
+      </life-span>
+      <release-group-list count="20">
+         <release-group type="Album" id="005b84a0-ecd6-39f1-b2f6-6eb48756b268">
+            <title>The Sufferer &amp; the Witness</title>
+            <first-release-date>2006-07-03</first-release-date>
+            <primary-type>Album</primary-type>
+         </release-group>
+         <release-group type="Album" id="0b0e4477-4b04-3683-8f01-3a4544c36b41">
+            <title>Appeal to Reason</title>
+            <first-release-date>2008-10-02</first-release-date>
+            <primary-type>Album</primary-type>
+         </release-group>
+         <release-group type="Live" id="201b01f1-0149-3812-84d3-afb92ec04e1e">
+            <title>2006-07-23: Denver, CO, USA</title>
+            <first-release-date />
+            <primary-type>Album</primary-type>
+            <secondary-type-list>
+               <secondary-type>Live</secondary-type>
+            </secondary-type-list>
+         </release-group>
+         <release-group type="Live" id="26cc46e0-5156-4d58-9163-b3ffbf0125f9">
+            <title>2011-06-04: KROQ Weenie Roast 2011</title>
+            <first-release-date>2011-06-04</first-release-date>
+            <primary-type>Album</primary-type>
+            <secondary-type-list>
+               <secondary-type>Live</secondary-type>
+            </secondary-type-list>
+         </release-group>
+         <release-group type="Single" id="2d62503a-d75e-4001-8a3f-21a9da2b8ffd">
+            <title>Grammatizator</title>
+            <first-release-date>2009-10-20</first-release-date>
+            <primary-type>Single</primary-type>
+         </release-group>
+         <release-group type="Single" id="3bb3c8fe-cd26-4310-9591-4e1751d6324c">
+            <title>Help Is on the Way</title>
+            <first-release-date>2011-01-25</first-release-date>
+            <primary-type>Single</primary-type>
+         </release-group>
+         <release-group type="Album" id="4dbed05b-d989-3729-b58a-c1e54b323141">
+            <title>Siren Song of the Counter Culture</title>
+            <first-release-date>2004-08-10</first-release-date>
+            <primary-type>Album</primary-type>
+         </release-group>
+         <release-group type="Live" id="5820d9ff-6312-485a-a2b8-fba1422496da">
+            <title>2008-06-22: Southside Festival, Neuhausen ob Eck, Germany</title>
+            <first-release-date />
+            <primary-type>Album</primary-type>
+            <secondary-type-list>
+               <secondary-type>Live</secondary-type>
+            </secondary-type-list>
+         </release-group>
+         <release-group type="Single" id="59da9332-b967-4366-b668-8e15e559c231">
+            <title>Join the Ranks</title>
+            <first-release-date>2011-04-16</first-release-date>
+            <primary-type>Single</primary-type>
+         </release-group>
+         <release-group type="Live" id="63b0f9d2-c723-489e-9b29-09d094b48764">
+            <title>Generation Lost</title>
+            <first-release-date>2006-12-05</first-release-date>
+            <secondary-type-list>
+               <secondary-type>Live</secondary-type>
+            </secondary-type-list>
+         </release-group>
+         <release-group type="Album" id="875b2ff0-604b-4db3-a2f8-b427d725caf2">
+            <title>Endgame</title>
+            <first-release-date>2011-03-11</first-release-date>
+            <primary-type>Album</primary-type>
+         </release-group>
+         <release-group type="EP" id="8c16b15d-5d71-30dd-a35c-6a6897c1443b">
+            <title>Transistor Revolt</title>
+            <first-release-date>2000</first-release-date>
+            <primary-type>EP</primary-type>
+         </release-group>
+         <release-group type="EP" id="a2727662-7959-3cd0-a1e5-3a3e0a134c77">
+            <title>This Is Noise</title>
+            <first-release-date>2007-07-10</first-release-date>
+            <primary-type>EP</primary-type>
+         </release-group>
+         <release-group type="Album" id="b8d78dea-7eb7-3c30-ae3d-083cf4863608">
+            <title>The Unraveling</title>
+            <first-release-date>2001-04-24</first-release-date>
+            <primary-type>Album</primary-type>
+         </release-group>
+         <release-group type="Album" id="d8b02e7c-9268-3954-abfb-607d1400613f">
+            <title>Revolutions Per Minute</title>
+            <first-release-date>2003-04-08</first-release-date>
+            <primary-type>Album</primary-type>
+         </release-group>
+         <release-group type="Single" id="deceb4ef-dbf5-3078-91fe-bf3740b56a7a">
+            <title>Siren Song of the Counter Culture</title>
+            <first-release-date />
+            <primary-type>Single</primary-type>
+         </release-group>
+         <release-group type="Live" id="e48402bd-37d3-3a6b-8b5c-41289cad5bc5">
+            <title>Live in Toronto</title>
+            <first-release-date />
+            <primary-type>Album</primary-type>
+            <secondary-type-list>
+               <secondary-type>Live</secondary-type>
+            </secondary-type-list>
+         </release-group>
+         <release-group type="EP" id="e788fb0f-92ef-35e6-b70f-0d776f58e33f">
+            <title>Rise Against</title>
+            <first-release-date>2009-05-12</first-release-date>
+            <primary-type>EP</primary-type>
+         </release-group>
+         <release-group type="EP" id="f55a53c6-2d17-400d-b337-94c22f10f6ba">
+            <title>AOL Undercover</title>
+            <first-release-date>2007-03-27</first-release-date>
+            <primary-type>EP</primary-type>
+         </release-group>
+         <release-group type="Single" id="fead730e-1e85-37fd-a100-a62149f09c4f">
+            <title>Swing Life Away</title>
+            <first-release-date>2005-11-14</first-release-date>
+            <primary-type>Single</primary-type>
+         </release-group>
+      </release-group-list>
+   </artist>
+</metadata>

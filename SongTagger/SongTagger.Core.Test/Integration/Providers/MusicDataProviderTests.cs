@@ -53,13 +53,13 @@ namespace SongTagger.Core.Test.Integration
         }
 
         [TestCaseSource(typeof(AlbumTestCaseSources),"AlbumSource")]
-        public int GetAlbumTest(IArtist artist, IEnumerable<ReleaseType> types)
+        public int GetAlbumTest(IArtist artist)
         {
             IEnumerable<IAlbum> releases = null;
 
             Assert.That(
                 () => {
-                releases = MusicData.Provider.GetReleases(artist, types);
+                releases = MusicData.Provider.GetReleases(artist);
             }, Throws.Nothing);
 
             Assert.That(releases, Is.Not.Null);
@@ -98,23 +98,17 @@ namespace SongTagger.Core.Test.Integration
             get{ return CreateMock("Deftones", "7527f6c2-d762-4b88-b5e2-9244f1e34c46");}
         }
 
-        private IEnumerable<ReleaseType> Album
-        {
-            get
-            {
-                return new List<ReleaseType> { ReleaseType.Album};
-            }
-        }
+
 
 
         internal IEnumerable AlbumSource
         {
             get
             {
-                yield return new TestCaseData(DefLeppard, Album).Returns(15); // PO....
-                yield return new TestCaseData(RiseAgainst, Album).Returns(10);
-                yield return new TestCaseData(Depresszio, Album).Returns(3);
-                yield return new TestCaseData(Deftones, Album).Returns(13);
+                yield return new TestCaseData(DefLeppard).Returns(15); // PO....
+                yield return new TestCaseData(RiseAgainst).Returns(10);
+                yield return new TestCaseData(Depresszio).Returns(3);
+                yield return new TestCaseData(Deftones).Returns(13);
             }
         }
     }
