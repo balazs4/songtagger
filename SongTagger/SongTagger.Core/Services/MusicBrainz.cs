@@ -134,6 +134,11 @@ namespace SongTagger.Core
 
             return artist ?? new UnknowArtist();
         }
+
+        internal static IEnumerable<IAlbum> ParseXmlToAlbum(XDocument result)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region Uri methods
@@ -174,6 +179,17 @@ namespace SongTagger.Core
             queryUri.Query = String.Format("query={0}", luceneQuery);
 
 
+            return queryUri.Uri;
+        }
+
+        internal static Uri CreateAlbumQueryUri(Guid id)
+        {
+            //http://musicbrainz.org/ws/2/artist/606bf117-494f-4864-891f-09d63ff6aa4b?inc=release-groups
+
+            UriBuilder queryUri = new UriBuilder(baseUrl.ToString());
+            queryUri.Path += String.Format("artist/{0}",id.ToString());
+      
+            queryUri.Query = "inc=release-groups";
             return queryUri.Uri;
         }
         #endregion

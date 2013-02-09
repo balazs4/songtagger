@@ -24,6 +24,8 @@ using System;
 using NUnit.Framework;
 
 using SongTagger.Core;
+using Moq;
+using System.Collections.Generic;
 
 namespace SongTagger.Core.Test.Unit.Providers
 {
@@ -39,7 +41,6 @@ namespace SongTagger.Core.Test.Unit.Providers
             Assert.That(instance, Is.SameAs(instance));
         }
 
-
         [TestCase(null)]
         [TestCase("")]
         [TestCase("  ")]
@@ -48,6 +49,29 @@ namespace SongTagger.Core.Test.Unit.Providers
             Assert.Throws<ArgumentException>(
                 () => MusicData.Provider.GetArtist(aritstName)
             );
+        }
+
+        [Test]
+        public void GetReleases_ArgumentCheck_ArgumentException_Expected()
+        {
+            Assert.Throws<ArgumentException>(
+                () => MusicData.Provider.GetReleases(null)
+            );
+
+            Assert.Throws<ArgumentException>(
+                () => MusicData.Provider.GetReleases(null)
+            );
+        }
+
+        [Test]
+        public void GetReleases_UnknowArtist_ExpectedEmptyAlbumList()
+        {
+            
+            Mock<IArtist> unknowArtist = new Mock<IArtist>();
+            unknowArtist.Setup(a => a.Id).Returns(Guid.Empty);
+
+            IEnumerable<IAlbum> albums = MusicData.Provider.GetReleases(unknowArtist.Object);            
+            CollectionAssert.IsEmpty(albums);
         }
     }
 }

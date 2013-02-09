@@ -30,6 +30,7 @@ using System.IO;
 using System.Xml.Linq;
 using System.Collections;
 using System.Reflection;
+using Moq;
 
 namespace SongTagger.Core.Test.Unit.Services
 {
@@ -251,7 +252,46 @@ namespace SongTagger.Core.Test.Unit.Services
         }
         #endregion
 
+        [Test]
+        public void CreateAlbumQueryUri_ExpectedValidUrl()
+        {
+            Guid id = Guid.NewGuid();
+            Uri actualUri = MusicBrainz.CreateAlbumQueryUri(id);
 
+            String expectedUriString = String.Format("{0}artist/{1}?inc=release-groups", 
+                                                     MusicBrainz.baseUrl.ToString(), id.ToString());
+
+            Assert.That(actualUri.ToString(), Is.EqualTo(expectedUriString));
+        }
+
+        [Test]
+        public void ParseXmlToAlbum() 
+        {
+            String xmlPath = TestHelper.GetInputDataFilePath("MusicBrainzTest.ParseXmlToAlbumList.ValidResult.xml");
+
+            if (!File.Exists(xmlPath))
+            {
+                Assert.Ignore("{0} file is not available.", xmlPath);
+            }
+            
+            IEnumerable<IAlbum> releases = null;
+            Assert.That(() => 
+                        {
+                releases = MusicBrainz.ParseXmlToAlbum(XDocument.Load(xmlPath));
+            }, 
+            Throws.Nothing);
+           
+            Assert.That(releases, Is.Not.Null);
+            CollectionAssert.IsNotEmpty(releases);
+            CollectionAssert.AllItemsAreUnique(releases);
+
+            Assert.That(releases.Count(), Is.EqualTo(20));
+
+            Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Album).Count(), Is.EqualTo(10));
+            Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.EP).Count(), Is.EqualTo(4));
+            Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Single).Count(), Is.EqualTo(5));
+            Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Live).Count(), Is.EqualTo(5));
+        }
     }
 }
 
