@@ -257,8 +257,8 @@ namespace SongTagger.Core.Test.Unit.Services
         {
             Guid id = Guid.NewGuid();
             Uri actualUri = MusicBrainz.CreateAlbumQueryUri(id);
-
-            String expectedUriString = String.Format("{0}artist/{1}?inc=release-groups", 
+            //release-group?artist=7527f6c2-d762-4b88-b5e2-9244f1e34c46&limit=100
+            String expectedUriString = String.Format("{0}release-group?artist={1}&limit=100", 
                                                      MusicBrainz.baseUrl.ToString(), id.ToString());
 
             Assert.That(actualUri.ToString(), Is.EqualTo(expectedUriString));
@@ -287,10 +287,16 @@ namespace SongTagger.Core.Test.Unit.Services
 
             Assert.That(releases.Count(), Is.EqualTo(20));
 
-            Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Album).Count(), Is.EqualTo(10));
+            Assert.That(releases.Any(a => a.ReleaseDate == new DateTime(2011,3,11)), Is.True);
+            Assert.That(releases.First(a => a.ReleaseDate == new DateTime(2011,3,11)).Name, Is.EqualTo("Endgame"));
+            Assert.That(releases.First(a => a.ReleaseDate == new DateTime(2011,3,11)).Id.ToString(), Is.EqualTo("875b2ff0-604b-4db3-a2f8-b427d725caf2"));
+
+
+            Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Album).Count(), Is.EqualTo(6));
             Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.EP).Count(), Is.EqualTo(4));
             Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Single).Count(), Is.EqualTo(5));
             Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Live).Count(), Is.EqualTo(5));
+            Assert.That(releases.Any(r => r.TypeOfRelease == ReleaseType.Unknow), Is.False);
         }
     }
 }

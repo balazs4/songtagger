@@ -100,6 +100,13 @@ namespace SongTagger.Core
             XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
             IEnumerable<IAlbum> albumList = MusicBrainz.ParseXmlToAlbum(result);
 
+            foreach (Album album in albumList)
+            {
+                album.ArtistOfRelease = artist;
+            }
+
+
+
             return albumList ?? new List<IAlbum>();
         }
         #endregion

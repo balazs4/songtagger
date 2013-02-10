@@ -85,6 +85,7 @@ namespace SongTagger.Core
         }
         #endregion
 
+        private static XNamespace mb = XNamespace.Get("http://musicbrainz.org/ns/mmd-2.0#");
         #region Parse methods
         internal static IArtist ParseXmlToArtist(XDocument result, int minimumScore)
         {
@@ -95,7 +96,6 @@ namespace SongTagger.Core
             IArtist artist = null;
             try
             {
-                XNamespace mb = XNamespace.Get("http://musicbrainz.org/ns/mmd-2.0#");
                 XNamespace ext = XNamespace.Get("http://musicbrainz.org/ns/ext#-2.0");
 
                 #region XName definitions
@@ -137,8 +137,87 @@ namespace SongTagger.Core
 
         internal static IEnumerable<IAlbum> ParseXmlToAlbum(XDocument result)
         {
-            throw new NotImplementedException();
+            IList<IAlbum> albumList = new List<IAlbum>();
+            try
+            {
+                #region XName definitions
+                XName releaseGroup = XName.Get("release-group", mb.NamespaceName);
+                XName title = XName.Get("title", mb.NamespaceName);
+                XName firtReleaseDate = XName.Get("first-release-date", mb.NamespaceName);
+                XName primaryType = XName.Get("primary-type", mb.NamespaceName);
+                XName secondaryType = XName.Get("secondary-type", mb.NamespaceName);
+
+                //XName fallbackType = XName.Get("title");
+                XName albumId = XName.Get("id");
+                #endregion
+
+
+                #region Xml Query
+                IEnumerable<XElement> rawAlbumList = result.Descendants(releaseGroup);
+
+                foreach (XElement item in rawAlbumList)
+                {
+                    #region Core fields
+                    Guid id;
+                    if (!Guid.TryParse(item.Attribute(albumId).Value, out id))
+                        continue;
+
+                    String name = item.Element(title).Value;
+                    if (String.IsNullOrWhiteSpace(name))
+                        continue;
+                    #endregion
+
+                    Album album = new Album() 
+                    {
+                        Id = id,
+                        Name = name
+                    };
+                    albumList.Add(album);
+
+                    #region Nice-to-have fields
+                    DateTime releaseDate;
+                    if (DateTime.TryParse(item.Element(firtReleaseDate).Value, out releaseDate))
+                    {
+                        album.ReleaseDate = releaseDate;
+                    }
+
+                    ReleaseType primary = ParseReleaseType(primaryType, item);
+                    ReleaseType secondary = ParseReleaseType(secondaryType, item);
+
+                    album.TypeOfRelease = (secondary != ReleaseType.Unknow)
+                                          ? secondary
+                                          : primary;
+
+                    #endregion
+                }
+
+                #endregion
+
+
+            } catch (Exception)
+            {
+                return new List<IAlbum>();
+            }
+
+            return albumList ?? new List<IAlbum>();
         }
+
+        private static ReleaseType ParseReleaseType(XName elementName, XElement item)
+        {
+            ReleaseType type;
+            try
+            {
+                if (!Enum.TryParse<ReleaseType>(item.Descendants(elementName).First().Value.ToString(), out type))
+                {
+                    type = ReleaseType.Unknow;
+                }
+            } catch
+            {
+                type = ReleaseType.Unknow;
+            }
+            return type;
+        }
+
         #endregion
 
         #region Uri methods
@@ -185,11 +264,11 @@ namespace SongTagger.Core
         internal static Uri CreateAlbumQueryUri(Guid id)
         {
             //http://musicbrainz.org/ws/2/artist/606bf117-494f-4864-891f-09d63ff6aa4b?inc=release-groups
-
+            //http://musicbrainz.org/ws/2/release-group?artist=7527f6c2-d762-4b88-b5e2-9244f1e34c46&limit=100
             UriBuilder queryUri = new UriBuilder(baseUrl.ToString());
-            queryUri.Path += String.Format("artist/{0}",id.ToString());
+            queryUri.Path += "release-group";
       
-            queryUri.Query = "inc=release-groups";
+            queryUri.Query = String.Format("artist={0}&limit=100", id.ToString());
             return queryUri.Uri;
         }
         #endregion
