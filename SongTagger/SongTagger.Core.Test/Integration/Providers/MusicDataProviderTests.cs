@@ -66,6 +66,8 @@ namespace SongTagger.Core.Test.Integration
             CollectionAssert.AllItemsAreNotNull(releases);
             CollectionAssert.AllItemsAreUnique(releases);
 
+            Assert.That(releases.All(a => a.ArtistOfRelease == artist), Is.True);
+
             return releases.Count();
         }
     }
@@ -105,10 +107,10 @@ namespace SongTagger.Core.Test.Integration
         {
             get
             {
-                yield return new TestCaseData(DefLeppard).Returns(15); // PO....
-                yield return new TestCaseData(RiseAgainst).Returns(10);
+                yield return new TestCaseData(DefLeppard).Returns(90); // PO....
+                yield return new TestCaseData(RiseAgainst).Returns(20);
                 yield return new TestCaseData(Depresszio).Returns(3);
-                yield return new TestCaseData(Deftones).Returns(13);
+                yield return new TestCaseData(Deftones).Returns(54);
             }
         }
     }
