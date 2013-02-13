@@ -106,6 +106,13 @@ namespace SongTagger.Core
             }
 
 
+            foreach (Album album in albumList)
+            {
+                Uri coverQuery = LastFm.CreateAlbumCoverQueryUri(album.Id);
+                XDocument lasfFmResult = LastFmService.ExecuteQuery(coverQuery);
+                (album.Covers as List<ICoverArt>).AddRange(LastFm.ParseXmlToCoverList(lasfFmResult));
+            }
+
 
             return albumList ?? new List<IAlbum>();
         }

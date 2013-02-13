@@ -22,6 +22,10 @@
 //
 using System;
 using NUnit.Framework;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SongTagger.Core.Test.Unit.Services
 {
@@ -31,12 +35,7 @@ namespace SongTagger.Core.Test.Unit.Services
         [Test]
         public void BaseUrlTest()
         {
-            IWebService service = WebServices.Instance(ServiceName.LastFm);
-            LastFm lastFmService = service as LastFm;
-
-            Assert.That(lastFmService, Is.Not.Null);
-            Assert.That(lastFmService.LastFmBaseUrl.ToString(), Contains.Substring("audioscrobbler"));
-            Assert.That(lastFmService.LastFmBaseUrl.ToString(), Contains.Substring("api_key"));
+            Assert.That(LastFm.LastFmBaseUrl.ToString(), Contains.Substring("audioscrobbler"));
         }
 
         [Test]
@@ -44,8 +43,43 @@ namespace SongTagger.Core.Test.Unit.Services
         {
             LastFm instance = new LastFm();
             Assert.That(() => {
-                instance.ExecuteQuery(null);}, Throws.ArgumentException);
+                instance.ExecuteQuery(null);}, 
+            Throws.ArgumentException);
         }
+
+        [Test]
+        public void CreateAlbumCoverQueryUri_ValidId()
+        {
+            Regex regex = new Regex(@"http://ws.audioscrobbler.com/2.0/\?api_key=[0-9a-f]{32}&mbid=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}&method=album.getinfo");
+
+            Uri actualUri = LastFm.CreateAlbumCoverQueryUri(Guid.NewGuid());
+            Console.WriteLine(actualUri.ToString());
+            Assert.That(
+                regex.IsMatch(actualUri.ToString()), 
+                Is.True);
+        }
+
+        [Test]
+        public void ParseXmlToCoverList_ValidXDocument()
+        {
+            XDocument doc = XDocument.Load(TestHelper.GetInputDataFilePath("LastFmTest.ParseXmlToCoverList.ValidCovers.xml"));
+
+            IEnumerable<ICoverArt> coverArt = LastFm.ParseXmlToCoverList(doc);
+
+            CollectionAssert.IsNotEmpty(coverArt);
+            CollectionAssert.AllItemsAreUnique(coverArt);
+
+            Assert.That(coverArt.Count(), Is.EqualTo(5));
+
+            Assert.That(coverArt.Any(c => c.SizeCategory == SizeType.Unknow), Is.False);
+
+            Assert.That(coverArt.Count(c => c.SizeCategory == SizeType.Large), Is.EqualTo(1));
+            Assert.That(coverArt.Count(c => c.SizeCategory == SizeType.ExtraLarge), Is.EqualTo(1));
+            Assert.That(coverArt.Count(c => c.SizeCategory == SizeType.Mega), Is.EqualTo(1));
+            Assert.That(coverArt.Count(c => c.SizeCategory == SizeType.Medium), Is.EqualTo(1));
+            Assert.That(coverArt.Count(c => c.SizeCategory == SizeType.Small), Is.EqualTo(1));
+        }
+
     }
 }
 
