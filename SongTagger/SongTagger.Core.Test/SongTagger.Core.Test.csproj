@@ -56,12 +56,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Unit\Providers\MusicDataProviderTests.cs" />
-    <Compile Include="Unit\Services\LastFmTests.cs" />
     <Compile Include="Unit\Services\WebServicesTests.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="Unit\ArtistTests.cs" />
     <Compile Include="Integration\Providers\MusicDataProviderTests.cs" />
     <Compile Include="Unit\Services\MusicBrainzTests.cs" />
+    <Compile Include="Unit\Services\LastFmTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
@@ -80,6 +80,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="inputData\MusicBrainzTest.ParseXmlToAlbumList.ValidResult.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="inputData\LastFmTest.ParseXmlToCoverList.ValidCovers.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

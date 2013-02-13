@@ -22,29 +22,28 @@
 //
 using System;
 using System.Xml.Linq;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SongTagger.Core
 {
     internal class LastFm : IWebService
     {
-        //api_key='b25b959554ed76058ac220b7b2e0a026'
         //http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=$api_key&artist=$artist&album=$album
+        //http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=xxx&mbid=3c186b52-ca73-46a3-a8e6-04559bfbb581
+        private static Uri baseUri;
+        private static string LastFmApiKey = File.ReadAllLines("lastfm.api").First(); //Request your own key ;-)
 
-        private Uri baseUri;
-        private readonly string LastFmApiKey = "b25b959554ed76058ac220b7b2e0a026";
-
-        internal Uri LastFmBaseUrl
+        internal static Uri LastFmBaseUrl
         {
             get { return baseUri;}
         }
 
-        internal LastFm()
+        static LastFm()
         {
-            UriBuilder uriBuilder = new UriBuilder("http://ws.audioscrobbler.com/2.0/") 
-            {
-                Query = String.Format("api_key={0}", LastFmApiKey)
-            };
-
+            UriBuilder uriBuilder = new UriBuilder("http://ws.audioscrobbler.com/2.0/");
+           
 
             baseUri = uriBuilder.Uri;
         }
@@ -72,6 +71,53 @@ namespace SongTagger.Core
         }
 
         #endregion
+
+        internal static Uri CreateAlbumCoverQueryUri(Guid albumId)
+        {
+            return new UriBuilder(baseUri) 
+            {
+                Query = String.Format("api_key={0}&mbid={1}&method=album.getinfo",LastFmApiKey,albumId.ToString())
+            }.Uri;
+
+
+        }
+
+        internal static IEnumerable<ICoverArt> ParseXmlToCoverList(XDocument lasfFmResult)
+        {
+            try
+            {
+                IList<ICoverArt> coverList = new List<ICoverArt>();
+
+                XName image = XName.Get("image");
+                XName size = XName.Get("size");
+
+                foreach (XElement element in lasfFmResult.Descendants(image).Where(e => !String.IsNullOrWhiteSpace(e.Value.ToString())))
+                {
+                    SizeType imgSize;
+                    if (!Enum.TryParse<SizeType>(element.Attribute(size).Value.ToUpperInvariant(), true, out imgSize))
+                    {
+                        imgSize = SizeType.Unknow;
+                    }
+
+                    Uri imgUrl = new Uri(element.Value.ToString());
+
+                    ICoverArt pic = new CoverArt() 
+                    {
+                        SizeCategory = imgSize,
+                        Url = imgUrl
+                    };
+
+                    coverList.Add(pic);
+                } 
+
+
+
+                return coverList;
+            } catch (Exception)
+            {
+                return new List<ICoverArt>();
+            }
+        }
     }
 }
 
