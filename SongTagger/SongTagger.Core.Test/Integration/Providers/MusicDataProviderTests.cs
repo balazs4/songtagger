@@ -68,6 +68,8 @@ namespace SongTagger.Core.Test.Integration
 
             Assert.That(releases.All(a => a.ArtistOfRelease == artist), Is.True);
 
+            Assert.That(releases.Any(a => a.Covers.Count > 0), Is.True);
+
             return releases.Count();
         }
     }
