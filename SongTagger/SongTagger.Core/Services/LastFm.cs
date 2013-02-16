@@ -72,11 +72,15 @@ namespace SongTagger.Core
 
         #endregion
 
-        internal static Uri CreateAlbumCoverQueryUri(Guid albumId)
+        internal static Uri CreateAlbumCoverQueryUri(IAlbum album)
         {
             return new UriBuilder(baseUri) 
             {
-                Query = String.Format("api_key={0}&mbid={1}&method=album.getinfo",LastFmApiKey,albumId.ToString())
+                Query = String.Format("api_key={0}&artist={1}&album={2}&method=album.getinfo",
+                                      LastFmApiKey,
+                                      album.ArtistOfRelease.Name.Replace(" ", "%20"), 
+                                      album.Name.Replace(" ", "%20")
+                                      )
             }.Uri;
 
 

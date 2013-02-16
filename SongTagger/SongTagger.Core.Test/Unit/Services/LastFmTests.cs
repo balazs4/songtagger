@@ -26,6 +26,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 
 namespace SongTagger.Core.Test.Unit.Services
 {
@@ -50,9 +51,16 @@ namespace SongTagger.Core.Test.Unit.Services
         [Test]
         public void CreateAlbumCoverQueryUri_ValidId()
         {
-            Regex regex = new Regex(@"http://ws.audioscrobbler.com/2.0/\?api_key=[0-9a-f]{32}&mbid=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}&method=album.getinfo");
+            Regex regex = new Regex(@"http://ws.audioscrobbler.com/2.0/\?api_key=[0-9a-f]{32}&artist=[\w\s\d]*&album=[\w\s\d]*&method=album.getinfo");
 
-            Uri actualUri = LastFm.CreateAlbumCoverQueryUri(Guid.NewGuid());
+            Mock<IArtist> artist = new Mock<IArtist>();
+            artist.Setup(a => a.Name).Returns("Def Leppard");
+
+            Mock<IAlbum> album = new Mock<IAlbum>();
+            album.Setup(a => a.Name).Returns("Hysteria");
+            album.Setup(a => a.ArtistOfRelease).Returns(artist.Object);
+
+            Uri actualUri = LastFm.CreateAlbumCoverQueryUri(album.Object);
             Console.WriteLine(actualUri.ToString());
             Assert.That(
                 regex.IsMatch(actualUri.ToString()), 
