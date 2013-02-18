@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Linq;
+using System.Diagnostics;
 
 namespace SongTagger.Core
 {
@@ -75,11 +76,16 @@ namespace SongTagger.Core
                 throw new ArgumentException("Artist name stub could not be null or empty", "nameStub");
             #endregion
 
+            Trace.TraceInformation("Search for '{0}'", nameStub);
             Uri queryUri = MusicBrainz.CreateArtistQueryUri(nameStub);
+
+            Trace.TraceInformation("Download content from '{0}'", queryUri.ToString());
             XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
 
+            Trace.TraceInformation("Parse xml content....");
             IArtist artist = MusicBrainz.ParseXmlToArtist(result, MinimumScore);
 
+            Trace.TraceInformation("...artist: {0}",artist.Name);
             return artist;
         }
 
@@ -93,11 +99,17 @@ namespace SongTagger.Core
                 
             if (artist is UnknowArtist || artist.Id == Guid.Empty)
             {
+                Trace.TraceWarning("Skip album query because 'UnknowArtist'");
                 return new List<IAlbum>();
             }
 
+            Trace.TraceInformation("Search for albums of '{0}'", artist.Name);
             Uri queryUri = MusicBrainz.CreateAlbumQueryUri(artist.Id);
+
+            Trace.TraceInformation("Download content from '{0}'", queryUri.ToString());
             XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
+
+            Trace.TraceInformation("Parse xml content....");
             IEnumerable<IAlbum> albumList = MusicBrainz.ParseXmlToAlbum(result);
 
             foreach (Album album in albumList)
@@ -106,10 +118,15 @@ namespace SongTagger.Core
             }
 
 
-            foreach (Album album in albumList.Where(a => a != null))
+            foreach (Album album in albumList.Where(a => a != null && a.Id != Guid.Empty))
             {
+                Trace.TraceInformation("Search cover for '{0}'", album.Name);
+
                 Uri coverQuery = LastFm.CreateAlbumCoverQueryUri(album);
+                Trace.TraceInformation("Download content from '{0}'", coverQuery.ToString());
+
                 XDocument lasfFmResult = LastFmService.ExecuteQuery(coverQuery);
+
                 (album.Covers as List<ICoverArt>).AddRange(LastFm.ParseXmlToCoverList(lasfFmResult));
             }
 
