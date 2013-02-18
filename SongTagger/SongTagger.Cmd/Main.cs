@@ -55,7 +55,7 @@ namespace SongTagger.Cmd
                 //GetRawArtistCollection(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Rock"));
                 new List<string> 
             {
-                "RiseAgainst", 
+                "RiseAgainst", "BulletForMyValentine", "12Stones"
             };
 
             IEnumerable<IArtist> artistList = ExecuteTask<String, IArtist>(
@@ -119,9 +119,13 @@ namespace SongTagger.Cmd
 
         private static string GetCleanName(string name)
         {
-            return name.Replace(" ", "")
-                        .Replace("ü", "u")
-                        .Replace("ö", "o");
+            return name
+                        .Replace("ó", "o")
+                        .Replace("ű", "ü")
+                        .Replace("ő", "ö")
+                        .Replace("Ó", "O")
+                        .Replace("Ű", "Ü")
+                        .Replace("Ő", "Ö"); 
             //TODO: ....
         }
 
@@ -150,16 +154,17 @@ namespace SongTagger.Cmd
 
         private static void DownloadCoverArt(string albumDirPath, IAlbum release)
         {
-            string name = "cover.jpg";
+            string name = "cover";
 
-            Uri winningUrl = GetCoverUrl(release);
+            Uri coverUrl = GetCoverUrl(release);
 
-            if (winningUrl == null)
+            if (coverUrl == null)
                 return;
 
             using (WebClient client = new WebClient())
             {
-                client.DownloadFile(winningUrl, Path.Combine(albumDirPath, name));
+                string ext = Path.GetExtension(coverUrl.ToString());
+                client.DownloadFile(coverUrl, Path.Combine(albumDirPath,String.Format("{0}{1}",name,ext)));
             }
         }
 
@@ -181,8 +186,8 @@ namespace SongTagger.Cmd
                 return;
 
             File.WriteAllText(
-                Path.Combine(albumDirPath, String.Format("{0}.mbid", release.Id)),
-                String.Format("{0}#{1}",release.Id.ToString(), release.ArtistOfRelease.Id.ToString())
+                Path.Combine(albumDirPath, "album.mbid"),
+                String.Format("{0}",release.Id.ToString())
             );
         }
 
@@ -195,11 +200,15 @@ namespace SongTagger.Cmd
             {
                 Console.WriteLine(group.Key.Name);
                 string artistDirPath = GetOrCreateDirectory(Path.Combine(targetDirPath, GetCleanName(group.Key.Name)));
-
+                
+                File.WriteAllText(
+                    Path.Combine(artistDirPath, "artist.mbid"),
+                    String.Format("{0}",group.Key.Id.ToString())
+                    );
 
                 foreach (IAlbum release in group.Where(a => a.Id != Guid.Empty).OrderBy(r => r.ReleaseDate))
                 {
-                    Console.WriteLine("\t ({0}) [{1}] {2} (#{3})", release.ReleaseDate.Year, release.TypeOfRelease, release.Name, release.Covers.Count);
+                    Console.WriteLine("\t ({0}) [{1}] {2} (#{3})", release.ReleaseDate.Year.ToString().PadLeft(4,'0'), release.TypeOfRelease, release.Name, release.Covers.Count);
                     string albumDirPath = GetOrCreateDirectory(Path.Combine(artistDirPath, GetAlbumDirectoryName(release)));
                     SaveMbidFile(albumDirPath, release);
                     DownloadCoverArt(albumDirPath, release);
