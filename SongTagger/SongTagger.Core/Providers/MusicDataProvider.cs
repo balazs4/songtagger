@@ -25,30 +25,27 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Linq;
 using System.Diagnostics;
+using NLog;
 
 namespace SongTagger.Core
 {
     public class MusicData : IProvider
     {
         private int MinimumScore { get; set; }
+        private readonly Logger logger;
 
         #region Singleton pattern
         private static MusicData singletonInstance;
 
         public static IProvider Provider
         {
-            get
-            {
-                if (singletonInstance == null)
-                    singletonInstance = new MusicData();
-
-                return singletonInstance as IProvider;
-            }
+            get{ return singletonInstance ?? (singletonInstance = new MusicData());}
         }
 
         private MusicData()
         {
             MinimumScore = 100;
+            logger = LogManager.GetCurrentClassLogger();
         }
         #endregion
 
@@ -76,16 +73,16 @@ namespace SongTagger.Core
                 throw new ArgumentException("Artist name stub could not be null or empty", "nameStub");
             #endregion
 
-            Trace.TraceInformation("Search for '{0}'", nameStub);
+            logger.Info("Search for '{0}'", nameStub);
             Uri queryUri = MusicBrainz.CreateArtistQueryUri(nameStub);
 
-            Trace.TraceInformation("Download content from '{0}'", queryUri.ToString());
+            logger.Info("Download content from '{0}'", queryUri.ToString());
             XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
 
-            Trace.TraceInformation("Parse xml content....");
+            logger.Info("Parse xml content....");
             IArtist artist = MusicBrainz.ParseXmlToArtist(result, MinimumScore);
 
-            Trace.TraceInformation("...artist: {0}",artist.Name);
+            logger.Info("...artist: {0}", artist.Name);
             return artist;
         }
 
@@ -99,17 +96,17 @@ namespace SongTagger.Core
                 
             if (artist is UnknowArtist || artist.Id == Guid.Empty)
             {
-                Trace.TraceWarning("Skip album query because 'UnknowArtist'");
+                logger.Warn("Skip album query because 'UnknowArtist'");
                 return new List<IAlbum>();
             }
 
-            Trace.TraceInformation("Search for albums of '{0}'", artist.Name);
+            logger.Info("Search for albums of '{0}'", artist.Name);
             Uri queryUri = MusicBrainz.CreateAlbumQueryUri(artist.Id);
 
-            Trace.TraceInformation("Download content from '{0}'", queryUri.ToString());
+            logger.Info("Download content from '{0}'", queryUri.ToString());
             XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
 
-            Trace.TraceInformation("Parse xml content....");
+            logger.Info("Parse xml content....");
             IEnumerable<IAlbum> albumList = MusicBrainz.ParseXmlToAlbum(result);
 
             foreach (Album album in albumList)
@@ -120,10 +117,10 @@ namespace SongTagger.Core
 
             foreach (Album album in albumList.Where(a => a != null && a.Id != Guid.Empty))
             {
-                Trace.TraceInformation("Search cover for '{0}'", album.Name);
+                logger.Info("Search cover for '{0}'", album.Name);
 
                 Uri coverQuery = LastFm.CreateAlbumCoverQueryUri(album);
-                Trace.TraceInformation("Download content from '{0}'", coverQuery.ToString());
+                logger.Info("Download content from '{0}'", coverQuery.ToString());
 
                 XDocument lasfFmResult = LastFmService.ExecuteQuery(coverQuery);
 

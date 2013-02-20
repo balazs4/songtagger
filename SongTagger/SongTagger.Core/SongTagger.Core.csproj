@@ -45,6 +45,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Core" />
+    <Reference Include="NLog">
+      <HintPath>..\packages\NLog.2.0.0.2000\lib\net40\NLog.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Artist.cs" />
@@ -58,5 +61,8 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Providers\MusicDataProvider.cs" />
     <Compile Include="Providers\IProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
