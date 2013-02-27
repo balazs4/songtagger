@@ -119,10 +119,8 @@ namespace SongTagger.Core.Service
                     data = client.DownloadString(queryUrl);
                 }
 
-            } catch (WebException e)
+            } catch (WebException)
             {
-                //Console.Error.WriteLine("{0}", queryUrl.ToString());
-                //Console.Error.WriteLine(e.ToString());
             }
             return data;
         }
