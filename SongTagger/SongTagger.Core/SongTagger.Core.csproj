@@ -64,6 +64,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\MusicDataProvider.cs" />
     <Compile Include="Service\IProvider.cs" />
+    <Compile Include="Song.cs" />
+    <Compile Include="Release.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

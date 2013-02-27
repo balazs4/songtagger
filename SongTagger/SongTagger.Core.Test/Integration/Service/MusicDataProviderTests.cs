@@ -60,7 +60,7 @@ namespace SongTagger.Core.Test.Integration.Service
 
             Assert.That(
                 () => {
-                releases = MusicData.Provider.GetReleases(artist);
+                releases = MusicData.Provider.GetAlbums(artist);
             }, Throws.Nothing);
 
             Assert.That(releases, Is.Not.Null);
