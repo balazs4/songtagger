@@ -28,7 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 
-namespace SongTagger.Core.Test.Unit.Services
+namespace SongTagger.Core.Test.Unit.Service
 {
     [TestFixture()]
     public class LastFmTests

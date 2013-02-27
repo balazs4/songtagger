@@ -32,7 +32,7 @@ using System.Collections;
 using System.Reflection;
 using Moq;
 
-namespace SongTagger.Core.Test.Unit.Services
+namespace SongTagger.Core.Test.Unit.Service
 {
     class MusicBrainzTestCaseSource
     {
