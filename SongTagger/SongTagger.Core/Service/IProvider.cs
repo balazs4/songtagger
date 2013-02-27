@@ -24,7 +24,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SongTagger.Core
+namespace SongTagger.Core.Service
 {
     public interface IProvider
     {

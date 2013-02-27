@@ -26,8 +26,9 @@ using NUnit.Framework;
 using SongTagger.Core;
 using Moq;
 using System.Collections.Generic;
+using SongTagger.Core.Service;
 
-namespace SongTagger.Core.Test.Unit.Providers
+namespace SongTagger.Core.Test.Unit.Service
 {
     [TestFixture()]
     public class MusicDataProviderTests

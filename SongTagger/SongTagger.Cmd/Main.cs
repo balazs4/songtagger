@@ -28,6 +28,7 @@ using System.Linq;
 
 using SongTagger.Core;
 using System.Net;
+using SongTagger.Core.Service;
 
 namespace SongTagger.Cmd
 {

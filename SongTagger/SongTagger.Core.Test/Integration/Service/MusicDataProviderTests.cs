@@ -26,8 +26,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
 using Moq;
+using SongTagger.Core.Service;
 
-namespace SongTagger.Core.Test.Integration
+namespace SongTagger.Core.Test.Integration.Service
 {
     [TestFixture()]
     [Explicit]
