@@ -54,13 +54,13 @@
     <Compile Include="Album.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="CoverArt.cs" />
-    <Compile Include="Services\MusicBrainz.cs" />
-    <Compile Include="Services\WebServices.cs" />
-    <Compile Include="Services\IWebService.cs" />
-    <Compile Include="Services\LastFm.cs" />
+    <Compile Include="Service\MusicBrainz.cs" />
+    <Compile Include="Service\WebServices.cs" />
+    <Compile Include="Service\IWebService.cs" />
+    <Compile Include="Service\LastFm.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Providers\MusicDataProvider.cs" />
-    <Compile Include="Providers\IProvider.cs" />
+    <Compile Include="Service\MusicDataProvider.cs" />
+    <Compile Include="Service\IProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
