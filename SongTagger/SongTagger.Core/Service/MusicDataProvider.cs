@@ -27,7 +27,7 @@ using System.Linq;
 using System.Diagnostics;
 using NLog;
 
-namespace SongTagger.Core
+namespace SongTagger.Core.Service
 {
     public class MusicData : IProvider
     {
