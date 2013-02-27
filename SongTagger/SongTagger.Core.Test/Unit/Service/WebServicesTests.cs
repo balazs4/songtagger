@@ -26,7 +26,7 @@ using NUnit.Framework;
 
 using SongTagger.Core;
 
-namespace SongTagger.Core.Test.Unit.Services
+namespace SongTagger.Core.Test.Unit.Service
 {
     [TestFixture()]
     public class WebServicesTests
