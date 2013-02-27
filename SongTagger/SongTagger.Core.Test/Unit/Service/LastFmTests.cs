@@ -27,6 +27,7 @@ using System.Xml.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
+using SongTagger.Core.Service;
 
 namespace SongTagger.Core.Test.Unit.Service
 {

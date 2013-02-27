@@ -32,6 +32,8 @@ using System.Collections;
 using System.Reflection;
 using Moq;
 
+using SongTagger.Core.Service;
+
 namespace SongTagger.Core.Test.Unit.Service
 {
     class MusicBrainzTestCaseSource
