@@ -55,13 +55,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Unit\Providers\MusicDataProviderTests.cs" />
-    <Compile Include="Unit\Services\WebServicesTests.cs" />
+    <Compile Include="Unit\Service\MusicDataProviderTests.cs" />
+    <Compile Include="Unit\Service\WebServicesTests.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="Unit\ArtistTests.cs" />
-    <Compile Include="Integration\Providers\MusicDataProviderTests.cs" />
-    <Compile Include="Unit\Services\MusicBrainzTests.cs" />
-    <Compile Include="Unit\Services\LastFmTests.cs" />
+    <Compile Include="Integration\Service\MusicDataProviderTests.cs" />
+    <Compile Include="Unit\Service\MusicBrainzTests.cs" />
+    <Compile Include="Unit\Service\LastFmTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
