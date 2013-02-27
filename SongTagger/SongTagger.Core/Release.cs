@@ -1,10 +1,10 @@
 //
-//  IProvider.cs
+//  Release.cs
 //
 //  Author:
 //       balazs4 <balazs4web@gmail.com>
 //
-//  Copyright (c) 2012 GPLv2 (CodePlex)
+//  Copyright (c) 2013 
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,15 +24,31 @@
 using System;
 using System.Collections.Generic;
 
-namespace SongTagger.Core.Service
+namespace SongTagger.Core
 {
-    public interface IProvider
+
+    internal class Release : IRelease
     {
-        IArtist GetArtist(string nameStub);
+        public Release()
+        {
+            Songs = new List<ISong>();
+        }
 
-        IEnumerable<IAlbum> GetAlbums(IArtist artist);
+        #region IRelease implementation
 
-        IEnumerable<IRelease> GetReleases(IAlbum album);
+        public IAlbum Album { get; internal set; }
+
+        public IEnumerable<ISong> Songs { get; private set; }
+
+        #endregion
+
+        #region IEntity implementation
+
+        public Guid Id{ get; private set; }
+
+        public string Name{ get; private set; }
+
+        #endregion
 
     }
     

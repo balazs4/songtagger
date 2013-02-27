@@ -71,7 +71,7 @@ namespace SongTagger.Cmd
                 artistList, 
                 (artist, temp) =>
             {
-                temp.AddRange(MusicData.Provider.GetReleases(artist));
+                temp.AddRange(MusicData.Provider.GetAlbums(artist));
             }
             );
 

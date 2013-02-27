@@ -86,7 +86,7 @@ namespace SongTagger.Core.Service
             return artist;
         }
 
-        public IEnumerable<IAlbum> GetReleases(IArtist artist)
+        public IEnumerable<IAlbum> GetAlbums(IArtist artist)
         {
             #region Argument check
             if (artist == null)
@@ -130,6 +130,13 @@ namespace SongTagger.Core.Service
 
             return albumList ?? new List<IAlbum>();
         }
+
+        public IEnumerable<IRelease> GetReleases(IAlbum album)
+        {
+            throw new NotImplementedException();
+        }
+
+
         #endregion
 
     }

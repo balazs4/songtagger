@@ -56,11 +56,11 @@ namespace SongTagger.Core.Test.Unit.Service
         public void GetReleases_ArgumentCheck_ArgumentException_Expected()
         {
             Assert.Throws<ArgumentException>(
-                () => MusicData.Provider.GetReleases(null)
+                () => MusicData.Provider.GetAlbums(null)
             );
 
             Assert.Throws<ArgumentException>(
-                () => MusicData.Provider.GetReleases(null)
+                () => MusicData.Provider.GetAlbums(null)
             );
         }
 
@@ -71,7 +71,7 @@ namespace SongTagger.Core.Test.Unit.Service
             Mock<IArtist> unknowArtist = new Mock<IArtist>();
             unknowArtist.Setup(a => a.Id).Returns(Guid.Empty);
 
-            IEnumerable<IAlbum> albums = MusicData.Provider.GetReleases(unknowArtist.Object);            
+            IEnumerable<IAlbum> albums = MusicData.Provider.GetAlbums(unknowArtist.Object);            
             CollectionAssert.IsEmpty(albums);
         }
     }
