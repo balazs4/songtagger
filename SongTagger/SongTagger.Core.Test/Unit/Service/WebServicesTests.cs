@@ -25,6 +25,7 @@ using System.Collections;
 using NUnit.Framework;
 
 using SongTagger.Core;
+using SongTagger.Core.Service;
 
 namespace SongTagger.Core.Test.Unit.Service
 {
