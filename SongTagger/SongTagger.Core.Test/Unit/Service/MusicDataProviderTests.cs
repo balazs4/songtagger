@@ -21,11 +21,11 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 using System;
-using NUnit.Framework;
-
-using SongTagger.Core;
-using Moq;
 using System.Collections.Generic;
+
+using Moq;
+using NUnit.Framework;
+using SongTagger.Core;
 using SongTagger.Core.Service;
 
 namespace SongTagger.Core.Test.Unit.Service
