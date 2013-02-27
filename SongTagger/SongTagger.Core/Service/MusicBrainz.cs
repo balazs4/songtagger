@@ -30,7 +30,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Text;
 
-namespace SongTagger.Core
+namespace SongTagger.Core.Service
 {
     internal class MusicBrainz : IWebService
     {
