@@ -26,7 +26,7 @@ using System.Xml.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace SongTagger.Core
+namespace SongTagger.Core.Service
 {
     public enum ServiceName
     {

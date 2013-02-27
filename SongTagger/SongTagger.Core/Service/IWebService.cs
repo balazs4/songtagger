@@ -26,7 +26,7 @@ using System.Net;
 using System.Xml.Linq;
 using System.Collections.Generic;
 
-namespace SongTagger.Core
+namespace SongTagger.Core.Service
 {
     public interface IWebService
     {

@@ -26,7 +26,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SongTagger.Core
+namespace SongTagger.Core.Service
 {
     internal class LastFm : IWebService
     {
