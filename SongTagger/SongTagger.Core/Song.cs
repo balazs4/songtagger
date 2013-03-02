@@ -25,14 +25,6 @@ using System.Collections.Generic;
 
 namespace SongTagger.Core
 {
-    public interface IRelease : IEntity
-    {
-        IAlbum Album { get; }
-
-        IEnumerable<ISong> Songs { get; }
-    }
-
-
     public interface ISong : IEntity
     {
         IAlbum Album { get; }
