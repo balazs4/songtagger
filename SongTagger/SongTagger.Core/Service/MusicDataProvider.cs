@@ -31,7 +31,7 @@ namespace SongTagger.Core.Service
 {
     public class MusicData : IProvider
     {
-        private int MinimumScore { get; set; }
+
         private readonly Logger logger;
 
         #region Singleton pattern
@@ -44,7 +44,6 @@ namespace SongTagger.Core.Service
 
         private MusicData()
         {
-            MinimumScore = 100;
             logger = LogManager.GetCurrentClassLogger();
         }
         #endregion
@@ -80,8 +79,10 @@ namespace SongTagger.Core.Service
             XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
 
             logger.Info("Parse xml content....");
-            IArtist artist = MusicBrainz.ParseXmlToArtist(result, MinimumScore);
+            IEnumerable<IArtist> artistList = MusicBrainz.ParseXmlToListOf<IArtist>(result);
 
+            IArtist artist = artistList.FirstOrDefault() ?? new UnknowArtist();
+       
             logger.Info("...artist: {0}", artist.Name);
             return artist;
         }
@@ -107,7 +108,7 @@ namespace SongTagger.Core.Service
             XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
 
             logger.Info("Parse xml content....");
-            IEnumerable<IAlbum> albumList = MusicBrainz.ParseXmlToAlbum(result);
+            IEnumerable<IAlbum> albumList = MusicBrainz.ParseXmlToListOf<IAlbum>(result);
 
             foreach (Album album in albumList)
             {

@@ -226,7 +226,7 @@ namespace SongTagger.Core.Test.Unit.Service
             IArtist artist = null;
             Assert.That(() => 
             {
-                artist = MusicBrainz.ParseXmlToArtist(XDocument.Load(xmlPath), minimumScore);
+                artist = MusicBrainz.ParseXmlToListOf<IArtist>(XDocument.Load(xmlPath)).FirstOrDefault() ?? new UnknowArtist();
             }, 
             Throws.Nothing);
 
@@ -243,14 +243,13 @@ namespace SongTagger.Core.Test.Unit.Service
             IArtist artist = null;
             Assert.That(() => 
             {
-                artist = MusicBrainz.ParseXmlToArtist(null, 0);
+                artist = MusicBrainz.ParseXmlToListOf<IArtist>(null).FirstOrDefault();
             }, 
             Throws.Nothing);
 
             Assert.That(artist, Is.Not.Null);
             Assert.That(artist, Is.InstanceOf<UnknowArtist>());
 
-        
         }
         #endregion
 
@@ -279,7 +278,7 @@ namespace SongTagger.Core.Test.Unit.Service
             IEnumerable<IAlbum> releases = null;
             Assert.That(() => 
                         {
-                releases = MusicBrainz.ParseXmlToAlbum(XDocument.Load(xmlPath));
+                releases = MusicBrainz.ParseXmlToListOf<IAlbum>(XDocument.Load(xmlPath));
             }, 
             Throws.Nothing);
            

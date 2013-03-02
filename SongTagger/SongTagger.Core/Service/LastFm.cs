@@ -33,7 +33,7 @@ namespace SongTagger.Core.Service
         //http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=$api_key&artist=$artist&album=$album
         //http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=xxx&mbid=3c186b52-ca73-46a3-a8e6-04559bfbb581
         private static Uri baseUri;
-        private static string LastFmApiKey = File.ReadAllLines("lastfm.api").First(); //Request your own key ;-)
+        private static string LastFmApiKey; //Request your own key ;-)
 
         internal static Uri LastFmBaseUrl
         {
@@ -43,7 +43,10 @@ namespace SongTagger.Core.Service
         static LastFm()
         {
             UriBuilder uriBuilder = new UriBuilder("http://ws.audioscrobbler.com/2.0/");
-           
+            if (File.Exists("lastfm.api"))
+                LastFmApiKey = File.ReadAllLines("lastfm.api").FirstOrDefault() ?? Guid.Empty.ToString().Replace("-",String.Empty); 
+            else
+                LastFmApiKey = Guid.Empty.ToString().Replace("-",String.Empty);
 
             baseUri = uriBuilder.Uri;
         }

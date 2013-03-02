@@ -35,33 +35,38 @@ namespace SongTagger.Core.Service
     internal class MusicBrainz : IWebService
     {
         private static readonly Object lockObject = new Object();
-        internal static readonly TimeSpan WAIT_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 2); //http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
-        internal static readonly Uri baseUrl = new Uri("http://musicbrainz.org/ws/2/");
 
+        /// <summary>
+        /// See: http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
+        /// </summary>
+        internal static readonly TimeSpan WAIT_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 2);
+        internal static readonly Uri baseUrl = new Uri("http://musicbrainz.org/ws/2/");
+        private static XNamespace mb = XNamespace.Get("http://musicbrainz.org/ns/mmd-2.0#");
 
         #region C'tors
         internal MusicBrainz()
         {
-
         }
         #endregion
-
+      
+        #region Download
         internal static String DownloadContentSafely(Uri queryUrl, WebServices.DownloadContentDelegate downloadAction)
         {
             String content = String.Empty;
             lock (lockObject)
             {
                 Stopwatch timer = Stopwatch.StartNew();
-
+                
                 content = downloadAction(queryUrl);
-
+                
                 timer.Stop();
-
+                
                 if (timer.Elapsed < WAIT_TIME_BETWEEN_QUERIES)
                     Thread.Sleep(WAIT_TIME_BETWEEN_QUERIES - timer.Elapsed);
             }
             return content;
         }
+
 
         #region IWebService implementation
         public XDocument ExecuteQuery(Uri queryUrl)
@@ -84,14 +89,35 @@ namespace SongTagger.Core.Service
             return result;
         }
         #endregion
+        #endregion
 
-        private static XNamespace mb = XNamespace.Get("http://musicbrainz.org/ns/mmd-2.0#");
         #region Parse methods
-        internal static IArtist ParseXmlToArtist(XDocument result, int minimumScore)
-        {
-            if (result == null)
-                return new UnknowArtist();
 
+        public static IEnumerable<TResult> ParseXmlToListOf<TResult>(XDocument xml) where TResult : IEntity
+        {
+            string name = typeof(TResult).Name;
+
+            switch (name)
+            {
+                case "IArtist":
+                    return ParseXmlToArtist(xml) as IEnumerable<TResult>;
+                    break;
+
+                case "IAlbum":
+                    return ParseXmlToAlbum(xml) as IEnumerable<TResult>;
+                    break;
+
+                default:
+                    return new List<TResult>();
+                    break;
+            }
+
+
+        }
+
+        private static IEnumerable<IArtist> ParseXmlToArtist(XDocument result)
+        {
+            int minimumScore = 100;
 
             IArtist artist = null;
             try
@@ -129,13 +155,13 @@ namespace SongTagger.Core.Service
 
             } catch (Exception)
             {
-                return new UnknowArtist();
+                artist = null;
             }
 
-            return artist ?? new UnknowArtist();
+            yield return artist ?? new UnknowArtist();
         }
 
-        internal static IEnumerable<IAlbum> ParseXmlToAlbum(XDocument result)
+        private static IEnumerable<IAlbum> ParseXmlToAlbum(XDocument result)
         {
             IList<IAlbum> albumList = new List<IAlbum>();
             try
