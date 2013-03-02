@@ -257,7 +257,7 @@ namespace SongTagger.Core.Test.Unit.Service
         public void CreateAlbumQueryUri_ExpectedValidUrl()
         {
             Guid id = Guid.NewGuid();
-            Uri actualUri = MusicBrainz.CreateAlbumQueryUri(id);
+            Uri actualUri = MusicBrainz.CreateQueryUriTo<IAlbum>(id);
             //release-group?artist=7527f6c2-d762-4b88-b5e2-9244f1e34c46&limit=100
             String expectedUriString = String.Format("{0}release-group?artist={1}&limit=100", 
                                                      MusicBrainz.baseUrl.ToString(), id.ToString());

@@ -72,5 +72,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tag\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
 </Project>

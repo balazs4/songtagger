@@ -31,7 +31,6 @@ namespace SongTagger.Core.Service
 {
     public class MusicData : IProvider
     {
-
         private readonly Logger logger;
 
         #region Singleton pattern
@@ -48,6 +47,7 @@ namespace SongTagger.Core.Service
         }
         #endregion
 
+        #region Services
         private IWebService MusicBrainzService
         {
             get
@@ -63,6 +63,7 @@ namespace SongTagger.Core.Service
                 return WebServices.Instance(ServiceName.LastFm);
             }
         }
+        #endregion
 
         #region IProvider implementation
         public IArtist GetArtist(string nameStub)
@@ -102,7 +103,7 @@ namespace SongTagger.Core.Service
             }
 
             logger.Info("Search for albums of '{0}'", artist.Name);
-            Uri queryUri = MusicBrainz.CreateAlbumQueryUri(artist.Id);
+            Uri queryUri = MusicBrainz.CreateQueryUriTo<IAlbum>(artist.Id);
 
             logger.Info("Download content from '{0}'", queryUri.ToString());
             XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
@@ -134,10 +135,16 @@ namespace SongTagger.Core.Service
 
         public IEnumerable<IRelease> GetReleases(IAlbum album)
         {
+            //TODO: releases; mbid = album.Id
+            //http://musicbrainz.org/ws/2/release-group/mbid?inc=releases
+
+
+            //TODO: songs of releases; mbid = release.Id
+            //http://musicbrainz.org/ws/2/release/mbid?inc=recordings
+
+
             throw new NotImplementedException();
         }
-
-
         #endregion
 
     }

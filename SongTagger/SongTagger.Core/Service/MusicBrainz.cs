@@ -247,7 +247,7 @@ namespace SongTagger.Core.Service
         #endregion
 
         #region Uri methods
-
+        //TODO: String/Name Utils namespace
         internal static string SplitArtistName(string rawName)
         {
             if (rawName.Contains(" "))
@@ -262,32 +262,51 @@ namespace SongTagger.Core.Service
             }
 
             return Regex.Replace(rawName, "([0-9]+|[A-Z])", " $1", RegexOptions.Compiled).Trim();
-
         }
 
         internal static Uri CreateArtistQueryUri(string nameOfArtist)
         {
-
             UriBuilder queryUri = new UriBuilder(baseUrl.ToString());
             queryUri.Path += "artist";
-
             if (String.IsNullOrWhiteSpace(nameOfArtist))
             {
                 queryUri.Query = "query=";
                 return queryUri.Uri;
             }
-
             string encoded = SplitArtistName(nameOfArtist);
-
             string luceneQuery = String.Format("{0}%20AND%20type:group", encoded.Replace(" ", "%20"));
-
             queryUri.Query = String.Format("query={0}", luceneQuery);
-
-
             return queryUri.Uri;
         }
 
-        internal static Uri CreateAlbumQueryUri(Guid id)
+        public static Uri CreateQueryUriTo<T>(Guid id) where T : IEntity
+        {
+            string targetName = typeof(T).Name;
+            Uri uri = null;
+            switch (targetName)
+            {
+                case "IArtist":
+                    throw new NotSupportedException("Artist lookup with ID currently not supported");
+                    break;
+
+                case "IAlbum":
+                    uri = CreateAlbumQueryUri(id);
+                    break;
+
+                case "IRelease":
+                    break;
+
+                case "ISong":
+                    break;
+
+                default:
+                    uri = new Uri("");
+                    break;
+            }
+            return uri;
+        }
+
+        private static Uri CreateAlbumQueryUri(Guid id)
         {
             //http://musicbrainz.org/ws/2/artist/606bf117-494f-4864-891f-09d63ff6aa4b?inc=release-groups
             //http://musicbrainz.org/ws/2/release-group?artist=7527f6c2-d762-4b88-b5e2-9244f1e34c46&limit=100
