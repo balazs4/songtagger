@@ -110,7 +110,7 @@ namespace SongTagger.Core.Test.Integration.Service
         {
             get
             {
-                yield return new TestCaseData(DefLeppard).Returns(90); // PO....
+                yield return new TestCaseData(DefLeppard).Returns(91); // PO....
                 yield return new TestCaseData(RiseAgainst).Returns(20);
                 yield return new TestCaseData(Depresszio).Returns(3);
                 yield return new TestCaseData(Deftones).Returns(54);
