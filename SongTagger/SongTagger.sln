@@ -7,12 +7,38 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Core.Test", "Son
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Cmd", "SongTagger.Cmd\SongTagger.Cmd.csproj", "{B85B2213-5C22-4DE2-AA28-C832F193A8C9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9403C1C0-501F-42D7-87D2-060E6C9680DA}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = SongTagger.Core\\SongTagger.Core.csproj
+		SccProjectName1 = SongTagger.Core
+		SccLocalPath1 = SongTagger.Core
+		SccProjectUniqueName2 = SongTagger.Core.Test\\SongTagger.Core.Test.csproj
+		SccProjectName2 = SongTagger.Core.Test
+		SccLocalPath2 = SongTagger.Core.Test
+		SccProjectUniqueName3 = SongTagger.Cmd\\SongTagger.Cmd.csproj
+		SccProjectName3 = SongTagger.Cmd
+		SccLocalPath3 = SongTagger.Cmd
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Release|Any CPU.Build.0 = Release|Any CPU
 		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -20,10 +46,9 @@ Global
 		{B85B2213-5C22-4DE2-AA28-C832F193A8C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B85B2213-5C22-4DE2-AA28-C832F193A8C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B85B2213-5C22-4DE2-AA28-C832F193A8C9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = SongTagger.Core\SongTagger.Core.csproj
@@ -42,7 +67,7 @@ Global
 		$5.NamingStyle = None
 		$5.IncludeInstanceMembers = True
 		$5.IncludeStaticEntities = True
-		$0.TextStylePolicy = $6
+		$0.TextStylePolicy = $11
 		$6.inheritsSet = VisualStudio
 		$6.inheritsScope = text/plain
 		$6.scope = text/x-csharp
@@ -65,43 +90,21 @@ Global
 		$7.inheritsSet = Mono
 		$7.inheritsScope = text/x-csharp
 		$7.scope = text/x-csharp
-		$0.TextStylePolicy = $8
 		$8.inheritsSet = VisualStudio
 		$8.inheritsScope = text/plain
 		$8.scope = text/plain
-		$0.TextStylePolicy = $9
 		$9.inheritsSet = null
 		$9.scope = application/config+xml
-		$0.XmlFormattingPolicy = $10
+		$0.XmlFormattingPolicy = $12
 		$10.inheritsSet = null
 		$10.scope = application/config+xml
-		$0.TextStylePolicy = $11
 		$11.inheritsSet = Mono
 		$11.inheritsScope = text/plain
 		$11.scope = application/xml
-		$0.XmlFormattingPolicy = $12
 		$12.inheritsSet = Mono
 		$12.inheritsScope = application/xml
 		$12.scope = application/xml
 		description = http://songtagger.codeplex.com/
 		outputpath = bin
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = SongTagger.Core\\SongTagger.Core.csproj
-		SccProjectName1 = SongTagger.Core
-		SccLocalPath1 = SongTagger.Core
-		SccProjectUniqueName2 = SongTagger.Core.Test\\SongTagger.Core.Test.csproj
-		SccProjectName2 = SongTagger.Core.Test
-		SccLocalPath2 = SongTagger.Core.Test
-		SccProjectUniqueName3 = SongTagger.ArtistDemo\\SongTagger.ArtistDemo.csproj
-		SccProjectName3 = SongTagger.ArtistDemo
-		SccLocalPath3 = SongTagger.ArtistDemo
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
