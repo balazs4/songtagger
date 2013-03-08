@@ -27,7 +27,7 @@ namespace SongTagger.Core
 {
 	public enum ReleaseType
 	{
-		Unknow = 0,
+		Unknown = 0,
 		Album,
 		EP,
 		Live,
@@ -52,7 +52,7 @@ namespace SongTagger.Core
 		public Album()
 		{
 			Id = Guid.Empty;
-			ArtistOfRelease = new UnknowArtist();
+			ArtistOfRelease = new UnknownArtist();
 			Covers = new List<ICoverArt>();
 		}
 

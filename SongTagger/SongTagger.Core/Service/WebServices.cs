@@ -30,6 +30,7 @@ namespace SongTagger.Core.Service
 {
     public enum ServiceName
     {
+        Unknown = 0,
         MusicBrainz = 1,
         LastFm = 2
     }

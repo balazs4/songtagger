@@ -47,7 +47,7 @@ namespace SongTagger.Core.Test.Integration.Service
             }, Throws.Nothing);
 
             Assert.That(artist, Is.Not.Null);
-            Assert.That(artist, Is.Not.InstanceOf<UnknowArtist>());
+            Assert.That(artist, Is.Not.InstanceOf<UnknownArtist>());
             StringAssert.AreEqualIgnoringCase(artistName, artist.Name);
 
             return artist.Id.ToString();

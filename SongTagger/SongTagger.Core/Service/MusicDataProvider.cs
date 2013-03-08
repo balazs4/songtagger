@@ -48,7 +48,7 @@ namespace SongTagger.Core.Service
         #endregion
 
         #region Services
-        private IWebService MusicBrainzService
+        private static IWebService MusicBrainzService
         {
             get
             {
@@ -56,7 +56,7 @@ namespace SongTagger.Core.Service
             }
         }
 
-        private IWebService LastFmService
+        private static IWebService LastFmService
         {
             get
             {
@@ -82,7 +82,7 @@ namespace SongTagger.Core.Service
             logger.Info("Parse xml content....");
             IEnumerable<IArtist> artistList = MusicBrainz.ParseXmlToListOf<IArtist>(result);
 
-            IArtist artist = artistList.FirstOrDefault() ?? new UnknowArtist();
+            IArtist artist = artistList.FirstOrDefault() ?? new UnknownArtist();
        
             logger.Info("...artist: {0}", artist.Name);
             return artist;
@@ -96,9 +96,9 @@ namespace SongTagger.Core.Service
 
             #endregion
                 
-            if (artist is UnknowArtist || artist.Id == Guid.Empty)
+            if (artist is UnknownArtist || artist.Id == Guid.Empty)
             {
-                logger.Warn("Skip album query because 'UnknowArtist'");
+                logger.Warn("Skip album query because 'UnknownArtist'");
                 return new List<IAlbum>();
             }
 

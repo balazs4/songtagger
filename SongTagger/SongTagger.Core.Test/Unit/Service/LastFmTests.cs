@@ -80,7 +80,7 @@ namespace SongTagger.Core.Test.Unit.Service
 
             Assert.That(coverArt.Count(), Is.EqualTo(5));
 
-            Assert.That(coverArt.Any(c => c.SizeCategory == SizeType.Unknow), Is.False);
+            Assert.That(coverArt.Any(c => c.SizeCategory == SizeType.Unknown), Is.False);
 
             Assert.That(coverArt.Count(c => c.SizeCategory == SizeType.Large), Is.EqualTo(1));
             Assert.That(coverArt.Count(c => c.SizeCategory == SizeType.ExtraLarge), Is.EqualTo(1));

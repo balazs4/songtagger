@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Artist.cs" />
     <Compile Include="Album.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="CoverArt.cs" />
     <Compile Include="Service\MusicBrainz.cs" />
