@@ -27,7 +27,7 @@ namespace SongTagger.Core
 {
 	public enum SizeType
 	{
-		Unknow,
+		Unknown,
 		Small,
 		Medium,
 		Large,
@@ -57,7 +57,7 @@ namespace SongTagger.Core
 		public NoCoverArt()
 		{
 			Url = new Uri("localhost");
-			SizeCategory = SizeType.Unknow;
+			SizeCategory = SizeType.Unknown;
 		}
 
 		#region ICoverArt implementation

@@ -51,9 +51,9 @@ namespace SongTagger.Core
 
         #region IEntity implementation
 
-        public Guid Id{ get; private set; }
+        public Guid Id{ get; internal set; }
 
-        public string Name{ get; private set; }
+        public string Name{ get; internal set; }
 
         #endregion
 

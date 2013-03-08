@@ -82,9 +82,9 @@ namespace SongTagger.Core.Test.Unit.Service
             }
             #endregion
 
-            #region Unknow artist
+            #region Unknown artist
             {
-                IArtist unknow = new UnknowArtist();
+                IArtist unknow = new UnknownArtist();
                 artistCollection.Add(unknow);
             }
             #endregion
@@ -96,7 +96,7 @@ namespace SongTagger.Core.Test.Unit.Service
             {
                 yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.ValidArtistWithGenres.xml", 99, artistCollection.FirstOrDefault(a => a.Name == "Rise Against"));
                 yield return new TestCaseData("MusicBrainzTest.ParseXmlToArtist.ValidArtistWithoutGenres.xml", 100, artistCollection.FirstOrDefault(a => a.Name == "Depresszió"));
-                yield return new TestCaseData("MusicBrainzTest.Error.xml", 0, artistCollection.FirstOrDefault(a => a is UnknowArtist));
+                yield return new TestCaseData("MusicBrainzTest.Error.xml", 0, artistCollection.FirstOrDefault(a => a is UnknownArtist));
             }       
         }
     }
@@ -226,7 +226,7 @@ namespace SongTagger.Core.Test.Unit.Service
             IArtist artist = null;
             Assert.That(() => 
             {
-                artist = MusicBrainz.ParseXmlToListOf<IArtist>(XDocument.Load(xmlPath)).FirstOrDefault() ?? new UnknowArtist();
+                artist = MusicBrainz.ParseXmlToListOf<IArtist>(XDocument.Load(xmlPath)).FirstOrDefault() ?? new UnknownArtist();
             }, 
             Throws.Nothing);
 
@@ -248,7 +248,7 @@ namespace SongTagger.Core.Test.Unit.Service
             Throws.Nothing);
 
             Assert.That(artist, Is.Not.Null);
-            Assert.That(artist, Is.InstanceOf<UnknowArtist>());
+            Assert.That(artist, Is.InstanceOf<UnknownArtist>());
 
         }
         #endregion
@@ -297,7 +297,7 @@ namespace SongTagger.Core.Test.Unit.Service
             Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.EP).Count(), Is.EqualTo(4));
             Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Single).Count(), Is.EqualTo(5));
             Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Live).Count(), Is.EqualTo(5));
-            Assert.That(releases.Any(r => r.TypeOfRelease == ReleaseType.Unknow), Is.False);
+            Assert.That(releases.Any(r => r.TypeOfRelease == ReleaseType.Unknown), Is.False);
         }
     }
 }

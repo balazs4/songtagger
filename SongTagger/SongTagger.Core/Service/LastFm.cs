@@ -103,7 +103,7 @@ namespace SongTagger.Core.Service
                     SizeType imgSize;
                     if (!Enum.TryParse<SizeType>(element.Attribute(size).Value.ToUpperInvariant(), true, out imgSize))
                     {
-                        imgSize = SizeType.Unknow;
+                        imgSize = SizeType.Unknown;
                     }
 
                     Uri imgUrl = new Uri(element.Value.ToString());

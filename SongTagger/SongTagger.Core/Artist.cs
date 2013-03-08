@@ -58,9 +58,9 @@ namespace SongTagger.Core
         }
     }
 
-    public class UnknowArtist : IArtist
+    public class UnknownArtist : IArtist
     {
-        public UnknowArtist()
+        public UnknownArtist()
         {
             Id = Guid.Empty;
             Genres = new List<String> 

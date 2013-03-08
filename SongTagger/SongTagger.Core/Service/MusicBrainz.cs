@@ -158,7 +158,7 @@ namespace SongTagger.Core.Service
                 artist = null;
             }
 
-            yield return artist ?? new UnknowArtist();
+            yield return artist ?? new UnknownArtist();
         }
 
         private static IEnumerable<IAlbum> ParseXmlToAlbum(XDocument result)
@@ -210,7 +210,7 @@ namespace SongTagger.Core.Service
                     ReleaseType primary = ParseReleaseType(primaryType, item);
                     ReleaseType secondary = ParseReleaseType(secondaryType, item);
 
-                    album.TypeOfRelease = (secondary != ReleaseType.Unknow)
+                    album.TypeOfRelease = (secondary != ReleaseType.Unknown)
                                           ? secondary
                                           : primary;
 
@@ -235,11 +235,11 @@ namespace SongTagger.Core.Service
             {
                 if (!Enum.TryParse<ReleaseType>(item.Descendants(elementName).First().Value.ToString(), out type))
                 {
-                    type = ReleaseType.Unknow;
+                    type = ReleaseType.Unknown;
                 }
             } catch
             {
-                type = ReleaseType.Unknow;
+                type = ReleaseType.Unknown;
             }
             return type;
         }
