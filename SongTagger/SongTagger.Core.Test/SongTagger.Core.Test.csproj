@@ -86,4 +86,5 @@
       <Name>SongTagger.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>
