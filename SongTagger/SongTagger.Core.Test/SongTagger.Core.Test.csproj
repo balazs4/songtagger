@@ -79,6 +79,9 @@
     <Content Include="inputData\LastFmTest.ParseXmlToCoverList.ValidCovers.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="inputData\MusicBrainzTest.ParseXmlToRelease.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
