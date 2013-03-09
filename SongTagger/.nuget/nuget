@@ -16,3 +16,4 @@ do
 	mono --runtime=v4.0.30319 $DIR/NuGet.exe install $config -OutputDirectory $packageDir
 done
 
+echo "Build your sln..."
