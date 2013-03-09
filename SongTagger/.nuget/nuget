@@ -1,0 +1,18 @@
+#! /bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+packageDir="$DIR/../packages"
+
+if [ ! -e $packageDir ]
+	then
+	mkdir "$packageDir"
+	echo "$packageDir  was created"
+fi
+
+for config in $(find "$DIR/.." -name "packages.config" | xargs)
+do
+	echo "$config"
+	mono --runtime=v4.0.30319 $DIR/NuGet.exe install $config
+done
+
