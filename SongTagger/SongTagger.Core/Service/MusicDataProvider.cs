@@ -135,17 +135,42 @@ namespace SongTagger.Core.Service
 
         public IEnumerable<IRelease> GetReleases(IAlbum album)
         {
+            if (album == null || album.Id == Guid.Empty)
+            {
+                logger.Warn("Unknown album....skip");
+                return new List<IRelease>();
+            }
+
+
             //TODO: releases; mbid = album.Id
             //http://musicbrainz.org/ws/2/release-group/mbid?inc=releases
+            logger.Info("Search for '{0}' release", album.Name);
+            Uri releaseUri = MusicBrainz.CreateQueryUriTo<IRelease>(album.Id);
 
+            logger.Info("Download content from '{0}'", releaseUri.ToString());
+            XDocument result = MusicBrainzService.ExecuteQuery(releaseUri);
 
+            IEnumerable<IRelease> releaseList = MusicBrainz.ParseXmlToListOf<IRelease>(result);
+
+            foreach (Release release in releaseList)
+            {
+                release.Album = album;
+                release.QuerySongDelegate = GetSongs;
+            }
+
+            return releaseList ?? new List<IRelease>();
+        }
+        #endregion
+
+        internal static IEnumerable<ISong> GetSongs(IRelease release) 
+        {
+            
+            
             //TODO: songs of releases; mbid = release.Id
             //http://musicbrainz.org/ws/2/release/mbid?inc=recordings
 
-
-            throw new NotImplementedException();
+            throw new NotImplementedException("on-demand feature is not implemented");
         }
-        #endregion
 
     }
 }

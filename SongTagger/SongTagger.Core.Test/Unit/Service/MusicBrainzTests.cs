@@ -266,7 +266,7 @@ namespace SongTagger.Core.Test.Unit.Service
         }
 
         [Test]
-        public void ParseXmlToAlbum() 
+        public void ParseXmlToAlbum()
         {
             String xmlPath = TestHelper.GetInputDataFilePath("MusicBrainzTest.ParseXmlToAlbumList.ValidResult.xml");
 
@@ -277,7 +277,7 @@ namespace SongTagger.Core.Test.Unit.Service
             
             IEnumerable<IAlbum> releases = null;
             Assert.That(() => 
-                        {
+            {
                 releases = MusicBrainz.ParseXmlToListOf<IAlbum>(XDocument.Load(xmlPath));
             }, 
             Throws.Nothing);
@@ -288,9 +288,9 @@ namespace SongTagger.Core.Test.Unit.Service
 
             Assert.That(releases.Count(), Is.EqualTo(20));
 
-            Assert.That(releases.Any(a => a.ReleaseDate == new DateTime(2011,3,11)), Is.True);
-            Assert.That(releases.First(a => a.ReleaseDate == new DateTime(2011,3,11)).Name, Is.EqualTo("Endgame"));
-            Assert.That(releases.First(a => a.ReleaseDate == new DateTime(2011,3,11)).Id.ToString(), Is.EqualTo("875b2ff0-604b-4db3-a2f8-b427d725caf2"));
+            Assert.That(releases.Any(a => a.ReleaseDate == new DateTime(2011, 3, 11)), Is.True);
+            Assert.That(releases.First(a => a.ReleaseDate == new DateTime(2011, 3, 11)).Name, Is.EqualTo("Endgame"));
+            Assert.That(releases.First(a => a.ReleaseDate == new DateTime(2011, 3, 11)).Id.ToString(), Is.EqualTo("875b2ff0-604b-4db3-a2f8-b427d725caf2"));
 
 
             Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Album).Count(), Is.EqualTo(6));
@@ -298,6 +298,38 @@ namespace SongTagger.Core.Test.Unit.Service
             Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Single).Count(), Is.EqualTo(5));
             Assert.That(releases.Where(r => r.TypeOfRelease == ReleaseType.Live).Count(), Is.EqualTo(5));
             Assert.That(releases.Any(r => r.TypeOfRelease == ReleaseType.Unknown), Is.False);
+        }
+
+        [Test]
+        public void CreateQueryUriTo_IRelease()
+        {
+            //http://musicbrainz.org/ws/2/release-group/mbid?inc=releases
+
+            Guid id = Guid.NewGuid();
+
+            string expectedUri = "http://musicbrainz.org/ws/2/release-group/" + id.ToString() + "?inc=releases";
+            string actualUri = MusicBrainz.CreateQueryUriTo<IRelease>(id).ToString();
+
+            Assert.That(actualUri, Is.EqualTo(expectedUri));
+        }
+
+        [Test]
+        public void ParseXmlToRelease_ValidXmlResult() 
+        {
+            string file = TestHelper.GetInputDataFilePath("MusicBrainzTest.ParseXmlToRelease.xml");
+            if (!File.Exists(file))
+            {
+                Assert.Ignore("{0} file is not available.", file);
+            }
+
+            IEnumerable<IRelease> releases = MusicBrainz.ParseXmlToListOf<IRelease>(XDocument.Load(file));
+
+            Assert.IsNotNull(releases);
+            CollectionAssert.IsNotEmpty(releases);
+            CollectionAssert.AllItemsAreUnique(releases);
+            Assert.AreEqual(5,releases.Count());
+
+            Assert.IsTrue(releases.All(r => r.Album.Name == "Endgame"));
         }
     }
 }

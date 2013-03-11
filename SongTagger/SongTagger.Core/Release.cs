@@ -38,14 +38,20 @@ namespace SongTagger.Core
     {
         public Release()
         {
-            Songs = new List<ISong>();
+            QuerySongDelegate = (IRelease release) => new List<ISong>();
         }
 
         #region IRelease implementation
 
         public IAlbum Album { get; internal set; }
 
-        public IEnumerable<ISong> Songs { get; private set; }
+        public IEnumerable<ISong> Songs 
+        { 
+            get 
+            {
+                return songList ?? (songList = QuerySongDelegate(this));
+            }
+        }
 
         #endregion
 
@@ -56,7 +62,15 @@ namespace SongTagger.Core
         public string Name{ get; internal set; }
 
         #endregion
+        private IEnumerable<ISong> songList;
 
+        internal delegate IEnumerable<ISong> QuerySongDelegateAction(IRelease release);
+
+        public QuerySongDelegateAction QuerySongDelegate
+        {
+            get;
+            internal set;
+        }
     }
     
 }
