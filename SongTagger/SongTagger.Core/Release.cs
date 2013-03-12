@@ -20,7 +20,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-
 using System;
 using System.Collections.Generic;
 
@@ -31,8 +30,9 @@ namespace SongTagger.Core
         IAlbum Album { get; }
         
         IEnumerable<ISong> Songs { get; }
+
+        String Country { get; }
     }
-    
 
     internal class Release : IRelease
     {
@@ -45,9 +45,9 @@ namespace SongTagger.Core
 
         public IAlbum Album { get; internal set; }
 
-        public IEnumerable<ISong> Songs 
+        public IEnumerable<ISong> Songs
         { 
-            get 
+            get
             {
                 return songList ?? (songList = QuerySongDelegate(this));
             }
@@ -60,6 +60,8 @@ namespace SongTagger.Core
         public Guid Id{ get; internal set; }
 
         public string Name{ get; internal set; }
+
+        public string Country{ get; internal set; }
 
         #endregion
         private IEnumerable<ISong> songList;

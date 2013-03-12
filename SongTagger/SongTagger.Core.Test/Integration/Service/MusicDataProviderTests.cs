@@ -53,7 +53,7 @@ namespace SongTagger.Core.Test.Integration.Service
             return artist.Id.ToString();
         }
 
-        [TestCaseSource(typeof(AlbumTestCaseSources),"AlbumSource")]
+        [TestCaseSource(typeof(AlbumTestCaseSources),"Artists")]
         public int GetAlbumTest(IArtist artist)
         {
             IEnumerable<IAlbum> releases = null;
@@ -73,40 +73,70 @@ namespace SongTagger.Core.Test.Integration.Service
 
             return releases.Count();
         }
+
+        [TestCaseSource(typeof(ReleaseTestCaseSource),"Albums")]
+        public void GetReleaseTest(IAlbum album)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    static class MockFactory
+    {
+        internal static IArtist CreateArtist(string name, string id) 
+        {
+            Mock<IArtist> mockArtist = new Mock<IArtist>();
+            
+            mockArtist.Setup(a => a.Id).Returns(new Guid(id));
+            mockArtist.Setup(a => a.Name).Returns(name);
+            return mockArtist.Object;
+        }
+
+        internal static IAlbum CreateAlbum(string name, string id) 
+        {
+            Mock<IAlbum> mockArtist = new Mock<IAlbum>();
+            
+            mockArtist.Setup(a => a.Id).Returns(new Guid(id));
+            mockArtist.Setup(a => a.Name).Returns(name);
+            return mockArtist.Object;
+        }
+
+
+//        internal static T CreateMock<T>(string name, string id) 
+//            where T : SongTagger.Core.IEntity
+//        {
+//            Mock<T> mockArtist = new Mock<T>();
+//            
+//            mockArtist.Setup(a => a.Id).Returns(new Guid(id));
+//            mockArtist.Setup(a => a.Name).Returns(name);
+//            return mockArtist.Object as T;
+//        }
     }
 
     class AlbumTestCaseSources
     {
 
-        private static IArtist CreateMock(string name, string id)
-        {
-            Mock<IArtist> mock = new Mock<IArtist>();
-            mock.Setup(a => a.Id).Returns(new Guid(id));
-            mock.Setup(a => a.Name).Returns(name);
-            return mock.Object as IArtist;
-        }
-
         private IArtist DefLeppard
         {
-            get{ return CreateMock("Def Leppard", "7249b899-8db8-43e7-9e6e-22f1e736024e");}
+            get{ return MockFactory.CreateArtist("Def Leppard", "7249b899-8db8-43e7-9e6e-22f1e736024e");}
         }
+
         private IArtist RiseAgainst
         {
-            get{ return CreateMock("Rise Against", "606bf117-494f-4864-891f-09d63ff6aa4b");}
+            get{ return MockFactory.CreateArtist("Rise Against", "606bf117-494f-4864-891f-09d63ff6aa4b");}
         }
+
         private IArtist Depresszio
         {
-            get{ return CreateMock("Depresszió", "79a8d8a6-012a-4dd9-b5e2-ed4b52a5d55e");}
+            get{ return MockFactory.CreateArtist("Depresszió", "79a8d8a6-012a-4dd9-b5e2-ed4b52a5d55e");}
         }
+
         private IArtist Deftones
         {
-            get{ return CreateMock("Deftones", "7527f6c2-d762-4b88-b5e2-9244f1e34c46");}
+            get{ return MockFactory.CreateArtist("Deftones", "7527f6c2-d762-4b88-b5e2-9244f1e34c46");}
         }
 
-
-
-
-        internal IEnumerable AlbumSource
+        internal IEnumerable Artists
         {
             get
             {
@@ -114,6 +144,29 @@ namespace SongTagger.Core.Test.Integration.Service
                 yield return new TestCaseData(RiseAgainst).Returns(20);
                 yield return new TestCaseData(Depresszio).Returns(3);
                 yield return new TestCaseData(Deftones).Returns(54);
+            }
+        }
+    }
+
+    class ReleaseTestCaseSource
+    {
+     
+        private IAlbum Endgame
+        {
+            get { return MockFactory.CreateAlbum("Endgame", "875b2ff0-604b-4db3-a2f8-b427d725caf2");}
+        }
+
+        private IAlbum Hysteria
+        {
+            get { return MockFactory.CreateAlbum("Hysteria","12fa3845-7c62-36e5-a8da-8be137155a72");}
+        }
+
+        internal IEnumerable Albums
+        {
+            get
+            {
+                yield return new TestCaseData(Endgame).Returns(5);
+                yield return new TestCaseData(Hysteria).Returns(9);
             }
         }
     }
