@@ -107,6 +107,10 @@ namespace SongTagger.Core.Service
                     return ParseXmlToAlbum(xml) as IEnumerable<TResult>;
                     break;
 
+                case "IRelease":
+                    return ParseXmlToRelease(xml) as IEnumerable<TResult>;
+                    break;
+
                 default:
                     return new List<TResult>();
                     break;
@@ -228,6 +232,52 @@ namespace SongTagger.Core.Service
             return albumList ?? new List<IAlbum>();
         }
 
+        private static IEnumerable<IRelease> ParseXmlToRelease(XDocument xml)
+        {
+            IList<IRelease> releaseList = new List<IRelease>();
+            try
+            {
+                #region XName definitions
+                XName xRelease = XName.Get("release", mb.NamespaceName);
+                XName xTitle = XName.Get("title", mb.NamespaceName);
+                XName xId = XName.Get("id");
+                XName xCountry = XName.Get("country", mb.NamespaceName);
+                #endregion
+
+
+                foreach (XElement element in xml.Descendants(xRelease))
+                {
+                    Guid id;
+                    if (!Guid.TryParse(element.Attribute(xId).Value, out id))
+                        continue;
+                    
+                    String name = element.Element(xTitle).Value;
+                    if (String.IsNullOrWhiteSpace(name))
+                        continue;
+
+                    string rawCountry = element.Element(xCountry).Value;
+
+
+                    IRelease item = new Release 
+                    {
+                        Name = name,
+                        Id = id,
+                        Country = String.IsNullOrWhiteSpace(rawCountry)
+                                  ? String.Empty
+                                  : rawCountry
+                    };
+
+                    releaseList.Add(item);
+                }
+
+
+            } catch (Exception)
+            {
+                return new List<IRelease>();
+            }
+            return releaseList ?? new List<IRelease>();
+        }
+
         private static ReleaseType ParseReleaseType(XName elementName, XElement item)
         {
             ReleaseType type;
@@ -294,6 +344,7 @@ namespace SongTagger.Core.Service
                     break;
 
                 case "IRelease":
+                    uri = CreateReleaseQuery(id);
                     break;
 
                 case "ISong":
@@ -314,6 +365,16 @@ namespace SongTagger.Core.Service
             queryUri.Path += "release-group";
       
             queryUri.Query = String.Format("artist={0}&limit=100", id.ToString());
+            return queryUri.Uri;
+        }
+
+        private static Uri CreateReleaseQuery(Guid id)
+        {
+            //http://musicbrainz.org/ws/2/release-group/mbid?inc=releases
+
+            UriBuilder queryUri = new UriBuilder(baseUrl.ToString());
+            queryUri.Path += String.Format("release-group/{0}", id.ToString());
+            queryUri.Query = "inc=releases";
             return queryUri.Uri;
         }
         #endregion

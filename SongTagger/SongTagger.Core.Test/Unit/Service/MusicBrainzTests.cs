@@ -307,10 +307,11 @@ namespace SongTagger.Core.Test.Unit.Service
 
             Guid id = Guid.NewGuid();
 
-            string expectedUri = "http://musicbrainz.org/ws/2/release-group/" + id.ToString() + "?inc=releases";
-            string actualUri = MusicBrainz.CreateQueryUriTo<IRelease>(id).ToString();
+            string expectedUri = string.Format("http://musicbrainz.org/ws/2/release-group/{0}?inc=releases", id.ToString());
+            Uri actualUri = MusicBrainz.CreateQueryUriTo<IRelease>(id);
+            Assert.IsNotNull(actualUri);
 
-            Assert.That(actualUri, Is.EqualTo(expectedUri));
+            Assert.That(actualUri.ToString(), Is.EqualTo(expectedUri));
         }
 
         [Test]
@@ -329,7 +330,7 @@ namespace SongTagger.Core.Test.Unit.Service
             CollectionAssert.AllItemsAreUnique(releases);
             Assert.AreEqual(5,releases.Count());
 
-            Assert.IsTrue(releases.All(r => r.Album.Name == "Endgame"));
+            Assert.IsTrue(releases.All(r => r.Name == "Endgame"), "Release title");
         }
     }
 }
