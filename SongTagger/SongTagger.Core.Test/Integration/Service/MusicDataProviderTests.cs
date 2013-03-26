@@ -75,9 +75,9 @@ namespace SongTagger.Core.Test.Integration.Service
         }
 
         [TestCaseSource(typeof(ReleaseTestCaseSource),"Albums")]
-        public void GetReleaseTest(IAlbum album)
+        public int GetReleaseTest(IAlbum album)
         {
-            throw new NotImplementedException();
+            return MusicData.Provider.GetReleases(album).Count();
         }
     }
 

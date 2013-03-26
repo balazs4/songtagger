@@ -165,7 +165,7 @@ namespace SongTagger.Core.Service
         internal static IEnumerable<ISong> GetSongs(IRelease release) 
         {
             
-            
+             
             //TODO: songs of releases; mbid = release.Id
             //http://musicbrainz.org/ws/2/release/mbid?inc=recordings
 

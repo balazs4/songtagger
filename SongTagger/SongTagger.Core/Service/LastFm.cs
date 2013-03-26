@@ -55,6 +55,7 @@ namespace SongTagger.Core.Service
 
         public System.Xml.Linq.XDocument ExecuteQuery(Uri queryUri)
         {
+
             if (queryUri == null)
             {
                 throw new ArgumentException("queryUrl could not be null", "queryUri");
