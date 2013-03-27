@@ -52,17 +52,7 @@ namespace SongTagger.Core.Test.Unit.Service
             );
         }
 
-        [Test]
-        public void GetReleases_ArgumentCheck_ArgumentException_Expected()
-        {
-            Assert.Throws<ArgumentException>(
-                () => MusicData.Provider.GetAlbums(null)
-            );
-
-            Assert.Throws<ArgumentException>(
-                () => MusicData.Provider.GetAlbums(null)
-            );
-        }
+     
 
         [Test]
         public void GetReleases_UnknowArtist_ExpectedEmptyAlbumList()

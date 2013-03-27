@@ -101,19 +101,19 @@ namespace SongTagger.Core.Service
             {
                 case "IArtist":
                     return ParseXmlToArtist(xml) as IEnumerable<TResult>;
-                    break;
+
 
                 case "IAlbum":
                     return ParseXmlToAlbum(xml) as IEnumerable<TResult>;
-                    break;
+
 
                 case "IRelease":
                     return ParseXmlToRelease(xml) as IEnumerable<TResult>;
-                    break;
+
 
                 default:
                     return new List<TResult>();
-                    break;
+
             }
 
 
@@ -337,7 +337,7 @@ namespace SongTagger.Core.Service
             {
                 case "IArtist":
                     throw new NotSupportedException("Artist lookup with ID currently not supported");
-                    break;
+
 
                 case "IAlbum":
                     uri = CreateAlbumQueryUri(id);
