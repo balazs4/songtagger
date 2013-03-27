@@ -34,6 +34,7 @@ namespace SongTagger.Core.Service
 
         IEnumerable<IRelease> GetReleases(IAlbum album);
 
+        IEnumerable<ISong> GetSongs(IRelease release);
     }
     
 }

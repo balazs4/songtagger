@@ -64,15 +64,13 @@ namespace SongTagger.Core
         public string Country{ get; internal set; }
 
         #endregion
+
         private IEnumerable<ISong> songList;
 
         internal delegate IEnumerable<ISong> QuerySongDelegateAction(IRelease release);
 
-        public QuerySongDelegateAction QuerySongDelegate
-        {
-            get;
-            internal set;
-        }
+        internal QuerySongDelegateAction QuerySongDelegate { private get; set; }
+       
     }
     
 }

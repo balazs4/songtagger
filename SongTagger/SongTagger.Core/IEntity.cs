@@ -32,4 +32,25 @@ namespace SongTagger.Core
         String Name { get; }
     }
 	
+    internal class ArtistStubEntity : IEntity
+    {
+        public ArtistStubEntity(string name)
+        {
+            #region Argument check
+            if (String.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Artist name stub could not be null or empty", "name");
+            #endregion
+            
+            Id = Guid.Empty;
+            Name = name;
+        }
+        
+        #region IEntity implementation
+        
+        public Guid Id{ get; private set; }
+        
+        public string Name{ get; private set; }
+        
+        #endregion
+    }
 }

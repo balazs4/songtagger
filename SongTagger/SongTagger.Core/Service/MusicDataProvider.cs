@@ -29,6 +29,8 @@ using NLog;
 
 namespace SongTagger.Core.Service
 {
+   
+
     public class MusicData : IProvider
     {
         private readonly Logger logger;
@@ -68,19 +70,15 @@ namespace SongTagger.Core.Service
         #region IProvider implementation
         public IArtist GetArtist(string nameStub)
         {
-            #region Argument check
-            if (String.IsNullOrWhiteSpace(nameStub))
-                throw new ArgumentException("Artist name stub could not be null or empty", "nameStub");
-            #endregion
+            ArtistStubEntity rawArtist = new ArtistStubEntity(nameStub);
 
-            logger.Info("Search for '{0}'", nameStub);
-            Uri queryUri = MusicBrainz.CreateArtistQueryUri(nameStub);
-
-            logger.Info("Download content from '{0}'", queryUri.ToString());
-            XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
-
-            logger.Info("Parse xml content....");
-            IEnumerable<IArtist> artistList = MusicBrainz.ParseXmlToListOf<IArtist>(result);
+            IEnumerable<IArtist> artistList = PerformQuery<ArtistStubEntity, IArtist>(
+                rawArtist,
+                (source) => !String.IsNullOrWhiteSpace(source.Name),
+                MusicBrainzService,
+                () => MusicBrainz.CreateArtistQueryUri(rawArtist.Name),
+                (xml) => MusicBrainz.ParseXmlToListOf<IArtist>(xml),
+                logger);
 
             IArtist artist = artistList.FirstOrDefault() ?? new UnknownArtist();
        
@@ -90,26 +88,12 @@ namespace SongTagger.Core.Service
 
         public IEnumerable<IAlbum> GetAlbums(IArtist artist)
         {
-            #region Argument check
-            if (artist == null)
-                throw new ArgumentException("artist", "Artist could not be null");
-
-            #endregion
-                
-            if (artist is UnknownArtist || artist.Id == Guid.Empty)
-            {
-                logger.Warn("Skip album query because 'UnknownArtist'");
-                return new List<IAlbum>();
-            }
-
-            logger.Info("Search for albums of '{0}'", artist.Name);
-            Uri queryUri = MusicBrainz.CreateQueryUriTo<IAlbum>(artist.Id);
-
-            logger.Info("Download content from '{0}'", queryUri.ToString());
-            XDocument result = MusicBrainzService.ExecuteQuery(queryUri);
-
-            logger.Info("Parse xml content....");
-            IEnumerable<IAlbum> albumList = MusicBrainz.ParseXmlToListOf<IAlbum>(result);
+            IEnumerable<IAlbum> albumList = PerformQuery<IArtist,IAlbum>(artist,
+                                                                         IsNotNullOrEmptyGuid,
+                                                                         MusicBrainzService,
+                                                                         () => MusicBrainz.CreateQueryUriTo<IAlbum>(artist.Id),
+                                                                         (xml) => MusicBrainz.ParseXmlToListOf<IAlbum>(xml),
+                                                                         logger);
 
             foreach (Album album in albumList)
             {
@@ -119,14 +103,15 @@ namespace SongTagger.Core.Service
 
             foreach (Album album in albumList.Where(a => a != null && a.Id != Guid.Empty))
             {
-                logger.Info("Search cover for '{0}'", album.Name);
+                IEnumerable<ICoverArt> coverArts = PerformQuery<IAlbum,ICoverArt>(album,
+                                                                                  IsNotNullOrEmptyGuid,
+                                                                                  LastFmService, 
+                                                                                  () => LastFm.CreateAlbumCoverQueryUri(album), 
+                                                                                  (xml) => LastFm.ParseXmlToCoverList(xml), 
+                                                                                  logger
+                                                                                  );
 
-                Uri coverQuery = LastFm.CreateAlbumCoverQueryUri(album);
-                logger.Info("Download content from '{0}'", coverQuery.ToString());
-
-                XDocument lasfFmResult = LastFmService.ExecuteQuery(coverQuery);
-
-                (album.Covers as List<ICoverArt>).AddRange(LastFm.ParseXmlToCoverList(lasfFmResult));
+                ((List<ICoverArt>)album.Covers).AddRange(coverArts);
             }
 
 
@@ -135,22 +120,12 @@ namespace SongTagger.Core.Service
 
         public IEnumerable<IRelease> GetReleases(IAlbum album)
         {
-            if (album == null || album.Id == Guid.Empty)
-            {
-                logger.Warn("Unknown album....skip");
-                return new List<IRelease>();
-            }
-
-
-            //TODO: releases; mbid = album.Id
-            //http://musicbrainz.org/ws/2/release-group/mbid?inc=releases
-            logger.Info("Search for '{0}' release", album.Name);
-            Uri releaseUri = MusicBrainz.CreateQueryUriTo<IRelease>(album.Id);
-
-            logger.Info("Download content from '{0}'", releaseUri.ToString());
-            XDocument result = MusicBrainzService.ExecuteQuery(releaseUri);
-
-            IEnumerable<IRelease> releaseList = MusicBrainz.ParseXmlToListOf<IRelease>(result);
+            IEnumerable<IRelease> releaseList = PerformQuery<IAlbum,IRelease>(album,
+                                                                              IsNotNullOrEmptyGuid,
+                                                                              MusicBrainzService,
+                                                                              () => MusicBrainz.CreateQueryUriTo<IRelease>(album.Id),
+                                                                              (xml) => MusicBrainz.ParseXmlToListOf<IRelease>(xml),
+                                                                              logger);
 
             foreach (Release release in releaseList)
             {
@@ -160,16 +135,50 @@ namespace SongTagger.Core.Service
 
             return releaseList ?? new List<IRelease>();
         }
+
+        public IEnumerable<ISong> GetSongs(IRelease release)
+        {
+           
+            return PerformQuery<IRelease,ISong>(release,
+                                                IsNotNullOrEmptyGuid,
+                                                MusicBrainzService, 
+                                                () => MusicBrainz.CreateQueryUriTo<ISong>(release.Id), 
+                                                (xml) => MusicBrainz.ParseXmlToListOf<ISong>(xml),
+                                                logger
+            );
+        }
         #endregion
 
-        internal static IEnumerable<ISong> GetSongs(IRelease release) 
-        {
-            
-             
-            //TODO: songs of releases; mbid = release.Id
-            //http://musicbrainz.org/ws/2/release/mbid?inc=recordings
 
-            throw new NotImplementedException("on-demand feature is not implemented");
+
+        private static bool IsNotNullOrEmptyGuid<TSource>(TSource entity)
+            where TSource : IEntity
+        {
+            return (entity != null && entity.Id != Guid.Empty);
+        }
+
+        private static IEnumerable<TResult> PerformQuery<TSource,TResult>(
+            TSource sourceItem,
+            Func<TSource,bool> argumentCheck,
+            IWebService service, 
+            Func<Uri> createUri, 
+            Func<XDocument, IEnumerable<TResult>> parseResult, 
+            Logger loggerInstance)
+            where TSource : IEntity
+        {
+            if (!argumentCheck(sourceItem))
+            {
+                loggerInstance.Warn("Unknow {0}...skip", typeof(TSource).Name);
+                return new List<TResult>();
+            }
+
+            loggerInstance.Info("Search for '{0}' {1}}", sourceItem.Name, typeof(TSource).Name);
+            Uri queryUri = createUri();
+
+            loggerInstance.Info("Download content from '{0}'", queryUri.ToString());
+            XDocument result = service.ExecuteQuery(queryUri);
+
+            return parseResult(result);
         }
 
     }

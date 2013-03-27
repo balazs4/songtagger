@@ -79,39 +79,15 @@ namespace SongTagger.Core.Test.Integration.Service
         {
             return MusicData.Provider.GetReleases(album).Count();
         }
+
+        [TestCaseSource(typeof(SongTestCaseSource), "Releases")]
+        public int GetSongTest(IRelease release) 
+        {
+            return MusicData.Provider.GetSongs(release).Count();
+        }
     }
 
-    static class MockFactory
-    {
-        internal static IArtist CreateArtist(string name, string id) 
-        {
-            Mock<IArtist> mockArtist = new Mock<IArtist>();
-            
-            mockArtist.Setup(a => a.Id).Returns(new Guid(id));
-            mockArtist.Setup(a => a.Name).Returns(name);
-            return mockArtist.Object;
-        }
 
-        internal static IAlbum CreateAlbum(string name, string id) 
-        {
-            Mock<IAlbum> mockArtist = new Mock<IAlbum>();
-            
-            mockArtist.Setup(a => a.Id).Returns(new Guid(id));
-            mockArtist.Setup(a => a.Name).Returns(name);
-            return mockArtist.Object;
-        }
-
-
-//        internal static T CreateMock<T>(string name, string id) 
-//            where T : SongTagger.Core.IEntity
-//        {
-//            Mock<T> mockArtist = new Mock<T>();
-//            
-//            mockArtist.Setup(a => a.Id).Returns(new Guid(id));
-//            mockArtist.Setup(a => a.Name).Returns(name);
-//            return mockArtist.Object as T;
-//        }
-    }
 
     class AlbumTestCaseSources
     {
@@ -140,10 +116,10 @@ namespace SongTagger.Core.Test.Integration.Service
         {
             get
             {
-                yield return new TestCaseData(DefLeppard).Returns(91); // PO....
+                //yield return new TestCaseData(DefLeppard).Returns(91);
                 yield return new TestCaseData(RiseAgainst).Returns(20);
                 yield return new TestCaseData(Depresszio).Returns(3);
-                yield return new TestCaseData(Deftones).Returns(54);
+                //yield return new TestCaseData(Deftones).Returns(54);
             }
         }
     }
@@ -165,9 +141,67 @@ namespace SongTagger.Core.Test.Integration.Service
         {
             get
             {
+                yield return new TestCaseData(null).Returns(0);
                 yield return new TestCaseData(Endgame).Returns(5);
                 yield return new TestCaseData(Hysteria).Returns(9);
             }
+        }
+    }
+
+    class SongTestCaseSource 
+    {
+        private IRelease Endgame
+        {
+            get { return MockFactory.CreateRelease("Endgame", "b71a0f31-c12f-4548-a9f6-740f737abad1");}
+        }
+       
+        internal IEnumerable Releases
+        {
+            get
+            {
+                yield return new TestCaseData(null).Returns(0);
+                yield return new TestCaseData(Endgame).Returns(12);
+            }
+        }
+    }
+
+    static class MockFactory
+    {
+        internal static IArtist CreateArtist(string name, string id) 
+        {
+            Mock<IArtist> mockArtist = new Mock<IArtist>();
+            
+            mockArtist.Setup(a => a.Id).Returns(new Guid(id));
+            mockArtist.Setup(a => a.Name).Returns(name);
+            return mockArtist.Object;
+        }
+        
+        internal static IAlbum CreateAlbum(string name, string id) 
+        {
+            Mock<IAlbum> mockArtist = new Mock<IAlbum>();
+            
+            mockArtist.Setup(a => a.Id).Returns(new Guid(id));
+            mockArtist.Setup(a => a.Name).Returns(name);
+            return mockArtist.Object;
+        }
+        
+        
+        //        internal static T CreateMock<T>(string name, string id) 
+        //            where T : SongTagger.Core.IEntity
+        //        {
+        //            Mock<T> mockArtist = new Mock<T>();
+        //            
+        //            mockArtist.Setup(a => a.Id).Returns(new Guid(id));
+        //            mockArtist.Setup(a => a.Name).Returns(name);
+        //            return mockArtist.Object as T;
+        //        }
+        
+        internal static IRelease CreateRelease(string name, string id)
+        {
+            Mock<IRelease> mockRelease = new Mock<IRelease>();
+            mockRelease.Setup(a => a.Id).Returns(new Guid(id));
+            mockRelease.Setup(a => a.Name).Returns(name);
+            return mockRelease.Object;
         }
     }
 }
