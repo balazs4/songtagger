@@ -14,9 +14,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9403C1
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.UI.Wpf", "SongTagger.UI.Wpf\SongTagger.UI.Wpf.csproj", "{B86BD75D-C723-45A1-B2C9-930E484898B2}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
 		SccLocalPath0 = .
@@ -29,6 +31,9 @@ Global
 		SccProjectUniqueName3 = SongTagger.Cmd\\SongTagger.Cmd.csproj
 		SccProjectName3 = SongTagger.Cmd
 		SccLocalPath3 = SongTagger.Cmd
+		SccProjectUniqueName4 = SongTagger.UI.Wpf\\SongTagger.UI.Wpf.csproj
+		SccProjectName4 = SongTagger.UI.Wpf
+		SccLocalPath4 = SongTagger.UI.Wpf
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +51,10 @@ Global
 		{B85B2213-5C22-4DE2-AA28-C832F193A8C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B85B2213-5C22-4DE2-AA28-C832F193A8C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B85B2213-5C22-4DE2-AA28-C832F193A8C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B86BD75D-C723-45A1-B2C9-930E484898B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B86BD75D-C723-45A1-B2C9-930E484898B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B86BD75D-C723-45A1-B2C9-930E484898B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B86BD75D-C723-45A1-B2C9-930E484898B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
