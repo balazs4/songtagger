@@ -95,9 +95,7 @@ namespace SongTagger.Core.Service
 
         public static IEnumerable<TResult> ParseXmlToListOf<TResult>(XDocument xml) where TResult : IEntity
         {
-            string name = typeof(TResult).Name;
-
-            switch (name)
+            switch (typeof(TResult).Name)
             {
                 case "IArtist":
                     return ParseXmlToArtist(xml) as IEnumerable<TResult>;
@@ -110,12 +108,13 @@ namespace SongTagger.Core.Service
                 case "IRelease":
                     return ParseXmlToRelease(xml) as IEnumerable<TResult>;
 
+                case "ISong":
+                    return ParseXmlToSong(xml) as IEnumerable<TResult>;
 
                 default:
                     return new List<TResult>();
 
             }
-
 
         }
 
@@ -278,6 +277,56 @@ namespace SongTagger.Core.Service
             return releaseList ?? new List<IRelease>();
         }
 
+        private static IEnumerable<ISong> ParseXmlToSong(XDocument xml)
+        {
+            IList<ISong> songs = new List<ISong>();
+            try
+            {
+                #region XName definitions
+                XName xTrack = XName.Get("track", mb.NamespaceName);
+                XName xRecording = XName.Get("recording", mb.NamespaceName);
+
+                XName xId = XName.Get("id");
+                XName xTitle = XName.Get("title", mb.NamespaceName);
+                XName xNumber = XName.Get("number", mb.NamespaceName);
+                #endregion
+                
+                
+                foreach (XElement track in xml.Descendants(xTrack))
+                {
+                    XElement recording = track.Element(xRecording);
+
+                    Guid id;
+                    if (!Guid.TryParse(recording.Attribute(xId).Value, out id))
+                        continue;
+
+                    String name = recording.Element(xTitle).Value;
+                    if (String.IsNullOrWhiteSpace(name))
+                        continue;
+
+                    int number;
+                    if (!Int32.TryParse(track.Element(xNumber).Value, out number)) 
+                    {
+                        number = 0;
+                    }
+
+                    ISong song = new Song 
+                    {
+                        Id = id,
+                        Number = number,
+                        Name = name,
+                    };
+
+                    songs.Add(song);
+                }
+              
+            } catch (Exception)
+            {
+                return new List<ISong>();
+            }
+            return songs;
+        }
+
         private static ReleaseType ParseReleaseType(XName elementName, XElement item)
         {
             ReleaseType type;
@@ -296,7 +345,6 @@ namespace SongTagger.Core.Service
 
         #endregion
 
-        #region Uri methods
         //TODO: String/Name Utils namespace
         internal static string SplitArtistName(string rawName)
         {
@@ -304,16 +352,19 @@ namespace SongTagger.Core.Service
             {
                 return rawName;
             }
-
+            
             string onlyUpperCasePattern = "^[A-Z]+$";
             if (Regex.Match(rawName, onlyUpperCasePattern).Success)
             {
                 return Regex.Replace(rawName, "([A-Z])", "$1.", RegexOptions.Compiled).Trim();
             }
-
+            
             return Regex.Replace(rawName, "([0-9]+|[A-Z])", " $1", RegexOptions.Compiled).Trim();
         }
 
+
+        #region Uri methods
+     
         internal static Uri CreateArtistQueryUri(string nameOfArtist)
         {
             UriBuilder queryUri = new UriBuilder(baseUrl.ToString());
@@ -329,32 +380,26 @@ namespace SongTagger.Core.Service
             return queryUri.Uri;
         }
 
-        public static Uri CreateQueryUriTo<T>(Guid id) where T : IEntity
+        internal static Uri CreateQueryUriTo<T>(Guid id) where T : IEntity
         {
-            string targetName = typeof(T).Name;
-            Uri uri = null;
-            switch (targetName)
+            switch (typeof(T).Name)
             {
                 case "IArtist":
                     throw new NotSupportedException("Artist lookup with ID currently not supported");
 
 
                 case "IAlbum":
-                    uri = CreateAlbumQueryUri(id);
-                    break;
+                    return CreateAlbumQueryUri(id);
 
                 case "IRelease":
-                    uri = CreateReleaseQuery(id);
-                    break;
+                    return CreateReleaseQuery(id);
 
                 case "ISong":
-                    break;
+                    return CreateSongQuery(id);
 
                 default:
-                    uri = new Uri("");
-                    break;
+                    throw new NotSupportedException();
             }
-            return uri;
         }
 
         private static Uri CreateAlbumQueryUri(Guid id)
@@ -375,6 +420,14 @@ namespace SongTagger.Core.Service
             UriBuilder queryUri = new UriBuilder(baseUrl.ToString());
             queryUri.Path += String.Format("release-group/{0}", id.ToString());
             queryUri.Query = "inc=releases";
+            return queryUri.Uri;
+        }
+
+        private static Uri CreateSongQuery(Guid id)
+        {
+            UriBuilder queryUri = new UriBuilder(baseUrl.ToString());
+            queryUri.Path += String.Format("release/{0}", id.ToString());
+            queryUri.Query = "inc=recordings";
             return queryUri.Uri;
         }
         #endregion
