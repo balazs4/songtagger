@@ -139,13 +139,21 @@ namespace SongTagger.Core.Service
         public IEnumerable<ISong> GetSongs(IRelease release)
         {
            
-            return PerformQuery<IRelease,ISong>(release,
+            IEnumerable<ISong> songs = PerformQuery<IRelease,ISong>(release,
                                                 IsNotNullOrEmptyGuid,
                                                 MusicBrainzService, 
                                                 () => MusicBrainz.CreateQueryUriTo<ISong>(release.Id), 
                                                 (xml) => MusicBrainz.ParseXmlToListOf<ISong>(xml),
                                                 logger
             );
+
+
+            foreach (Song song in songs)
+            {
+                song.Release = release;
+            }
+
+            return songs;
         }
         #endregion
 

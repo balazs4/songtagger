@@ -82,6 +82,9 @@
     <Content Include="inputData\MusicBrainzTest.ParseXmlToRelease.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="inputData\MusicBrainzTest.ParseXmlToSong.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">

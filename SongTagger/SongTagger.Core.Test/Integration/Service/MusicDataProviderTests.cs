@@ -81,13 +81,11 @@ namespace SongTagger.Core.Test.Integration.Service
         }
 
         [TestCaseSource(typeof(SongTestCaseSource), "Releases")]
-        public int GetSongTest(IRelease release) 
+        public int GetSongTest(IRelease release)
         {
             return MusicData.Provider.GetSongs(release).Count();
         }
     }
-
-
 
     class AlbumTestCaseSources
     {
@@ -134,7 +132,7 @@ namespace SongTagger.Core.Test.Integration.Service
 
         private IAlbum Hysteria
         {
-            get { return MockFactory.CreateAlbum("Hysteria","12fa3845-7c62-36e5-a8da-8be137155a72");}
+            get { return MockFactory.CreateAlbum("Hysteria", "12fa3845-7c62-36e5-a8da-8be137155a72");}
         }
 
         internal IEnumerable Albums
@@ -148,11 +146,16 @@ namespace SongTagger.Core.Test.Integration.Service
         }
     }
 
-    class SongTestCaseSource 
+    class SongTestCaseSource
     {
         private IRelease Endgame
         {
             get { return MockFactory.CreateRelease("Endgame", "b71a0f31-c12f-4548-a9f6-740f737abad1");}
+        }
+
+        private IRelease Hysteria
+        {
+            get { return MockFactory.CreateRelease("Hysteria", "58b8eab9-cd8b-4c86-9031-ddb126071de4");}
         }
        
         internal IEnumerable Releases
@@ -161,13 +164,14 @@ namespace SongTagger.Core.Test.Integration.Service
             {
                 yield return new TestCaseData(null).Returns(0);
                 yield return new TestCaseData(Endgame).Returns(12);
+                yield return new TestCaseData(Hysteria).Returns(12);
             }
         }
     }
 
     static class MockFactory
     {
-        internal static IArtist CreateArtist(string name, string id) 
+        internal static IArtist CreateArtist(string name, string id)
         {
             Mock<IArtist> mockArtist = new Mock<IArtist>();
             
@@ -176,7 +180,7 @@ namespace SongTagger.Core.Test.Integration.Service
             return mockArtist.Object;
         }
         
-        internal static IAlbum CreateAlbum(string name, string id) 
+        internal static IAlbum CreateAlbum(string name, string id)
         {
             Mock<IAlbum> mockArtist = new Mock<IAlbum>();
             

@@ -27,15 +27,18 @@ namespace SongTagger.Core
 {
     public interface ISong : IEntity
     {
-        IAlbum Album { get; }
+        IRelease Release { get; }
+
+        int Number {get;}
     }
 
     internal class Song : ISong
     {
         #region ISong implementation
 
-        public IAlbum Album { get; internal set; }
+        public IRelease Release { get; internal set; }
 
+        public int Number {get; internal set; }
         #endregion
 
         #region IEntity implementation

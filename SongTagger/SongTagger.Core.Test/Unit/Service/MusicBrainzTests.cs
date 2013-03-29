@@ -211,8 +211,6 @@ namespace SongTagger.Core.Test.Unit.Service
             return actual;
         }
 
-
-        #region Parsing tests
         [TestCaseSource(typeof(MusicBrainzTestCaseSource),"ParseXmlToArtistTestFactory")]
         public void ParseXmlToArtistTest(string xmlFileName, int minimumScore, IArtist expectedArtist)
         {
@@ -251,7 +249,6 @@ namespace SongTagger.Core.Test.Unit.Service
             Assert.That(artist, Is.InstanceOf<UnknownArtist>());
 
         }
-        #endregion
 
         [Test]
         public void CreateAlbumQueryUri_ExpectedValidUrl()
@@ -315,7 +312,7 @@ namespace SongTagger.Core.Test.Unit.Service
         }
 
         [Test]
-        public void ParseXmlToRelease_ValidXmlResult() 
+        public void ParseXmlToRelease_ValidXmlResult()
         {
             string file = TestHelper.GetInputDataFilePath("MusicBrainzTest.ParseXmlToRelease.xml");
             if (!File.Exists(file))
@@ -328,9 +325,36 @@ namespace SongTagger.Core.Test.Unit.Service
             Assert.IsNotNull(releases);
             CollectionAssert.IsNotEmpty(releases);
             CollectionAssert.AllItemsAreUnique(releases);
-            Assert.AreEqual(5,releases.Count());
+            Assert.AreEqual(5, releases.Count());
 
             Assert.IsTrue(releases.All(r => r.Name == "Endgame"), "Release title");
+        }
+
+        [Test]
+        public void CreateQueryUriTo_ISong()
+        {
+            Guid id = Guid.NewGuid();
+            string expectedUri = "http://musicbrainz.org/ws/2/release/" + id.ToString() + "?inc=recordings";
+            Uri actualUri = MusicBrainz.CreateQueryUriTo<ISong>(id);
+            Assert.IsNotNull(actualUri);
+            Assert.That(actualUri.ToString(), Is.EqualTo(expectedUri));
+        }
+
+        [Test]
+        public void ParseXmlToSong_ValidXmlResult()
+        {
+            string file = TestHelper.GetInputDataFilePath("MusicBrainzTest.ParseXmlToSong.xml");
+            if (!File.Exists(file))
+            {
+                Assert.Ignore("{0} file is not available.", file);
+            }
+
+            IEnumerable<ISong> songs = MusicBrainz.ParseXmlToListOf<ISong>(XDocument.Load(file));
+            
+            Assert.IsNotNull(songs);
+            CollectionAssert.IsNotEmpty(songs);
+            CollectionAssert.AllItemsAreUnique(songs);
+            Assert.AreEqual(12, songs.Count());
         }
     }
 }
