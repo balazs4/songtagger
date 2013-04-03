@@ -69,13 +69,13 @@
     <Compile Include="Service\IProvider.cs" />
     <Compile Include="Song.cs" />
     <Compile Include="Release.cs" />
+    <Compile Include="Tag\TagHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tag\" />
-    <Folder Include="Utils\" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

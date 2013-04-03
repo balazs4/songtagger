@@ -93,4 +93,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <ItemGroup>
+    <Folder Include="Integration\Tag\" />
+  </ItemGroup>
 </Project>
