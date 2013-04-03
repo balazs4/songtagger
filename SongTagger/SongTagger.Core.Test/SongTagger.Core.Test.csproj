@@ -62,6 +62,7 @@
     <Compile Include="Integration\Service\MusicDataProviderTests.cs" />
     <Compile Include="Unit\Service\MusicBrainzTests.cs" />
     <Compile Include="Unit\Service\LastFmTests.cs" />
+    <Compile Include="Integration\Tag\TagHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="inputData\MusicBrainzTest.ParseXmlToArtist.ValidArtistWithGenres.xml">
