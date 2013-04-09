@@ -21,12 +21,46 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 using System;
+using System.IO;
+using TagLib;
+using System.Collections.Generic;
 
 namespace SongTagger.Core.Tag
 {
-    public static class TagHandler
+    internal static class TagHandler
     {
-       
+        public static void Save(ISong songInfo, FileInfo mp3File)
+        {
+            if (mp3File == null)
+                throw new ArgumentNullException("mp3File", "Mp3 file cannot be null");
+
+            if (!mp3File.Exists)
+                throw new FileNotFoundException("File does not exist", mp3File.FullName);
+
+            if (songInfo == null)
+                throw new NotSupportedException("Songinfo could not be null");
+
+            List<TagTypes> tags = new List<TagTypes>
+            {
+                TagTypes.Id3v1,
+                TagTypes.Id3v2
+            };
+
+            TagLib.Mpeg.AudioFile mp3 = new TagLib.Mpeg.AudioFile(mp3File.FullName);
+            mp3.RemoveTags(TagTypes.AllTags);
+
+            foreach (TagTypes tagType in tags)
+            {
+                TagLib.Tag tag = mp3.GetTag(tagType, true);
+                tag.Title = songInfo.Name;
+                tag.Track = 4;
+                tag.Album = songInfo.Release.Album.Name;
+                tag.AlbumArtists = new string[] {songInfo.Release.Album.ArtistOfRelease.Name};
+                tag.Year = Convert.ToUInt32(songInfo.Release.Album.ReleaseDate.Year);
+            }
+            mp3.Save();
+        }
+
     }
 }
 
