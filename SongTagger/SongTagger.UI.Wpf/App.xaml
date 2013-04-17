@@ -3,6 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+         <Style x:Key="CommonStyle" TargetType="Control">
+             <Setter Property="FontFamily" Value="Segoe UI"/>
+         </Style>
+        <Style TargetType="DockPanel">
+            <Setter Property="LastChildFill" Value="True"/>
+        </Style>
     </Application.Resources>
 </Application>
