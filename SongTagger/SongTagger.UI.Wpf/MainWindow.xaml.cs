@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SongTagger.UI.Wpf.ViewModel;
 
 namespace SongTagger.UI.Wpf
 {
@@ -22,6 +23,36 @@ namespace SongTagger.UI.Wpf
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainWindowViewModelDesignData();
+        }
+    }
+
+
+    public class MainWindowViewModelDesignData : MainWindowViewModel
+    {
+        public MainWindowViewModelDesignData()
+        {
+            WindowTitle = GetType().Namespace + " | Design data";
+            StatusCollection.Add("[START] This is only design data....");
+            StatusCollection.Add("This is only design data....ready");
+            SourceDirectory = new SourceDirectoryViewModelDesignData();
+            Target = new TargetViewModelDesignData();
+        }
+    }
+
+    public class SourceDirectoryViewModelDesignData : SourceDirectoryViewModel
+    {
+        public SourceDirectoryViewModelDesignData()
+        {
+            
+        }
+    }
+
+    public class TargetViewModelDesignData : TargetViewModel
+    {
+        public TargetViewModelDesignData()
+        {
+            
         }
     }
 }
