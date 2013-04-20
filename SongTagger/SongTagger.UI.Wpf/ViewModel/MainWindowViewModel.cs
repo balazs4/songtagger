@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows.Data;
+using System.IO;
 
 namespace SongTagger.UI.Wpf.ViewModel
 {
@@ -51,17 +54,6 @@ namespace SongTagger.UI.Wpf.ViewModel
             }
         }
 
-        private SourceDirectoryViewModel sourceDirectoryViewModel;
-        public SourceDirectoryViewModel SourceDirectory
-        {
-            get { return sourceDirectoryViewModel; }
-            set
-            {
-                sourceDirectoryViewModel = value;
-                RaisePropertyChangedEvent("SourceDirectory");
-            }
-        }
-
         private TargetViewModel targetViewModel;
         public TargetViewModel Target
         {
@@ -72,11 +64,6 @@ namespace SongTagger.UI.Wpf.ViewModel
                 RaisePropertyChangedEvent("Target");
             }
         }
-    }
-
-    public class SourceDirectoryViewModel : ViewModelBase
-    {
-
     }
 
     public class TargetViewModel : ViewModelBase
