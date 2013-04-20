@@ -54,21 +54,6 @@ namespace SongTagger.UI.Wpf.ViewModel
             }
         }
 
-        private TargetViewModel targetViewModel;
-        public TargetViewModel Target
-        {
-            get { return targetViewModel; }
-            set
-            {
-                targetViewModel = value;
-                RaisePropertyChangedEvent("Target");
-            }
-        }
-    }
-
-    public class TargetViewModel : ViewModelBase
-    {
-
     }
 
 }
