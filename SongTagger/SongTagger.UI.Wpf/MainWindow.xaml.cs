@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -35,24 +36,6 @@ namespace SongTagger.UI.Wpf
             WindowTitle = GetType().Namespace + " | Design data";
             StatusCollection.Add("[START] This is only design data....");
             StatusCollection.Add("This is only design data....ready");
-            SourceDirectory = new SourceDirectoryViewModelDesignData();
-            Target = new TargetViewModelDesignData();
-        }
-    }
-
-    public class SourceDirectoryViewModelDesignData : SourceDirectoryViewModel
-    {
-        public SourceDirectoryViewModelDesignData()
-        {
-            
-        }
-    }
-
-    public class TargetViewModelDesignData : TargetViewModel
-    {
-        public TargetViewModelDesignData()
-        {
-            
         }
     }
 }
