@@ -8,16 +8,25 @@ namespace SongTagger.UI.Wpf.ViewModel
 {
     public class DelegateCommand : ICommand
     {
+
+        public DelegateCommand(Action<object> action) : 
+            this (action, null)
+        {
+            
+        }
+
+        public DelegateCommand(Action<object> action, Predicate<object> canExecute )
+        {
+            if (action == null)
+                throw new ArgumentNullException("action");
+            CommandAction = action;
+            CanExecuteCommandAction = canExecute;
+        }
+
+        
+
         public Action<object> CommandAction { get; private set; }
         public Predicate<object> CanExecuteCommandAction { get; private set; }
-
-        private void RaiseCanExecuteChangedEvent()
-        {
-            if (CanExecuteChanged == null)
-                return;
-
-            CanExecuteChanged(this, EventArgs.Empty);
-        }
 
         public void Execute(object parameter)
         {
@@ -33,10 +42,15 @@ namespace SongTagger.UI.Wpf.ViewModel
                 return true;
 
             bool canexecute = CanExecuteCommandAction(parameter);
-            RaiseCanExecuteChangedEvent();
             return canexecute;
         }
 
-        public event EventHandler CanExecuteChanged;
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+        
     }
 }
