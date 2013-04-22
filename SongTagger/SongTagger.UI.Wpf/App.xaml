@@ -6,6 +6,11 @@
          <Style x:Key="CommonStyle" TargetType="Control">
              <Setter Property="FontFamily" Value="Segoe UI"/>
          </Style>
+
+        <Style x:Key="HeaderStyle" TargetType="Control" BasedOn="{StaticResource CommonStyle}">
+            <Setter Property="FontSize" Value="24"/>
+        </Style>
+
         <Style TargetType="DockPanel">
             <Setter Property="LastChildFill" Value="True"/>
         </Style>

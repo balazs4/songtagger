@@ -5,21 +5,131 @@
         xmlns:DesignData="clr-namespace:SongTagger.UI.Wpf"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:Gong="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=DesignData:MainWindowViewModelDesignData}"
-        Title="{Binding WindowTitle}" Height="675" Width="800"
+        Title="{Binding WindowTitle}" Height="675" Width="700"
         >
     <Window.Resources>
         <ViewModel:StatusConverter x:Key="GetLastStatusMessage"/>
+        <ViewModel:BooleanToVisibilityConverter x:Key="Bool2Visibilty"/>
+        
+        <DataTemplate x:Key="ArtistDisplayInfoDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
+            <StackPanel>
+                <Label Content="{Binding ArtistName}" HorizontalContentAlignment="Right"
+                       Style="{StaticResource HeaderStyle}"/>
+                <ItemsControl ItemsSource="{Binding ArtistGenres}" HorizontalAlignment="Right">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ArtistSearchInProgressDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
+            <StackPanel>
+                <Label Content="Search in progress..." 
+                       Style="{StaticResource HeaderStyle}"
+                       HorizontalContentAlignment="Right"/>
+                <ProgressBar IsIndeterminate="True" Width="50" Height="20"
+                             HorizontalAlignment="Right"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ArtistWaitingForUserDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
+            <StackPanel HorizontalAlignment="Center">
+                <Label 
+                    Content="Enter artist name..." 
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource HeaderStyle}"
+                    />
+                <TextBox 
+                    Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                    MinWidth="300"
+                    TextAlignment="Center"
+                    Style="{StaticResource HeaderStyle}"
+                    Background="LightYellow"
+                    />
+                <Button Content="Search"
+                        Width="50"
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor, 
+AncestorType={x:Type Window}}, Path=DataContext.SearchArtistCommand}"
+                        />
+            </StackPanel>
+
+        </DataTemplate>
+
+        <DataTemplate x:Key="ArtistDropTargetDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
+            <StackPanel HorizontalAlignment="Stretch">
+                <Label Content="Drop target..." HorizontalAlignment="Center"/>
+            </StackPanel>
+        </DataTemplate>
+
+        
+        <Style x:Key="ArtistViewStyle" TargetType="ContentControl">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=Artist.Status}" Value="WaitingForUser">
+                    <Setter Property="ContentTemplate" Value="{StaticResource ArtistWaitingForUserDataTemplate}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Artist.Status}" Value="SearchInProgress">
+                    <Setter Property="ContentTemplate" Value="{StaticResource ArtistSearchInProgressDataTemplate}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Artist.Status}" Value="DisplayInfo">
+                    <Setter Property="ContentTemplate" Value="{StaticResource ArtistDisplayInfoDataTemplate}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Artist.Status}" Value="DropTarget">
+                    <Setter Property="ContentTemplate" Value="{StaticResource ArtistDropTargetDataTemplate}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SearchArtistCommand}" CommandParameter="Rise against"/>
+    </Window.InputBindings>
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem>
                 <Label Content="{Binding StatusCollection, Converter={StaticResource GetLastStatusMessage}}"/>
             </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <ProgressBar IsIndeterminate="True" Width="300"/>
+            </StatusBarItem>
         </StatusBar>
         <Grid>
-            <Image Source="http://tswiftynation.weebly.com/uploads/1/0/4/2/10425949/2918640_orig.jpg"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" MinHeight="120"/>
+                <RowDefinition Height="2*" MinHeight="180"/>
+                <RowDefinition Height="5*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" 
+                        HorizontalAlignment="Stretch" 
+                        Background="Silver"
+                        AllowDrop="True"
+                        Gong:DragDrop.IsDropTarget="True"
+                        Gong:DragDrop.DropHandler="{Binding}"                        
+                        >
+                <ContentControl 
+                    Content="{Binding Artist}" 
+                    Style="{StaticResource ArtistViewStyle}"
+                    />
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <Image Height="150" Width="150"
+                    Source="http://images.uulyrics.com/cover/d/def-leppard/album-retro-active.jpg"/>
+            </Grid>
+            <Grid Grid.Row="2">
+
+            </Grid>
         </Grid>
     </DockPanel>
 </Window>
