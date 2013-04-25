@@ -13,7 +13,12 @@
     <Window.Resources>
         <ViewModel:StatusConverter x:Key="GetLastStatusMessage"/>
         <ViewModel:BooleanToVisibilityConverter x:Key="Bool2Visibilty"/>
-        
+
+        <DataTemplate x:Key="EmptyDataTemple">
+            <StackPanel/>
+        </DataTemplate>
+
+
         <DataTemplate x:Key="ArtistDisplayInfoDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
             <StackPanel>
                 <Label Content="{Binding ArtistName}" HorizontalContentAlignment="Right"
@@ -30,9 +35,41 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="20"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="1"
+                            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.GetAlbumsCommand}"
+                            >
+                        <Button.Template>
+                            <ControlTemplate>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsEnabled" Value="true">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="false">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                                <Image Source="Images\yes.png"/>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button Grid.Column="2"
+                            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ResetCommand}"
+                            >
+                        <Button.Template>
+                            <ControlTemplate>
+                                <Image Source="Images\no.png"/>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
             </StackPanel>
         </DataTemplate>
-
         <DataTemplate x:Key="ArtistSearchInProgressDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
             <StackPanel>
                 <Label Content="Search in progress..." 
@@ -45,25 +82,26 @@
 
         <DataTemplate x:Key="ArtistWaitingForUserDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
             <StackPanel HorizontalAlignment="Center">
+                <StackPanel.InputBindings>
+                    <KeyBinding Key="Enter"
+                                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SearchArtistCommand}"
+                                />
+                </StackPanel.InputBindings>
                 <Label 
                     Content="Enter artist name..." 
                     HorizontalAlignment="Center"
                     Style="{StaticResource HeaderStyle}"
                     />
-                <TextBox 
+                <TextBox
+                    TabIndex="0"
+                    Name="searchTextBox"
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                     MinWidth="300"
                     TextAlignment="Center"
                     Style="{StaticResource HeaderStyle}"
                     Background="LightYellow"
                     />
-                <Button Content="Search"
-                        Width="50"
-                        Command="{Binding RelativeSource={RelativeSource FindAncestor, 
-AncestorType={x:Type Window}}, Path=DataContext.SearchArtistCommand}"
-                        />
             </StackPanel>
-
         </DataTemplate>
 
         <DataTemplate x:Key="ArtistDropTargetDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
@@ -71,8 +109,6 @@ AncestorType={x:Type Window}}, Path=DataContext.SearchArtistCommand}"
                 <Label Content="Drop target..." HorizontalAlignment="Center"/>
             </StackPanel>
         </DataTemplate>
-
-        
         <Style x:Key="ArtistViewStyle" TargetType="ContentControl">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Path=Artist.Status}" Value="WaitingForUser">
@@ -89,7 +125,76 @@ AncestorType={x:Type Window}}, Path=DataContext.SearchArtistCommand}"
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        
+
+
+
+        <DataTemplate x:Key="AlbumsDisplayInfoDataTemplate">
+            <ListBox ItemsSource="{Binding}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Image Grid.Column="0" 
+                                   MaxWidth="150" MaxHeight="150">
+                                <Image.ToolTip>
+                                    <Image Source="{Binding Cover}"/>
+                                </Image.ToolTip>
+                                <Image.Style>
+                                    <Style TargetType="Image">
+                                        <Setter Property="Source" Value="{Binding Cover}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Cover}" Value="{x:Null}">
+                                                <Setter Property="Source" Value="Images\unknown-cover.png"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                            <StackPanel Grid.Column="1">
+                                <Label Style="{StaticResource HeaderStyle}"
+                                        Content="{Binding AlbumName}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="{Binding Year}"/>
+                                    <Label Foreground="Gray" Content="{Binding AlbumType}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+        </DataTemplate>
+
+        <DataTemplate x:Key="AlbumsSearchInProgressDataTemplate">
+            <StackPanel>
+                <Label Content="Search in progress..." 
+                       Style="{StaticResource HeaderStyle}"
+                       HorizontalContentAlignment="Center"
+                       VerticalContentAlignment="Center"
+                       />
+                <ProgressBar IsIndeterminate="True" Width="150" Height="10"
+                             HorizontalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             />
+            </StackPanel>
+        </DataTemplate>
+
+        <Style x:Key="AlbumViewStyle" TargetType="ContentControl">
+            <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemple}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=Status}" Value="GettingAlbums">
+                    <Setter Property="ContentTemplate" Value="{StaticResource AlbumsSearchInProgressDataTemplate}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Status}" Value="AlbumsReady">
+                    <Setter Property="ContentTemplate" Value="{StaticResource AlbumsDisplayInfoDataTemplate}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SearchArtistCommand}" CommandParameter="Rise against"/>
@@ -97,16 +202,13 @@ AncestorType={x:Type Window}}, Path=DataContext.SearchArtistCommand}"
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem>
-                <Label Content="{Binding StatusCollection, Converter={StaticResource GetLastStatusMessage}}"/>
-            </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right">
-                <ProgressBar IsIndeterminate="True" Width="300"/>
+                <TextBlock Text="{Binding Status}"/>
             </StatusBarItem>
         </StatusBar>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" MinHeight="120"/>
-                <RowDefinition Height="2*" MinHeight="180"/>
+                <RowDefinition Height="2*" MinHeight="150"/>
                 <RowDefinition Height="5*"/>
             </Grid.RowDefinitions>
 
@@ -123,13 +225,15 @@ AncestorType={x:Type Window}}, Path=DataContext.SearchArtistCommand}"
                     />
             </StackPanel>
 
-            <Grid Grid.Row="1">
-                <Image Height="150" Width="150"
-                    Source="http://images.uulyrics.com/cover/d/def-leppard/album-retro-active.jpg"/>
-            </Grid>
+            <ContentControl Grid.Row="1"
+                    Content="{Binding Albums}" 
+                    Style="{StaticResource AlbumViewStyle}"
+                    />
+
             <Grid Grid.Row="2">
 
             </Grid>
         </Grid>
+
     </DockPanel>
 </Window>
