@@ -26,8 +26,7 @@ namespace SongTagger.UI.Wpf
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel(SongTagger.Core.Service.MusicData.Provider);
-        }
-       
+        }       
     }
 
 
@@ -37,10 +36,14 @@ namespace SongTagger.UI.Wpf
             : base(DesignDataProvider.Instance)
         {
             WindowTitle = GetType().Namespace + " | Design data";
-            StatusCollection.Add("[START] This is only design data....");
-            StatusCollection.Add("This is only design data....ready");
             Artist = new ArtistViewModel();
-            //SearchArtistCommand.Execute("Foobar artist");
+            Artist.Status = ArtistViewModelStatus.DisplayInfo;
+            Artist.ArtistName = "Design artist";
+            Artist.ArtistGenres.Add("genre");
+
+
+            GetAlbumsCommand.Execute(null);
+
         }
     }
 
@@ -71,7 +74,20 @@ namespace SongTagger.UI.Wpf
 
         public IEnumerable<IAlbum> GetAlbums(IArtist artist)
         {
-            throw new NotImplementedException();
+            System.Threading.Thread.Sleep(1000);
+            List<IAlbum> albums = new List<IAlbum>
+                {
+                    new AlbumDesignData { 
+                        Name = "Retro active", ReleaseDate = new DateTime(1993,1,1), TypeOfRelease = ReleaseType.Album, 
+                        Covers = new List<ICoverArt>{ new CoverArtDesignData{SizeCategory = SizeType.Large, Url = new Uri("http://images.uulyrics.com/cover/d/def-leppard/album-retro-active.jpg") }}
+                    },
+
+                    new AlbumDesignData { 
+                        Name = "Hysteria", ReleaseDate = new DateTime(1987,1,1), TypeOfRelease = ReleaseType.Album, 
+                        Covers = new List<ICoverArt>{ new CoverArtDesignData{SizeCategory = SizeType.Large, Url = new Uri("http://4.bp.blogspot.com/-FZCXTJLTFYk/TfMPiqBgw7I/AAAAAAAAALg/yMicagJg3Xk/s1600/HISTERIA.jpg") }}
+                    }
+                };
+            return albums;
         }
 
         public IEnumerable<IRelease> GetReleases(IAlbum album)
@@ -91,5 +107,21 @@ namespace SongTagger.UI.Wpf
         public Guid Id { get; set; }
         public string Name { get; set; }
         public List<string> Genres { get; set; }
+    }
+
+    public class AlbumDesignData : IAlbum
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public IArtist ArtistOfRelease { get; set; }
+        public IList<ICoverArt> Covers { get; set; }
+        public DateTime ReleaseDate { get; set; }
+        public ReleaseType TypeOfRelease { get; set; }
+    }
+
+    public class CoverArtDesignData : ICoverArt
+    {
+        public Uri Url { get;  set; }
+        public SizeType SizeCategory { get; set; }
     }
 }
