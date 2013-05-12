@@ -22,8 +22,10 @@
 //
 using System;
 using System.IO;
+using System.Linq;
 using TagLib;
 using System.Collections.Generic;
+using System.Net;
 
 namespace SongTagger.Core.Tag
 {
@@ -52,15 +54,62 @@ namespace SongTagger.Core.Tag
             foreach (TagTypes tagType in tags)
             {
                 TagLib.Tag tag = mp3.GetTag(tagType, true);
+
                 tag.Title = songInfo.Name;
-                tag.Track = 4;
+
+                tag.Track = (uint)songInfo.Number;
+
                 tag.Album = songInfo.Release.Album.Name;
+
                 tag.AlbumArtists = new string[] {songInfo.Release.Album.ArtistOfRelease.Name};
+                tag.Performers = new string[] {songInfo.Release.Album.ArtistOfRelease.Name};
+
                 tag.Year = Convert.ToUInt32(songInfo.Release.Album.ReleaseDate.Year);
+
+                tag.Genres = songInfo.Release.Album.ArtistOfRelease.Genres.ToArray();
+
+                tag.Pictures = GetCovertArt(songInfo, mp3File.DirectoryName);
             }
+
             mp3.Save();
         }
 
+        private static IPicture[] GetCovertArt(ISong songInfo, string targetDir)
+        {
+            Func<Uri, string, IPicture> tryDownload = 
+                (url, target) => 
+            {
+                try
+                {
+                    using (WebClient client = new WebClient())
+                    {
+                        client.DownloadFile(url, target);
+                    }
+                } catch
+                {
+                    return null;
+                }
+                
+                if (System.IO.File.Exists(target))
+                    return new Picture(target);
+                else
+                    return null;
+
+            };
+
+
+            List<IPicture> pictures = new List<IPicture>();
+
+            foreach (ICoverArt cover in songInfo.Release.Album.Covers.Where(c => c.SizeCategory == SizeType.Large))
+            {
+                string targetFile = Path.Combine(targetDir, Guid.NewGuid() + Path.GetExtension(cover.Url.ToString()));
+                IPicture pic = tryDownload(cover.Url,targetFile);
+                if (pic != null)
+                    pictures.Add(pic);
+            }
+
+            return pictures.ToArray();
+        }
     }
 }
 

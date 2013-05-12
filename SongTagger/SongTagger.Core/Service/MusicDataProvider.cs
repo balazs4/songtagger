@@ -68,6 +68,12 @@ namespace SongTagger.Core.Service
         #endregion
 
         #region IProvider implementation
+
+        public IArtist GetArtistById(Guid artistId)
+        {
+            throw new NotImplementedException("TODO");
+        }
+
         public IArtist GetArtist(string nameStub)
         {
             ArtistStubEntity rawArtist = new ArtistStubEntity(nameStub);
