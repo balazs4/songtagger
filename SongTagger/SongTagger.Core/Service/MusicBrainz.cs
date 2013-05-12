@@ -137,8 +137,15 @@ namespace SongTagger.Core.Service
                 #endregion
 
                 #region Xml Query
-                XElement artistElement = result.Descendants(xnameArtist)
-                    .First(e => e.HasAttributes && Convert.ToInt32(e.Attribute(xnameScore).Value) >= minimumScore);
+                IEnumerable<XElement> artistElements =result.Descendants(xnameArtist);
+
+
+                XElement artistElement = artistElements.First();
+                if (artistElements.Any(e => e.HasAttributes && e.Attribute(xnameScore) != null))
+                {
+                    artistElements.First(e => Convert.ToInt32(e.Attribute(xnameScore).Value) >= minimumScore);
+                }
+
 
                 IEnumerable<string> rawGenreList = artistElement
                         .Descendants(xnameTag)
@@ -305,7 +312,7 @@ namespace SongTagger.Core.Service
                         continue;
 
                     int number;
-                    if (!Int32.TryParse(track.Element(xNumber).Value, out number)) 
+                    if (!Int32.TryParse(track.Element(xNumber).Value, out number))
                     {
                         number = 0;
                     }
@@ -379,17 +386,16 @@ namespace SongTagger.Core.Service
             queryUri.Query = String.Format("query={0}", luceneQuery);
             return queryUri.Uri;
         }
-
+       
         internal static Uri CreateQueryUriTo<T>(Guid id) where T : IEntity
         {
             switch (typeof(T).Name)
             {
                 case "IArtist":
-                    throw new NotSupportedException("Artist lookup with ID currently not supported");
-
+                    return CreateArtistQuery(id);
 
                 case "IAlbum":
-                    return CreateAlbumQueryUri(id);
+                    return CreateAlbumQuery(id);
 
                 case "IRelease":
                     return CreateReleaseQuery(id);
@@ -402,7 +408,18 @@ namespace SongTagger.Core.Service
             }
         }
 
-        private static Uri CreateAlbumQueryUri(Guid id)
+        private static Uri CreateArtistQuery(Guid id)
+        {
+              //http://musicbrainz.org/ws/2/artist/7249b899-8db8-43e7-9e6e-22f1e736024e?inc=tags
+
+            UriBuilder builder = new UriBuilder(baseUrl);
+            builder.Path += "artist/" + id.ToString();
+            builder.Query = "inc=tags";
+
+            return builder.Uri;
+        }
+
+        private static Uri CreateAlbumQuery(Guid id)
         {
             //http://musicbrainz.org/ws/2/artist/606bf117-494f-4864-891f-09d63ff6aa4b?inc=release-groups
             //http://musicbrainz.org/ws/2/release-group?artist=7527f6c2-d762-4b88-b5e2-9244f1e34c46&limit=100
