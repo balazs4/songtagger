@@ -28,8 +28,6 @@ namespace SongTagger.Core.Service
 {
     public interface IProvider
     {
-        IArtist GetArtistById(Guid artistId);
-
         IArtist GetArtist(string nameStub);
 
         IEnumerable<IAlbum> GetAlbums(IArtist artist);

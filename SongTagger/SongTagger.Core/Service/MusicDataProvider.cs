@@ -29,8 +29,6 @@ using NLog;
 
 namespace SongTagger.Core.Service
 {
-   
-
     public class MusicData : IProvider
     {
         private readonly Logger logger;
@@ -67,27 +65,36 @@ namespace SongTagger.Core.Service
         }
         #endregion
 
+
+
+
+
         #region IProvider implementation
-
-        public IArtist GetArtistById(Guid artistId)
-        {
-            throw new NotImplementedException("TODO");
-        }
-
         public IArtist GetArtist(string nameStub)
         {
             ArtistStubEntity rawArtist = new ArtistStubEntity(nameStub);
 
+            Func<ArtistStubEntity, bool> check = (source) => !String.IsNullOrWhiteSpace(source.Name);
+            Func<Uri> createUri = () => MusicBrainz.CreateArtistQueryUri(rawArtist.Name);
+
+
+            if (rawArtist.Id != Guid.Empty)
+            {
+                check = (source) => source.Id != Guid.Empty;
+                createUri = () => MusicBrainz.CreateQueryUriTo<IArtist>(rawArtist.Id);
+            }           
+
+            
             IEnumerable<IArtist> artistList = PerformQuery<ArtistStubEntity, IArtist>(
                 rawArtist,
-                (source) => !String.IsNullOrWhiteSpace(source.Name),
+                check,
                 MusicBrainzService,
-                () => MusicBrainz.CreateArtistQueryUri(rawArtist.Name),
+                createUri,
                 (xml) => MusicBrainz.ParseXmlToListOf<IArtist>(xml),
                 logger);
-
+            
             IArtist artist = artistList.FirstOrDefault() ?? new UnknownArtist();
-       
+            
             logger.Info("...artist: {0}", artist.Name);
             return artist;
         }
@@ -115,7 +122,7 @@ namespace SongTagger.Core.Service
                                                                                   () => LastFm.CreateAlbumCoverQueryUri(album), 
                                                                                   (xml) => LastFm.ParseXmlToCoverList(xml), 
                                                                                   logger
-                                                                                  );
+                );
 
                 ((List<ICoverArt>)album.Covers).AddRange(coverArts);
             }

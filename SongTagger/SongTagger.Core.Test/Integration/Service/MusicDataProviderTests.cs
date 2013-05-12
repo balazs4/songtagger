@@ -39,6 +39,7 @@ namespace SongTagger.Core.Test.Integration.Service
         [TestCase("Korn",Result = "ac865b2e-bba8-4f5a-8756-dd40d5e39f46")]
         [TestCase("4Lyn",Result = "03df376e-f696-4df0-a8e4-3bbc9c8c1c5d")]
         [TestCase("LiveOnRelease",Result = "70bd46ea-684a-4a2b-a3b6-4bf825476e25")]
+
         public string GetArtistTest(string artistName)
         {
             IArtist artist = null;
@@ -51,6 +52,15 @@ namespace SongTagger.Core.Test.Integration.Service
             StringAssert.AreEqualIgnoringCase(artistName, artist.Name);
 
             return artist.Id.ToString();
+        }
+
+        [TestCase("b2ea6506-645e-4935-8d82-84c3a95fe7f0", Result= "Cro")]
+        [TestCase("4d7928cd-7ed2-4282-8c29-c0c9f966f1bd", Result= "Alice Cooper")]
+        [TestCase("7249b899-8db8-43e7-9e6e-22f1e736024e", Result= "Def Leppard")]
+        public string GetArtistByIdTest(string id)
+        {
+            IArtist result = MusicData.Provider.GetArtist(id);
+            return result.Name;
         }
 
         [TestCaseSource(typeof(AlbumTestCaseSources),"Artists")]

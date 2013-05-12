@@ -20,7 +20,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-
 using System;
 
 namespace SongTagger.Core
@@ -31,7 +30,7 @@ namespace SongTagger.Core
 
         String Name { get; }
     }
-	
+    
     internal class ArtistStubEntity : IEntity
     {
         public ArtistStubEntity(string name)
@@ -40,9 +39,17 @@ namespace SongTagger.Core
             if (String.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Artist name stub could not be null or empty", "name");
             #endregion
-            
-            Id = Guid.Empty;
-            Name = name;
+    
+            Guid id;
+            if (Guid.TryParse(name, out id))
+            {
+                Id = id;
+                Name = name;
+            } else
+            {
+                Id = Guid.Empty;
+                Name = name;    
+            }
         }
         
         #region IEntity implementation
