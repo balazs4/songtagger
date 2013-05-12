@@ -30,79 +30,149 @@ using System.Collections.Generic;
 
 namespace SongTagger.Core.Test.Integration.Tag
 {
-    [TestFixture()]
-    public class TagHandlerTests
+    [TestFixture]
+    public class TagHandlerSaveTests
     {
         private string tempFileName;
+        private ISong songInfo;
+        private TagLib.Mpeg.AudioFile mp3File;
+        private IDictionary<TagLib.TagTypes, TagLib.Tag> tags;
 
-        [SetUp]
-        public void Setup() 
+        private static string GetFileName()
         {
-            tempFileName = Path.Combine(Path.GetTempPath(), "tagHandlerTest.mp3");
+            string tmpDir = Path.Combine(Path.GetTempPath(), "songtagger");
+
+            if (Directory.Exists(tmpDir))
+                Directory.Delete(tmpDir);
+
+            Directory.CreateDirectory(tmpDir);
+
+            string tmp = Path.Combine(tmpDir, "tagHandlerTest.mp3");
             string fileName = TestHelper.GetInputDataFilePath("01_kelet_vagy_nyugat.mp3");
-            File.Copy(fileName,tempFileName,true);
+            File.Copy(fileName, tmp, true);
+            return tmp;
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            if (File.Exists(tempFileName))
-            {
-                File.Delete(tempFileName);
-            }
-        }
-
-        [Test]
-        public void Save_FileExist_SongInfoValid()
+        private static ISong SetupMock()
         {
             Mock<IArtist> artistMock = new Mock<IArtist>();
             artistMock.Setup(a => a.Name).Returns("Blub artist");
             artistMock.Setup(a => a.Genres).Returns(new List<String> { "rock", "alternative", "punk"});
+           
+            Mock<ICoverArt> coverArt = new Mock<ICoverArt>();
+            coverArt.Setup(c => c.SizeCategory).Returns(SizeType.Large);
+            coverArt.Setup(c => c.Url).Returns(new Uri("http://a1-images.myspacecdn.com/images03/33/668528fd88864db9ba4f1b41efae24ca/lrg.jpg"));
+            
+
+
 
             Mock<IAlbum> albumMock = new Mock<IAlbum>();
             albumMock.Setup(a => a.Name).Returns("Foobar");
-            albumMock.Setup(a => a.ReleaseDate).Returns(new DateTime(1986,03,16));
+            albumMock.Setup(a => a.ReleaseDate).Returns(new DateTime(1986, 03, 16));
             albumMock.Setup(a => a.ArtistOfRelease).Returns(artistMock.Object);
-
-
+            albumMock.Setup(a => a.Covers).Returns(new List<ICoverArt> {coverArt.Object});
+            
             Mock<IRelease> releaseMock = new Mock<IRelease>();
             releaseMock.Setup(r => r.Name).Returns("Foobar");
             releaseMock.Setup(r => r.Album).Returns(albumMock.Object);
-
+            
             Mock<ISong> songMock = new Mock<ISong>();
             songMock.Setup(s => s.Name).Returns("I wanna be...");
-            songMock.Setup(s => s.Number).Returns(4);
-            songMock.Setup(s =>s.Release).Returns(releaseMock.Object);
-
-
-
-            ISong songInfo = songMock.Object;
-            FileInfo mp3 = new FileInfo(tempFileName);
-            TagHandler.Save(songMock.Object, mp3);
-
-
-            TagLib.Mpeg.AudioFile file = new TagLib.Mpeg.AudioFile(mp3.FullName);
-            List<TagLib.TagTypes> tags = new List<TagLib.TagTypes> 
-            {
-                TagLib.TagTypes.Id3v1,
-                TagLib.TagTypes.Id3v2
-            };
-
-            foreach (TagLib.TagTypes tag in tags)
-            {
-                TagLib.Tag id3Tag = file.GetTag(tag);
-                Assert.AreEqual(songInfo.Name, id3Tag.Title, "Wrong title in " + tag);
-                Assert.AreEqual(songInfo.Number, id3Tag.Track, "Wrong track number in " + tag);
-                Assert.AreEqual(songInfo.Release.Album.Name, id3Tag.Album, "Wrong album name in " + tag);
-                Assert.AreEqual(songInfo.Release.Album.ReleaseDate.Year.ToString(), id3Tag.Year.ToString(), "Wrong album year in " + tag);
-                Assert.AreEqual(songInfo.Release.Album.ArtistOfRelease.Name, id3Tag.FirstAlbumArtist, "Wrong artist in " + tag);
-                CollectionAssert.AreEquivalent(songInfo.Release.Album.ArtistOfRelease.Genres, id3Tag.Genres);
-                Assert.IsTrue(file.Tag.Pictures.Length > 0);
-
-                //TODO: Country...Ids
-            }
-
+            songMock.Setup(s => s.Number).Returns(16);
+            songMock.Setup(s => s.Release).Returns(releaseMock.Object);
+            
+            return songMock.Object;
         }
+
+        [TestFixtureSetUp]
+        public void TestFixtureSetup()
+        {
+            tempFileName = GetFileName();
+            songInfo = SetupMock();
+
+            TagHandler.Save(songInfo, new FileInfo(tempFileName));
+
+            mp3File = new TagLib.Mpeg.AudioFile(tempFileName);
+
+            tags = new Dictionary<TagLib.TagTypes, TagLib.Tag>
+            {
+                {TagLib.TagTypes.Id3v1, mp3File.GetTag(TagLib.TagTypes.Id3v1)},
+                {TagLib.TagTypes.Id3v2, mp3File.GetTag(TagLib.TagTypes.Id3v2)}
+            };
+        }
+
+        [SetUp]
+        public void Setup()
+        {
+            Assert.IsNotNull(mp3File);
+        }
+
+        [TestFixtureTearDown]
+        public void TestFixtureTearDown()
+        {
+            FileInfo tmpFile = new FileInfo(tempFileName);
+            if (Directory.Exists(tmpFile.DirectoryName))
+            {
+                Directory.Delete(tmpFile.DirectoryName,true);
+            }
+        }
+
+        [TestCase(TagLib.TagTypes.Id3v1)]
+        [TestCase(TagLib.TagTypes.Id3v2)]
+        public void Assert_Title(TagLib.TagTypes tag)
+        {
+            TagLib.Tag id3Tag = tags [tag];
+            Assert.AreEqual(songInfo.Name, id3Tag.Title, tag.ToString());
+        }
+
+        [TestCase(TagLib.TagTypes.Id3v1)]
+        [TestCase(TagLib.TagTypes.Id3v2)]
+        public void Assert_TrackNumber(TagLib.TagTypes tag)
+        {
+            TagLib.Tag id3Tag = tags [tag];
+            Assert.AreEqual(songInfo.Number, id3Tag.Track, tag.ToString());
+        }
+
+        [TestCase(TagLib.TagTypes.Id3v1)]
+        [TestCase(TagLib.TagTypes.Id3v2)]
+        public void Assert_AlbumName(TagLib.TagTypes tag)
+        {
+            TagLib.Tag id3Tag = tags [tag];
+            Assert.AreEqual(songInfo.Release.Album.Name, id3Tag.Album, tag.ToString());
+        }
+
+        [TestCase(TagLib.TagTypes.Id3v1)]
+        [TestCase(TagLib.TagTypes.Id3v2)]
+        public void Assert_AlbumReleaseYear(TagLib.TagTypes tag)
+        {
+            TagLib.Tag id3Tag = tags [tag];
+            Assert.AreEqual(songInfo.Release.Album.ReleaseDate.Year.ToString(), id3Tag.Year.ToString(), tag.ToString());
+        }
+
+        [TestCase(TagLib.TagTypes.Id3v1)]
+        [TestCase(TagLib.TagTypes.Id3v2)]
+        public void Assert_ArtistName(TagLib.TagTypes tag)
+        {
+            TagLib.Tag id3Tag = tags [tag];
+            Assert.AreEqual(songInfo.Release.Album.ArtistOfRelease.Name, id3Tag.FirstPerformer, tag.ToString());
+        }
+
+        //[TestCase(TagLib.TagTypes.Id3v1)]
+        [TestCase(TagLib.TagTypes.Id3v2)]
+        public void Assert_ArtistGenres(TagLib.TagTypes tag)
+        {
+            TagLib.Tag id3Tag = tags [tag];
+            CollectionAssert.AreEquivalent(songInfo.Release.Album.ArtistOfRelease.Genres, id3Tag.Genres, tag.ToString());
+        }
+
+        //[TestCase(TagLib.TagTypes.Id3v1)]
+        [TestCase(TagLib.TagTypes.Id3v2)]
+        public void Assert_CoverArt(TagLib.TagTypes tag)
+        {
+            TagLib.Tag id3Tag = tags [tag];
+            CollectionAssert.IsNotEmpty(id3Tag.Pictures, tag.ToString());
+        }
+
     }
 }
 
