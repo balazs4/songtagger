@@ -21,9 +21,6 @@ using SongTagger.Core.Service;
 namespace SongTagger.UI.Wpf.ViewModel
 {
 
-
-
-
     public class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -175,7 +172,8 @@ namespace SongTagger.UI.Wpf.ViewModel
             if (asyncCall == null)
                 return;
 
-            IEnumerable<IAlbum> albumList = asyncCall.EndInvoke(asyncResult);
+            List<IAlbum> albumList = asyncCall.EndInvoke(asyncResult).ToList();
+            albumList.Sort((a, b) => a.ReleaseDate.Year.CompareTo(b.ReleaseDate.Year));
             foreach (IAlbum album in albumList)
             {
                 Action addAction = () => Albums.Add(AlbumViewModel.CreateAlbumViewModel(album));
