@@ -9,6 +9,7 @@
 
         <Style x:Key="HeaderStyle" TargetType="Control" BasedOn="{StaticResource CommonStyle}">
             <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Normal"/>
         </Style>
 
         <Style TargetType="DockPanel">

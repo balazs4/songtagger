@@ -26,7 +26,7 @@ namespace SongTagger.UI.Wpf
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel(SongTagger.Core.Service.MusicData.Provider);
-        }       
+        }
     }
 
 
@@ -37,7 +37,7 @@ namespace SongTagger.UI.Wpf
         {
             WindowTitle = GetType().Namespace + " | Design data";
             Artist = new ArtistViewModel();
-            Artist.Status = ArtistViewModelStatus.WaitingForUser;
+            Artist.Status = ArtistViewModelStatus.DisplayInfo;
             Artist.ArtistName = "Design artist";
             Artist.ArtistGenres.Add("genre");
 
@@ -61,15 +61,15 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        private DesignDataProvider() 
+        private DesignDataProvider()
         {
-            
+
         }
 
         public IArtist GetArtist(string nameStub)
         {
             System.Threading.Thread.Sleep(5000);
-            return new ArtistDesignData {Name = "Desing band", Genres = new List<string> {"rock", "metal"}};
+            return new ArtistDesignData { Name = "Desing band", Genres = new List<string> { "rock", "metal" } };
         }
 
         public IEnumerable<IAlbum> GetAlbums(IArtist artist)
@@ -77,14 +77,24 @@ namespace SongTagger.UI.Wpf
             System.Threading.Thread.Sleep(1000);
             List<IAlbum> albums = new List<IAlbum>
                 {
-                    new AlbumDesignData { 
+                    new AlbumDesignData 
+                    { 
                         Name = "Retro active", ReleaseDate = new DateTime(1993,1,1), TypeOfRelease = ReleaseType.Album, 
                         Covers = new List<ICoverArt>{ new CoverArtDesignData{SizeCategory = SizeType.Large, Url = new Uri("http://images.uulyrics.com/cover/d/def-leppard/album-retro-active.jpg") }}
                     },
 
-                    new AlbumDesignData { 
-                        Name = "Hysteria", ReleaseDate = new DateTime(1987,1,1), TypeOfRelease = ReleaseType.Album, 
+                    new AlbumDesignData 
+                    { 
+                        Name = "Hysteria (unrelease B-side tracks live demo)", ReleaseDate = new DateTime(1987,1,1), TypeOfRelease = ReleaseType.Album, 
                         Covers = new List<ICoverArt>{ new CoverArtDesignData{SizeCategory = SizeType.Large, Url = new Uri("http://4.bp.blogspot.com/-FZCXTJLTFYk/TfMPiqBgw7I/AAAAAAAAALg/yMicagJg3Xk/s1600/HISTERIA.jpg") }}
+                    },
+
+                    new AlbumDesignData
+                    {
+                            Name = "In the round, in your face live",
+                            ReleaseDate = new DateTime(1988,08,08),
+                            TypeOfRelease = ReleaseType.Live,
+                            Covers = new List<ICoverArt>()
                     }
                 };
             return albums;
@@ -103,7 +113,7 @@ namespace SongTagger.UI.Wpf
 
     public class ArtistDesignData : IArtist
     {
-        
+
         public Guid Id { get; set; }
         public string Name { get; set; }
         public List<string> Genres { get; set; }
@@ -121,7 +131,7 @@ namespace SongTagger.UI.Wpf
 
     public class CoverArtDesignData : ICoverArt
     {
-        public Uri Url { get;  set; }
+        public Uri Url { get; set; }
         public SizeType SizeCategory { get; set; }
     }
 }
