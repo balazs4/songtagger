@@ -37,7 +37,7 @@ namespace SongTagger.UI.Wpf
         {
             WindowTitle = GetType().Namespace + " | Design data";
             Artist = new ArtistViewModel();
-            Artist.Status = ArtistViewModelStatus.DisplayInfo;
+            Artist.Status = ArtistViewModelStatus.WaitingForUser;
             Artist.ArtistName = "Design artist";
             Artist.ArtistGenres.Add("genre");
 

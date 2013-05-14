@@ -8,7 +8,7 @@
         xmlns:Gong="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=DesignData:MainWindowViewModelDesignData}"
-        Title="{Binding WindowTitle}" Height="675" Width="700"
+        Title="{Binding WindowTitle}" Height="600" Width="500"
         >
     <Window.Resources>
         <ViewModel:StatusConverter x:Key="GetLastStatusMessage"/>
@@ -17,8 +17,6 @@
         <DataTemplate x:Key="EmptyDataTemple">
             <StackPanel/>
         </DataTemplate>
-
-
         <DataTemplate x:Key="ArtistDisplayInfoDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
             <StackPanel>
                 <Label Content="{Binding ArtistName}" HorizontalContentAlignment="Right"
@@ -79,7 +77,6 @@
                              HorizontalAlignment="Right"/>
             </StackPanel>
         </DataTemplate>
-
         <DataTemplate x:Key="ArtistWaitingForUserDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
             <StackPanel HorizontalAlignment="Center">
                 <StackPanel.InputBindings>
@@ -92,18 +89,27 @@
                     HorizontalAlignment="Center"
                     Style="{StaticResource HeaderStyle}"
                     />
-                <TextBox
+                <WrapPanel HorizontalAlignment="Center">
+                    <TextBox
                     TabIndex="0"
                     Name="searchTextBox"
                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                    MinWidth="300"
+                    MinWidth="270"
                     TextAlignment="Center"
                     Style="{StaticResource HeaderStyle}"
                     Background="LightYellow"
                     />
+                    <Button Width="30"  Height="30" 
+                            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SearchArtistCommand}">
+                        <Button.Template>
+                            <ControlTemplate>
+                                <Image Source="Images\search.png"/>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </WrapPanel>
             </StackPanel>
         </DataTemplate>
-
         <DataTemplate x:Key="ArtistDropTargetDataTemplate" DataType="{x:Type ViewModel:ArtistViewModel}">
             <StackPanel HorizontalAlignment="Stretch">
                 <Label Content="Drop target..." HorizontalAlignment="Center"/>
@@ -126,13 +132,23 @@
             </Style.Triggers>
         </Style>
 
-
-
         <DataTemplate x:Key="AlbumsDisplayInfoDataTemplate">
-            <ListBox ItemsSource="{Binding}">
+            <ListBox ItemsSource="{Binding}" 
+                     ScrollViewer.CanContentScroll="False"
+                     ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                     >
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
+                        <Grid MinWidth="500">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="*"/>
@@ -164,10 +180,14 @@
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
             </ListBox>
 
         </DataTemplate>
-
         <DataTemplate x:Key="AlbumsSearchInProgressDataTemplate">
             <StackPanel>
                 <Label Content="Search in progress..." 
@@ -181,7 +201,6 @@
                              />
             </StackPanel>
         </DataTemplate>
-
         <Style x:Key="AlbumViewStyle" TargetType="ContentControl">
             <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemple}"/>
             <Style.Triggers>
@@ -193,8 +212,6 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-
-
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SearchArtistCommand}" CommandParameter="Rise against"/>
@@ -208,13 +225,13 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" MinHeight="120"/>
-                <RowDefinition Height="2*" MinHeight="150"/>
+                <RowDefinition Height="2*" MinHeight="160"/>
                 <RowDefinition Height="5*"/>
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" 
                         HorizontalAlignment="Stretch" 
-                        Background="Silver"
+                        Background="Transparent"
                         AllowDrop="True"
                         Gong:DragDrop.IsDropTarget="True"
                         Gong:DragDrop.DropHandler="{Binding}"                        
