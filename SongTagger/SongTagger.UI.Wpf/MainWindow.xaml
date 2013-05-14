@@ -42,6 +42,9 @@
                     <Button Grid.Column="1"
                             Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.GetAlbumsCommand}"
                             >
+                        <Button.InputBindings>
+                            <KeyBinding Key="Enter" Modifiers="Control"/>
+                        </Button.InputBindings>
                         <Button.Template>
                             <ControlTemplate>
                                 <ControlTemplate.Triggers>
@@ -73,7 +76,7 @@
                 <Label Content="Search in progress..." 
                        Style="{StaticResource HeaderStyle}"
                        HorizontalContentAlignment="Right"/>
-                <ProgressBar IsIndeterminate="True" Width="50" Height="20"
+                <ProgressBar IsIndeterminate="True" Width="150" Height="10"
                              HorizontalAlignment="Right"/>
             </StackPanel>
         </DataTemplate>
@@ -133,60 +136,42 @@
         </Style>
 
         <DataTemplate x:Key="AlbumsDisplayInfoDataTemplate">
-            <ListBox ItemsSource="{Binding}" 
-                     ScrollViewer.CanContentScroll="False"
-                     ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                     >
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="true">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid MinWidth="500">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Image Grid.Column="0" 
-                                   MaxWidth="150" MaxHeight="150">
-                                <Image.ToolTip>
-                                    <Image Source="{Binding Cover}"/>
-                                </Image.ToolTip>
-                                <Image.Style>
-                                    <Style TargetType="Image">
-                                        <Setter Property="Source" Value="{Binding Cover}"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Cover}" Value="{x:Null}">
-                                                <Setter Property="Source" Value="Images\unknown-cover.png"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Image.Style>
-                            </Image>
-                            <StackPanel Grid.Column="1">
-                                <Label Style="{StaticResource HeaderStyle}"
-                                        Content="{Binding AlbumName}"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label Content="{Binding Year}"/>
-                                    <Label Foreground="Gray" Content="{Binding AlbumType}"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel IsItemsHost="True"/>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-            </ListBox>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="150"/>
+                </Grid.ColumnDefinitions>
 
+                <StackPanel Grid.Column="0" HorizontalAlignment="Right">
+                    <Label Style="{StaticResource HeaderStyle}"
+                           FontSize="16">
+                        <Label.Content>
+                           <TextBlock Text="{Binding AlbumName}" TextWrapping="Wrap"/>
+                        </Label.Content>
+                        </Label>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Label Content="{Binding Year}"/>
+                        <Label Foreground="Gray" Content="{Binding AlbumType}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Image Grid.Column="1" 
+                                   MaxWidth="150" MaxHeight="150">
+                    <Image.ToolTip>
+                        <Image Source="{Binding Cover}"/>
+                    </Image.ToolTip>
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Setter Property="Source" Value="{Binding Cover}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Cover}" Value="{x:Null}">
+                                    <Setter Property="Source" Value="Images\unknown-cover.png"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+            </Grid>
         </DataTemplate>
         <DataTemplate x:Key="AlbumsSearchInProgressDataTemplate">
             <StackPanel>
@@ -242,11 +227,19 @@
                     />
             </StackPanel>
 
-            <ContentControl Grid.Row="1"
-                    Content="{Binding Albums}" 
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Height="30" Content="prev" Command="{Binding SelectPreviousAlbumCommand}"/>
+                <ContentControl Grid.Column="1"
+                    Content="{Binding AlbumsView}" 
                     Style="{StaticResource AlbumViewStyle}"
                     />
-
+                <Button Grid.Column="2" Height="30" Content="next" Command="{Binding SelectNextAlbumCommand}"/>
+            </Grid>
             <Grid Grid.Row="2">
 
             </Grid>

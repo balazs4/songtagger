@@ -50,6 +50,8 @@ namespace SongTagger.UI.Wpf.ViewModel
             ResetCommand = new DelegateCommand(ResetExecute, CanExecuteReset);
             SearchArtistCommand = new DelegateCommand(SearchArtistExecute, CanExecuteSearchArtist);
             GetAlbumsCommand = new DelegateCommand(GetAlbumsExecute, CanExecuteGetAlbums);
+            SelectNextAlbumCommand = new DelegateCommand(SelectNextAlbumExecute, SelectNextAlbumCanExecute);
+            SelectPreviousAlbumCommand = new DelegateCommand(SelectPreviousAlbumExecute, SelectPreviousAlbumCanExecute);
         }
 
         private void OnPropertyChangedDispatcher(object sender, PropertyChangedEventArgs eventArgs)
@@ -69,6 +71,8 @@ namespace SongTagger.UI.Wpf.ViewModel
             {
                 Status = ViewModelStatus.AlbumsReady;
             }
+
+
         }
 
         private string windowTitle;
@@ -177,8 +181,11 @@ namespace SongTagger.UI.Wpf.ViewModel
             foreach (IAlbum album in albumList)
             {
                 Action addAction = () => Albums.Add(AlbumViewModel.CreateAlbumViewModel(album));
-                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, addAction);
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, addAction);
             }
+
+            AlbumsView = CollectionViewSource.GetDefaultView(Albums);
+            AlbumsView.MoveCurrentToFirst();
         }
 
         private bool CanExecuteGetAlbums(object parameter)
@@ -209,6 +216,43 @@ namespace SongTagger.UI.Wpf.ViewModel
             {
                 albums = value;
                 RaisePropertyChangedEvent("Albums");
+            }
+        }
+
+        private ICollectionView albumsview;
+        public ICollectionView AlbumsView
+        {
+            get
+            {
+                return albumsview;
+            }
+            private set
+            {
+                albumsview = value;
+
+                albumsview.Filter = AlbumFilter;
+
+                RaisePropertyChangedEvent("AlbumsView");
+            }
+        }
+
+        private bool AlbumFilter(object o)
+        {
+            AlbumViewModel album = ((AlbumViewModel)o);
+
+            switch (album.AlbumModel.TypeOfRelease)
+            {
+                case ReleaseType.Album:
+                case ReleaseType.Live:
+                    return true;
+
+                case ReleaseType.Unknown:
+                case ReleaseType.EP:
+                case ReleaseType.Single:
+                    return false;
+
+                default:
+                    return false;
             }
         }
 
@@ -247,6 +291,63 @@ namespace SongTagger.UI.Wpf.ViewModel
             SearchArtistCommand.Execute(directoryInfo.Name);
         }
 
+        #endregion
+
+        #region AlbumPagingCommand
+        public ICommand SelectPreviousAlbumCommand { get; private set; }
+
+        private void SelectPreviousAlbumExecute(object param)
+        {
+            AlbumsView.MoveCurrentToPrevious();
+        }
+
+        private bool SelectPreviousAlbumCanExecute(object param)
+        {
+            return CanSelectionExecute(AlbumsView, 
+                view => view.CurrentPosition == 0,
+                view => view.IsCurrentBeforeFirst
+                );
+        }
+
+        public ICommand SelectNextAlbumCommand { get; private set; }
+
+        private void SelectNextAlbumExecute(object param)
+        {
+            AlbumsView.MoveCurrentToNext();
+        }
+
+        private bool SelectNextAlbumCanExecute(object param)
+        {
+            Predicate<ICollectionView> ifCurrentItemIsLast = delegate(ICollectionView view)
+                {
+                    List<object> itemsAfterFiltering = view.SourceCollection.Cast<object>().Where(source => AlbumFilter(source)).ToList();
+                    if (itemsAfterFiltering.LastOrDefault() == view.CurrentItem)
+                        return false;
+
+                    return true;
+                };
+
+
+            return CanSelectionExecute(AlbumsView, 
+                ifCurrentItemIsLast,
+                view => view.IsCurrentAfterLast
+                );
+        }
+
+        private static bool CanSelectionExecute(ICollectionView source, params Predicate<ICollectionView>[] criterias)
+        {
+            if (source == null)
+                return false;
+
+            if (source.IsEmpty)
+                return false;
+
+            if (criterias.Any(c => c(source)))
+                return false;
+
+
+            return true;
+        }
         #endregion
     }
 
