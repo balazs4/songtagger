@@ -58,37 +58,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Unit\Service\MusicDataProviderTests.cs" />
-    <Compile Include="Unit\Service\WebServicesTests.cs" />
     <Compile Include="TestHelper.cs" />
-    <Compile Include="Unit\ArtistTests.cs" />
-    <Compile Include="Integration\Service\MusicDataProviderTests.cs" />
-    <Compile Include="Unit\Service\MusicBrainzTests.cs" />
-    <Compile Include="Unit\Service\LastFmTests.cs" />
-    <Compile Include="Integration\Tag\TagHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="inputData\MusicBrainzTest.ParseXmlToArtist.ValidArtistWithGenres.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="inputData\MusicBrainzTest.ParseXmlToArtist.ValidArtistWithoutGenres.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="inputData\MusicBrainzTest.Error.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="inputData\MusicBrainzTest.ParseXmlToAlbumList.ValidResult.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="inputData\LastFmTest.ParseXmlToCoverList.ValidCovers.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="inputData\MusicBrainzTest.ParseXmlToRelease.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="inputData\MusicBrainzTest.ParseXmlToSong.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="inputData\01_kelet_vagy_nyugat.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -101,6 +73,8 @@
   </ItemGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <ItemGroup>
+    <Folder Include="Integration\Service\" />
     <Folder Include="Integration\Tag\" />
+    <Folder Include="Unit\Service\" />
   </ItemGroup>
 </Project>

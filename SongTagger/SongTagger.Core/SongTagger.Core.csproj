@@ -55,27 +55,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Artist.cs" />
-    <Compile Include="Album.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IEntity.cs" />
-    <Compile Include="CoverArt.cs" />
-    <Compile Include="Service\MusicBrainz.cs" />
-    <Compile Include="Service\WebServices.cs" />
-    <Compile Include="Service\IWebService.cs" />
-    <Compile Include="Service\LastFm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service\MusicDataProvider.cs" />
     <Compile Include="Service\IProvider.cs" />
-    <Compile Include="Song.cs" />
-    <Compile Include="Release.cs" />
     <Compile Include="Tag\TagHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tag\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

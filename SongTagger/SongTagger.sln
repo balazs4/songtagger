@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Core", "SongTagg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Core.Test", "SongTagger.Core.Test\SongTagger.Core.Test.csproj", "{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.Cmd", "SongTagger.Cmd\SongTagger.Cmd.csproj", "{B85B2213-5C22-4DE2-AA28-C832F193A8C9}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9403C1C0-501F-42D7-87D2-060E6C9680DA}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
@@ -18,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SongTagger.UI.Wpf", "SongTa
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs15
 		SccLocalPath0 = .
@@ -28,12 +26,9 @@ Global
 		SccProjectUniqueName2 = SongTagger.Core.Test\\SongTagger.Core.Test.csproj
 		SccProjectName2 = SongTagger.Core.Test
 		SccLocalPath2 = SongTagger.Core.Test
-		SccProjectUniqueName3 = SongTagger.Cmd\\SongTagger.Cmd.csproj
-		SccProjectName3 = SongTagger.Cmd
-		SccLocalPath3 = SongTagger.Cmd
-		SccProjectUniqueName4 = SongTagger.UI.Wpf\\SongTagger.UI.Wpf.csproj
-		SccProjectName4 = SongTagger.UI.Wpf
-		SccLocalPath4 = SongTagger.UI.Wpf
+		SccProjectUniqueName3 = SongTagger.UI.Wpf\\SongTagger.UI.Wpf.csproj
+		SccProjectName3 = SongTagger.UI.Wpf
+		SccLocalPath3 = SongTagger.UI.Wpf
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,10 +42,6 @@ Global
 		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{302BE3F2-952C-4FCE-86B8-E5D26DFE3556}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B85B2213-5C22-4DE2-AA28-C832F193A8C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B85B2213-5C22-4DE2-AA28-C832F193A8C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B85B2213-5C22-4DE2-AA28-C832F193A8C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B85B2213-5C22-4DE2-AA28-C832F193A8C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B86BD75D-C723-45A1-B2C9-930E484898B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B86BD75D-C723-45A1-B2C9-930E484898B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B86BD75D-C723-45A1-B2C9-930E484898B2}.Release|Any CPU.ActiveCfg = Release|Any CPU

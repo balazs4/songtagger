@@ -28,13 +28,13 @@ namespace SongTagger.Core.Service
 {
     public interface IProvider
     {
-        IArtist GetArtist(string nameStub);
+        //IArtist GetArtist(string nameStub);
 
-        IEnumerable<IAlbum> GetAlbums(IArtist artist);
+        //IEnumerable<IAlbum> GetAlbums(IArtist artist);
 
-        IEnumerable<IRelease> GetReleases(IAlbum album);
+        //IEnumerable<IRelease> GetReleases(IAlbum album);
 
-        IEnumerable<ISong> GetSongs(IRelease release);
+        //IEnumerable<ISong> GetSongs(IRelease release);
     }
     
 }
