@@ -61,11 +61,6 @@
     <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="inputData\01_kelet_vagy_nyugat.mp3">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
       <Project>{CABCA89A-AC52-449C-B66B-74DD7B3F3A74}</Project>
       <Name>SongTagger.Core</Name>
