@@ -56,6 +56,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="inputData\SongTagger.txt" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestHelper.cs" />
@@ -71,5 +72,23 @@
     <Folder Include="Integration\Service\" />
     <Folder Include="Integration\Tag\" />
     <Folder Include="Unit\Service\" />
+    <Folder Include="inputData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="inputData\MusicBrainz.Artist.Lookup.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="inputData\MusicBrainz.Artist.Search.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="inputData\MusicBrainz.Recording.Lookup.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="inputData\MusicBrainz.Release.Browse.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="inputData\MusicBrainz.ReleaseGroup.Browse.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

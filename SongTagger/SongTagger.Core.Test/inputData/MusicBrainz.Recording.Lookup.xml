@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://musicbrainz.org/ns/mmd-2.0#">
+   <release id="205f2019-fc18-477a-971c-ecc37aa216fc">
+      <title>Appeal to Reason</title>
+      <status>Official</status>
+      <quality>normal</quality>
+      <disambiguation>Amazon digital edition</disambiguation>
+      <packaging>None</packaging>
+      <text-representation>
+         <language>eng</language>
+         <script>Latn</script>
+      </text-representation>
+      <date>2008-10-10</date>
+      <country>DE</country>
+      <release-event-list count="1">
+         <release-event>
+            <date>2008-10-10</date>
+            <area id="85752fda-13c4-31a3-bee5-0e5cb1f51dad">
+               <name>Germany</name>
+               <sort-name>Germany</sort-name>
+               <iso-3166-1-code-list>
+                  <iso-3166-1-code>DE</iso-3166-1-code>
+               </iso-3166-1-code-list>
+            </area>
+         </release-event>
+      </release-event-list>
+      <barcode />
+      <asin>B001SQJHNG</asin>
+      <cover-art-archive>
+         <artwork>true</artwork>
+         <count>1</count>
+         <front>true</front>
+         <back>false</back>
+      </cover-art-archive>
+      <medium-list count="1">
+         <medium>
+            <position>1</position>
+            <track-list count="14" offset="0">
+               <track id="dc7e4599-7d04-37e5-9fc3-e4ad9d09b196">
+                  <position>1</position>
+                  <number>1</number>
+                  <length>199053</length>
+                  <recording id="27d3cdc3-98c5-4651-9489-ab824af1e056">
+                     <title>Collapse (Post-Amerika)</title>
+                     <length>199053</length>
+                  </recording>
+               </track>
+               <track id="0f260ae3-4dc1-34ed-84f0-df4260da942a">
+                  <position>2</position>
+                  <number>2</number>
+                  <length>241606</length>
+                  <recording id="5e056cd1-e1e9-4712-9adc-a2cc437616ef">
+                     <title>Long Forgotten Sons</title>
+                     <length>241606</length>
+                  </recording>
+               </track>
+               <track id="0656cbae-8689-34b9-ad94-4a39384363a5">
+                  <position>3</position>
+                  <number>3</number>
+                  <length>222511</length>
+                  <recording id="8a51e006-bd1e-46d0-919f-26944d5ed657">
+                     <title>Re-Education (Through Labor)</title>
+                     <length>222511</length>
+                  </recording>
+               </track>
+               <track id="e5265bc0-c138-34c4-ba9c-a8c366acad6c">
+                  <position>4</position>
+                  <number>4</number>
+                  <length>189126</length>
+                  <recording id="e045a005-dc51-44d3-896e-ff174519030a">
+                     <title>The Dirt Whispered</title>
+                     <length>189126</length>
+                  </recording>
+               </track>
+               <track id="173e5199-dba7-332a-8c0b-757dee50b6ba">
+                  <position>5</position>
+                  <number>5</number>
+                  <length>184816</length>
+                  <recording id="4e74d860-6bcb-4d95-8a0c-502ca641708f">
+                     <title>Kotov Syndrome</title>
+                     <length>184816</length>
+                  </recording>
+               </track>
+               <track id="64c0c2a0-a3c0-3ec8-b80b-f4b14a727f32">
+                  <position>6</position>
+                  <number>6</number>
+                  <length>222432</length>
+                  <recording id="2568a9e7-da67-438e-b545-c947de15d4a2">
+                     <title>From Heads Unworthy</title>
+                     <length>222432</length>
+                  </recording>
+               </track>
+               <track id="73a0aaa0-8988-3e89-ac68-1f343d37d9f4">
+                  <position>7</position>
+                  <number>7</number>
+                  <length>207072</length>
+                  <recording id="596e8f15-99db-4da5-ac44-a128b0e01892">
+                     <title>The Strength to Go On</title>
+                     <length>207072</length>
+                  </recording>
+               </track>
+               <track id="0f425157-6552-3d57-96f4-1f49c37a5f85">
+                  <position>8</position>
+                  <number>8</number>
+                  <length>245524</length>
+                  <recording id="2be8b279-498a-4b76-a896-e6489f0c8260">
+                     <title>Audience of One</title>
+                     <length>245524</length>
+                  </recording>
+               </track>
+               <track id="6414aba1-54ab-304d-a1b4-9a25c4cbcca7">
+                  <position>9</position>
+                  <number>9</number>
+                  <length>214726</length>
+                  <recording id="ca35f76f-794b-4a07-838a-7042da4d3895">
+                     <title>Entertainment</title>
+                     <length>214726</length>
+                  </recording>
+               </track>
+               <track id="aa7557bb-8dda-3e65-9575-46484c1f6944">
+                  <position>10</position>
+                  <number>10</number>
+                  <length>253126</length>
+                  <recording id="f206a913-8e3a-4463-acb5-602492e19090">
+                     <title>Hero of War</title>
+                     <length>253126</length>
+                  </recording>
+               </track>
+               <track id="f52ac91a-6d32-3b25-aa6b-bb112a77ed81">
+                  <position>11</position>
+                  <number>11</number>
+                  <length>242337</length>
+                  <recording id="b9c512aa-c8d9-4432-a668-4a6ca80a2836">
+                     <title>Savior</title>
+                     <length>242337</length>
+                  </recording>
+               </track>
+               <track id="54199e91-8afd-3ec5-8531-46c86ab16eb7">
+                  <position>12</position>
+                  <number>12</number>
+                  <length>242599</length>
+                  <recording id="e6f8a921-ab27-47a0-97a6-764309b3ec8f">
+                     <title>Hairline Fracture</title>
+                     <length>242599</length>
+                  </recording>
+               </track>
+               <track id="5ced47d1-220d-3496-b83c-28fb2598386e">
+                  <position>13</position>
+                  <number>13</number>
+                  <length>241580</length>
+                  <recording id="3d629643-aac6-4201-ada6-3e2bee518e2e">
+                     <title>Whereabouts Unknown</title>
+                     <length>241580</length>
+                  </recording>
+               </track>
+               <track id="d0839754-6a59-31b4-8ce3-4f3824d770f9">
+                  <position>14</position>
+                  <number>14</number>
+                  <length>202997</length>
+                  <recording id="ff28c979-8a8e-4ca9-808d-a26ce5bb6b82">
+                     <title>Historia Calamitatum</title>
+                     <length>202997</length>
+                  </recording>
+               </track>
+            </track-list>
+         </medium>
+      </medium-list>
+   </release>
+</metadata>

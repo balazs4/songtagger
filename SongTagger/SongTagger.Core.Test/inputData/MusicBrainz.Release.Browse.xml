@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://musicbrainz.org/ns/mmd-2.0#">
+   <release-list count="9">
+      <release id="205f2019-fc18-477a-971c-ecc37aa216fc">
+         <title>Appeal to Reason</title>
+         <status>Official</status>
+         <quality>normal</quality>
+         <disambiguation>Amazon digital edition</disambiguation>
+         <packaging>None</packaging>
+         <text-representation>
+            <language>eng</language>
+            <script>Latn</script>
+         </text-representation>
+         <date>2008-10-10</date>
+         <country>DE</country>
+         <release-event-list count="1">
+            <release-event>
+               <date>2008-10-10</date>
+               <area id="85752fda-13c4-31a3-bee5-0e5cb1f51dad">
+                  <name>Germany</name>
+                  <sort-name>Germany</sort-name>
+                  <iso-3166-1-code-list>
+                     <iso-3166-1-code>DE</iso-3166-1-code>
+                  </iso-3166-1-code-list>
+               </area>
+            </release-event>
+         </release-event-list>
+         <barcode />
+         <asin>B001SQJHNG</asin>
+         <cover-art-archive>
+            <artwork>true</artwork>
+            <count>1</count>
+            <front>true</front>
+            <back>false</back>
+         </cover-art-archive>
+      </release>
+      <release id="8378cdd0-ccdc-367e-9a8e-26b73f949417">
+         <title>Appeal to Reason</title>
+         <status>Official</status>
+         <quality>normal</quality>
+         <text-representation>
+            <language>eng</language>
+            <script>Latn</script>
+         </text-representation>
+         <date>2008-10-14</date>
+         <country>US</country>
+         <release-event-list count="1">
+            <release-event>
+               <date>2008-10-14</date>
+               <area id="489ce91b-6658-3307-9877-795b68554c98">
+                  <name>United States</name>
+                  <sort-name>United States</sort-name>
+                  <iso-3166-1-code-list>
+                     <iso-3166-1-code>US</iso-3166-1-code>
+                  </iso-3166-1-code-list>
+               </area>
+            </release-event>
+         </release-event-list>
+         <barcode>602517850231</barcode>
+         <asin>B001FBSMVW</asin>
+         <cover-art-archive>
+            <artwork>false</artwork>
+            <count>0</count>
+            <front>false</front>
+            <back>false</back>
+         </cover-art-archive>
+      </release>
+      <release id="954f8d9c-b667-4f3b-a6e0-1e00da7e2371">
+         <title>Appeal to Reason</title>
+         <status>Official</status>
+         <quality>normal</quality>
+         <packaging>Jewel Case</packaging>
+         <text-representation>
+            <language>eng</language>
+            <script>Latn</script>
+         </text-representation>
+         <date>2008-10-02</date>
+         <country>GB</country>
+         <release-event-list count="1">
+            <release-event>
+               <date>2008-10-02</date>
+               <area id="8a754a16-0027-3a29-b6d7-2b40ea0481ed">
+                  <name>United Kingdom</name>
+                  <sort-name>United Kingdom</sort-name>
+                  <iso-3166-1-code-list>
+                     <iso-3166-1-code>GB</iso-3166-1-code>
+                  </iso-3166-1-code-list>
+               </area>
+            </release-event>
+         </release-event-list>
+         <barcode>602517878259</barcode>
+         <cover-art-archive>
+            <artwork>false</artwork>
+            <count>0</count>
+            <front>false</front>
+            <back>false</back>
+         </cover-art-archive>
+      </release>
+      <release id="a114380b-4976-366d-b925-865b27b3cd76">
+         <title>Appeal to Reason</title>
+         <status>Official</status>
+         <quality>normal</quality>
+         <disambiguation>limited edition digipak</disambiguation>
+         <packaging>Digipak</packaging>
+         <text-representation>
+            <language>eng</language>
+            <script>Latn</script>
+         </text-representation>
+         <date>2008-10-06</date>
+         <country>GB</country>
+         <release-event-list count="1">
+            <release-event>
+               <date>2008-10-06</date>
+               <area id="8a754a16-0027-3a29-b6d7-2b40ea0481ed">
+                  <name>United Kingdom</name>
+                  <sort-name>United Kingdom</sort-name>
+                  <iso-3166-1-code-list>
+                     <iso-3166-1-code>GB</iso-3166-1-code>
+                  </iso-3166-1-code-list>
+               </area>
+            </release-event>
+         </release-event-list>
+         <barcode>0602517843530</barcode>
+         <asin>B001ESYAOE</asin>
+         <cover-art-archive>
+            <artwork>false</artwork>
+            <count>0</count>
+            <front>false</front>
+            <back>false</back>
+         </cover-art-archive>
+      </release>
+      <release id="a882f73c-83ac-410f-bf98-7d60cc2c1ee3">
+         <title>Appeal to Reason</title>
+         <status>Official</status>
+         <quality>normal</quality>
+         <packaging>Other</packaging>
+         <text-representation>
+            <language>eng</language>
+            <script>Latn</script>
+         </text-representation>
+         <date>2008-10-10</date>
+         <country>DE</country>
+         <release-event-list count="1">
+            <release-event>
+               <date>2008-10-10</date>
+               <area id="85752fda-13c4-31a3-bee5-0e5cb1f51dad">
+                  <name>Germany</name>
+                  <sort-name>Germany</sort-name>
+                  <iso-3166-1-code-list>
+                     <iso-3166-1-code>DE</iso-3166-1-code>
+                  </iso-3166-1-code-list>
+               </area>
+            </release-event>
+         </release-event-list>
+         <barcode>0602517843530</barcode>
+         <asin>B001ESYAOE</asin>
+         <cover-art-archive>
+            <artwork>false</artwork>
+            <count>0</count>
+            <front>false</front>
+            <back>false</back>
+         </cover-art-archive>
+      </release>
+      <release id="a934c3db-afa8-4a0f-a750-1557a9aaf8bc">
+         <title>Appeal to Reason</title>
+         <status>Official</status>
+         <quality>normal</quality>
+         <packaging>None</packaging>
+         <text-representation>
+            <language>eng</language>
+            <script>Latn</script>
+         </text-representation>
+         <date>2008-10-07</date>
+         <country>US</country>
+         <release-event-list count="1">
+            <release-event>
+               <date>2008-10-07</date>
+               <area id="489ce91b-6658-3307-9877-795b68554c98">
+                  <name>United States</name>
+                  <sort-name>United States</sort-name>
+                  <iso-3166-1-code-list>
+                     <iso-3166-1-code>US</iso-3166-1-code>
+                  </iso-3166-1-code-list>
+               </area>
+            </release-event>
+         </release-event-list>
+         <barcode />
+         <asin>B001FYRNJQ</asin>
+         <cover-art-archive>
+            <artwork>true</artwork>
+            <count>1</count>
+            <front>true</front>
+            <back>false</back>
+         </cover-art-archive>
+      </release>
+      <release id="b5ae03f1-0980-4c67-ae20-e9635b69f404">
+         <title>Appeal to Reason</title>
+         <status>Official</status>
+         <quality>normal</quality>
+         <text-representation>
+            <language>eng</language>
+            <script>Latn</script>
+         </text-representation>
+         <date>2008-10</date>
+         <country>XW</country>
+         <release-event-list count="1">
+            <release-event>
+               <date>2008-10</date>
+               <area id="525d4e18-3d00-31b9-a58b-a146a916de8f">
+                  <name>[Worldwide]</name>
+                  <sort-name>[Worldwide]</sort-name>
+                  <iso-3166-1-code-list>
+                     <iso-3166-1-code>XW</iso-3166-1-code>
+                  </iso-3166-1-code-list>
+               </area>
+            </release-event>
+         </release-event-list>
+         <asin>B001FYRNJQ</asin>
+         <cover-art-archive>
+            <artwork>true</artwork>
+            <count>1</count>
+            <front>true</front>
+            <back>false</back>
+         </cover-art-archive>
+      </release>
+      <release id="e58575b5-514e-4abb-9847-a6bb9cfa3fdc">
+         <title>Appeal to Reason</title>
+         <status>Official</status>
+         <quality>normal</quality>
+         <text-representation>
+            <language>eng</language>
+            <script>Latn</script>
+         </text-representation>
+         <date>2008-10-07</date>
+         <country>US</country>
+         <release-event-list count="1">
+            <release-event>
+               <date>2008-10-07</date>
+               <area id="489ce91b-6658-3307-9877-795b68554c98">
+                  <name>United States</name>
+                  <sort-name>United States</sort-name>
+                  <iso-3166-1-code-list>
+                     <iso-3166-1-code>US</iso-3166-1-code>
+                  </iso-3166-1-code-list>
+               </area>
+            </release-event>
+         </release-event-list>
+         <barcode>602517826625</barcode>
+         <asin>B001FBSMMQ</asin>
+         <cover-art-archive>
+            <artwork>false</artwork>
+            <count>0</count>
+            <front>false</front>
+            <back>false</back>
+         </cover-art-archive>
+      </release>
+      <release id="f55d9405-806c-3f98-8228-c3d60d9fb5b3">
+         <title>Appeal to Reason</title>
+         <status>Official</status>
+         <quality>normal</quality>
+         <text-representation>
+            <language>eng</language>
+            <script>Latn</script>
+         </text-representation>
+         <date>2008-10-21</date>
+         <country>US</country>
+         <release-event-list count="1">
+            <release-event>
+               <date>2008-10-21</date>
+               <area id="489ce91b-6658-3307-9877-795b68554c98">
+                  <name>United States</name>
+                  <sort-name>United States</sort-name>
+                  <iso-3166-1-code-list>
+                     <iso-3166-1-code>US</iso-3166-1-code>
+                  </iso-3166-1-code-list>
+               </area>
+            </release-event>
+         </release-event-list>
+         <barcode>602517850248</barcode>
+         <asin>B001FBSMVM</asin>
+         <cover-art-archive>
+            <artwork>false</artwork>
+            <count>0</count>
+            <front>false</front>
+            <back>false</back>
+         </cover-art-archive>
+      </release>
+   </release-list>
+</metadata>

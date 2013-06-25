@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://musicbrainz.org/ns/mmd-2.0#">
+   <artist type="Group" id="606bf117-494f-4864-891f-09d63ff6aa4b">
+      <name>Rise Against</name>
+      <sort-name>Rise Against</sort-name>
+      <isni-list>
+         <isni>0000000090215531</isni>
+      </isni-list>
+      <country>US</country>
+      <area id="489ce91b-6658-3307-9877-795b68554c98">
+         <name>United States</name>
+         <sort-name>United States</sort-name>
+         <iso-3166-1-code-list>
+            <iso-3166-1-code>US</iso-3166-1-code>
+         </iso-3166-1-code-list>
+      </area>
+      <life-span>
+         <begin>1999</begin>
+      </life-span>
+      <tag-list>
+         <tag count="1">
+            <name>american</name>
+         </tag>
+         <tag count="1">
+            <name>hardcore punk</name>
+         </tag>
+         <tag count="1">
+            <name>melodic hardcore</name>
+         </tag>
+         <tag count="1">
+            <name>nervous breakdown</name>
+         </tag>
+         <tag count="1">
+            <name>punk</name>
+         </tag>
+         <tag count="1">
+            <name>punk rock</name>
+         </tag>
+         <tag count="1">
+            <name>rock</name>
+         </tag>
+         <tag count="1">
+            <name>rock and indie</name>
+         </tag>
+         <tag count="1">
+            <name>usa</name>
+         </tag>
+      </tag-list>
+   </artist>
+</metadata>
