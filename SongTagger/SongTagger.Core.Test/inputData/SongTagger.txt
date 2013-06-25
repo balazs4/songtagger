@@ -1,0 +1,18 @@
+SongTagger
+
+=== MusicBrainz ===
+
+Artist (search)
+http://musicbrainz.org/ws/2/artist?query=Rise+Against
+
+Artist (lookup)
+http://musicbrainz.org/ws/2/artist/606bf117-494f-4864-891f-09d63ff6aa4b?inc=tags
+
+Release-Groups (browse)
+http://musicbrainz.org/ws/2/release-group?artist=606bf117-494f-4864-891f-09d63ff6aa4b&limit=200
+
+Release (browse)
+http://musicbrainz.org/ws/2/release?release-group=0b0e4477-4b04-3683-8f01-3a4544c36b41
+
+Recording (lookup)
+http://musicbrainz.org/ws/2/release/205f2019-fc18-477a-971c-ecc37aa216fc?inc=recordings
