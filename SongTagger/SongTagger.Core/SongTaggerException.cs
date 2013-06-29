@@ -1,10 +1,10 @@
 //
-//  TestHelper.cs
+//  SongTaggerException.cs
 //
 //  Author:
 //       balazs4 <balazs4web@gmail.com>
 //
-//  Copyright (c) 2012 GPLv2 (CodePlex)
+//  Copyright (c) 2013 
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -20,32 +20,33 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
+
 using System;
-using System.IO;
-using System.Collections;
-using NUnit.Framework;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 
-namespace SongTagger.Core.Test
+namespace SongTagger.Core
 {
-    internal class TestHelper
+
+    public class SongTaggerException : Exception
     {
-
-        private static DirectoryInfo inputDataRoot = new DirectoryInfo("inputData");
-
-        internal static string GetInputDataFilePath(string fileName)
+        public SongTaggerException() : base()
         {
-            return Path.Combine(inputDataRoot.FullName, fileName);
+
         }
 
-
-
-        internal static Artist RiseAgainst 
+        public SongTaggerException(string message) : base (message)
         {
-            get 
-            {
-                return new Artist { Id = new Guid("606bf117-494f-4864-891f-09d63ff6aa4b"), Name = "Rise Against"};
-            }
+
+        }
+
+        public SongTaggerException(string message, Exception inner) : base (message, inner)
+        {
+        }
+
+        protected SongTaggerException(SerializationInfo info, StreamingContext context)
+        {
+         
         }
     }
 }
-

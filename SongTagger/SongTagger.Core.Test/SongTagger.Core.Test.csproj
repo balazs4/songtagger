@@ -60,6 +60,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestHelper.cs" />
+    <Compile Include="Integration\Service\MusicDataProviderTests.cs" />
+    <Compile Include="Unit\Service\MusicBrainzExtensionTests.cs" />
+    <Compile Include="Unit\Service\MusicDataProviderTests.cs" />
+    <Compile Include="Unit\Service\ServiceClientTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
