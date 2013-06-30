@@ -37,13 +37,30 @@ namespace SongTagger.Core.Test
             return Path.Combine(inputDataRoot.FullName, fileName);
         }
 
-
-
-        internal static Artist RiseAgainst 
+        internal static Artist RiseAgainst
         {
-            get 
+            get
             {
-                return new Artist { Id = new Guid("606bf117-494f-4864-891f-09d63ff6aa4b"), Name = "Rise Against"};
+                return new Artist
+                {
+                    Id = new Guid("606bf117-494f-4864-891f-09d63ff6aa4b"),
+                    Name = "Rise Against"
+                };
+            }
+        }
+
+        internal static ReleaseGroup AppealToReason
+        {
+            get
+            {
+                return new ReleaseGroup
+                { 
+                    Id = new Guid("0b0e4477-4b04-3683-8f01-3a4544c36b41"), 
+                    Name = "Appeal to Reason",
+                    PrimaryType = ReleaseGroupType.Album,
+                    FirstReleaseDate = new DateTime(2008,10,2),
+                    Artist = RiseAgainst
+                };
             }
         }
     }

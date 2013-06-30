@@ -59,12 +59,32 @@ namespace SongTagger.Core.Test.Integration.Service
 
         [TestCaseSource("ArtistSource")]
         [Category("Acceptance")]
-        public int B_GetReleaseGroupsTest(Artist artist)
+        public int B_BrowseReleaseGroupsTest(Artist artist)
         {
             IEnumerable<ReleaseGroup> result = MusicData.Provider.BrowseReleaseGroups(artist);
             Assert.IsNotNull(result, "Result collection null");
             CollectionAssert.IsNotEmpty(result, "Result collection is empty");
             Assert.IsTrue(result.All(rg => rg.Artist == artist), "Artist of release group is wrong");
+            return result.Count();
+        }
+
+        internal static IEnumerable ReleaseGroupSource
+        {
+            get
+            {
+                yield return new TestCaseData(TestHelper.AppealToReason).Returns(9);
+            }
+        }
+
+        [TestCaseSource("ReleaseGroupSource")]
+        [Category("Acceptance")]
+        public int C_BrowseReleaseTest(ReleaseGroup releaseGroup)
+        {
+            IEnumerable<Release> result = MusicData.Provider.BrowseReleases(releaseGroup);
+            Assert.IsNotNull(result, "Result collection null");
+            CollectionAssert.IsNotEmpty(result, "Result collection is empty");
+            Assert.AreEqual(result.Count(),result.Count(r => r.ReleaseGroup == releaseGroup), "Wrong release group");
+            Assert.AreEqual(result.Count(),result.Count(r => r.Name == releaseGroup.Name), "Wrong release in the collection");
             return result.Count();
         }
     }

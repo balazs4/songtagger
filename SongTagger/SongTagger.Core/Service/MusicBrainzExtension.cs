@@ -42,7 +42,8 @@ namespace SongTagger.Core
         private static Dictionary<Type, string> mapping = new Dictionary<Type, string>
         {
             {typeof(Artist),"artist"},
-            {typeof(ReleaseGroup), "release-group"}
+            {typeof(ReleaseGroup), "release-group"},
+            {typeof(Release), "release"}
         };
 
         private static Uri baseUri = new Uri("http://musicbrainz.org/ws/2/");

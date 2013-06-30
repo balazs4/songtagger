@@ -94,11 +94,21 @@ namespace SongTagger.Core
         internal Artist Artist { get; set; }
     }
 
+    [Serializable]
+    [XmlRootAttribute("release", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
     public class Release : IEntity
     {
+        [XmlAttribute("id")]
         public Guid Id{ get; set; }
 
+        [XmlElement("title")]
         public string Name { get; set; }
+
+        [XmlElement("status")]
+        public string Status { get; set; }
+
+        [XmlElement("country")]
+        public string Country { get; set; }
 
         public ReleaseGroup ReleaseGroup { get; set; }
     }
