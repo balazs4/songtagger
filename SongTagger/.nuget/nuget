@@ -13,7 +13,7 @@ fi
 for config in $(find "$DIR/.." -name "packages.config" | xargs)
 do
 	echo "$config"
-	mono --runtime=v4.0.30319 $DIR/NuGet.exe install $config -OutputDirectory $packageDir
+	mono --runtime=v4.0.30319 $DIR/nuget.exe install $config -OutputDirectory $packageDir
 done
 
 echo "Build your sln..."
