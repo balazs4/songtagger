@@ -31,7 +31,7 @@ namespace SongTagger.Core
     {
         #region Helper stuff
 
-        private static string GetMusicBrainzEntityName(Type type)
+        internal static string GetMusicBrainzEntityName(Type type)
         {
             if (!mapping.ContainsKey(type))
                 throw new NotSupportedException(type + " is currently not supported");

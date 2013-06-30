@@ -26,6 +26,7 @@ using SongTagger.Core.Service;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace SongTagger.Core.Test.Unit.Service
 {
@@ -77,17 +78,19 @@ namespace SongTagger.Core.Test.Unit.Service
         {
             string content = GetContent("MusicBrainz.Artist.Search.xml");
 
-            MusicBrainzMetadataContainer result = MusicData.DeserializeContent(content);
+            IEnumerable<Artist> result = MusicData.DeserializeContent<Artist>(content);
 
 
             Assert.IsNotNull(result);
-            CollectionAssert.IsNotEmpty(result.ArtistCollection);
-            Assert.IsTrue(result.ArtistCollection.All(a => a != null), "result contains one or more null artist");
-            Assert.IsTrue(result.ArtistCollection.Any(a => a.Name == "Rise Against"), "Not found expected artist");
+            CollectionAssert.IsNotEmpty(result);
+            Assert.IsTrue(result.All(a => a != null), "result contains one or more null artist");
+            Assert.IsTrue(result.Any(a => a.Name == "Rise Against"), "Not found expected artist");
 
-            Artist artist = result.ArtistCollection.First(a => a.Name == "Rise Against");
+            Artist artist = result.First(a => a.Name == "Rise Against");
             Assert.AreEqual("606bf117-494f-4864-891f-09d63ff6aa4b", artist.Id.ToString(), "Artist id");
             Assert.AreEqual(9, artist.Tags.Count(), "Tags count");
+            Assert.AreEqual(ArtistType.Group, artist.Type, "artist type");
+            Assert.AreEqual(100, artist.Score, "Score");
         }
 
         [Test]
@@ -95,14 +98,14 @@ namespace SongTagger.Core.Test.Unit.Service
         {
             string content = GetContent("MusicBrainz.ReleaseGroup.Browse.xml");
 
-            MusicBrainzMetadataContainer result = MusicData.DeserializeContent(content);
+            IEnumerable<ReleaseGroup> result = MusicData.DeserializeContent<ReleaseGroup>(content);
 
             Assert.IsNotNull(result);
-            CollectionAssert.IsNotEmpty(result.ReleaseGroupCollection);
-            Assert.IsTrue(result.ReleaseGroupCollection.All(a => a != null), "result contains one or more null artist");
-            Assert.IsTrue(result.ReleaseGroupCollection.Any(a => a.Name == "Appeal to Reason"), "Not found expected release group");
+            CollectionAssert.IsNotEmpty(result);
+            Assert.IsTrue(result.All(a => a != null), "result contains one or more null artist");
+            Assert.IsTrue(result.Any(a => a.Name == "Appeal to Reason"), "Not found expected release group");
 
-            ReleaseGroup item = result.ReleaseGroupCollection.First(a => a.Name == "Appeal to Reason");
+            ReleaseGroup item = result.First(a => a.Name == "Appeal to Reason");
             Assert.AreEqual("0b0e4477-4b04-3683-8f01-3a4544c36b41", item.Id.ToString(), "Release group id");
             Assert.AreEqual(2008, item.FirstReleaseDate.Year, "First release date");
             Assert.AreEqual(ReleaseGroupType.Album, item.PrimaryType, "Primary type");
