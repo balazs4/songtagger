@@ -74,12 +74,11 @@ namespace SongTagger.Core.Test.Unit.Service
         }
 
         [Test]
-        public void DeserializateContent_Artist()
+        public void DeserializeContent_Artist()
         {
             string content = GetContent("MusicBrainz.Artist.Search.xml");
 
             IEnumerable<Artist> result = MusicData.DeserializeContent<Artist>(content);
-
 
             Assert.IsNotNull(result);
             CollectionAssert.IsNotEmpty(result);
@@ -94,7 +93,7 @@ namespace SongTagger.Core.Test.Unit.Service
         }
 
         [Test]
-        public void DeserializateContent_ReleaseGroup()
+        public void DeserializeContent_ReleaseGroup()
         {
             string content = GetContent("MusicBrainz.ReleaseGroup.Browse.xml");
 
@@ -109,6 +108,24 @@ namespace SongTagger.Core.Test.Unit.Service
             Assert.AreEqual("0b0e4477-4b04-3683-8f01-3a4544c36b41", item.Id.ToString(), "Release group id");
             Assert.AreEqual(2008, item.FirstReleaseDate.Year, "First release date");
             Assert.AreEqual(ReleaseGroupType.Album, item.PrimaryType, "Primary type");
+        }
+
+        [Test]
+        public void DeserializeContent_Release()
+        {
+            string content = GetContent("MusicBrainz.Release.Browse.xml");
+
+            IEnumerable<Release> result = MusicData.DeserializeContent<Release>(content);
+
+            Assert.IsNotNull(result);
+            CollectionAssert.IsNotEmpty(result);
+            Assert.IsTrue(result.All(a => a != null), "result contains one or more null artist");
+            Assert.IsTrue(result.All(a => a.Name == "Appeal to Reason"), "result contains other releases too");
+
+            Release release = result.First(a => a.Id.ToString() == "205f2019-fc18-477a-971c-ecc37aa216fc");
+            Assert.AreEqual("DE", release.Country, "Release country");
+            Assert.AreEqual("Official", release.Status, "Release status");
+            Assert.AreEqual("Appeal to Reason", release.Name, "Release name");
         }
     }
 }
