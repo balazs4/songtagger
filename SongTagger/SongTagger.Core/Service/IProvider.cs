@@ -31,6 +31,7 @@ using System.Xml.Serialization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace SongTagger.Core.Service
 {
@@ -38,9 +39,9 @@ namespace SongTagger.Core.Service
     {
         IEnumerable<Artist> SearchArtist(string name);
 
-        IEnumerable<ReleaseGroup> GetReleasGroups(Artist artist);
+        IEnumerable<ReleaseGroup> BrowseReleaseGroups(Artist artist);
 
-        IEnumerable<Release> GetReleases(ReleaseGroup releaseGroup);
+        IEnumerable<Release> BrowseReleases(ReleaseGroup releaseGroup);
     }
 
     public class MusicData : IProvider
@@ -52,24 +53,18 @@ namespace SongTagger.Core.Service
             return Query<Artist>(Artist.Empty.Search(name));
         }
 
-        public IEnumerable<ReleaseGroup> GetReleasGroups(Artist artist)
+        public IEnumerable<ReleaseGroup> BrowseReleaseGroups(Artist artist)
         {
-            CheckArgument<Artist>(artist,
-                                  (a) => a == null,
-                                  (a) => a.Id == Guid.Empty
-            );
-
-            IEnumerable<ReleaseGroup> result = Query<ReleaseGroup>(artist.Browse<ReleaseGroup>());
-            foreach (ReleaseGroup item in result)
-            {
-                item.Artist = artist;
-            }
-            return result;
+            EntityArgumentCheck<Artist>(artist);
+            Action<ReleaseGroup> postProcess = (item) => item.Artist = artist;
+            return Query<ReleaseGroup>(artist.Browse<ReleaseGroup>(), postProcess);
         }
 
-        public IEnumerable<Release> GetReleases(ReleaseGroup releaseGroup)
+        public IEnumerable<Release> BrowseReleases(ReleaseGroup releaseGroup)
         {
-            throw new NotImplementedException();
+            EntityArgumentCheck<ReleaseGroup>(releaseGroup);
+            Action<Release> postProcess = (item) => item.ReleaseGroup = releaseGroup;
+            return Query<Release>(releaseGroup.Browse<Release>(), postProcess);
         }
         #endregion
         #region Singleton pattern
@@ -131,8 +126,27 @@ namespace SongTagger.Core.Service
         private static IEnumerable<TResult> Query<TResult>(Uri url) 
             where TResult : IEntity
         {
-            string content = ServiceClient.DownloadContent(url, MusicBrainzPreparation);
-            return DeserializeContent<TResult>(content);
+            return Query<TResult>(url, null);
+        }
+
+        private static IEnumerable<TResult> Query<TResult>(Uri url, Action<TResult> postProcess)
+            where TResult : IEntity
+        {
+            using (PerformanceTrace tracer = new PerformanceTrace("Query " + typeof(TResult).Name))
+            {
+                string content = ServiceClient.DownloadContent(url, MusicBrainzPreparation);
+                tracer.WriteTrace("Download finished from " + url.ToString());
+
+                IEnumerable<TResult> result = DeserializeContent<TResult>(content);
+                tracer.WriteTrace("Deserialization finished");
+
+                if (postProcess != null)
+                {
+                    Parallel.ForEach(result.AsParallel(), postProcess);
+                    tracer.WriteTrace("Postprocessing finished");
+                }
+                return result;
+            }
         }
 
         private static void CheckArgument<T>(T argument, params Predicate<T>[] argumentCheck)
@@ -142,6 +156,68 @@ namespace SongTagger.Core.Service
             {
                 throw new ArgumentException(typeof(T).Name);
             }
+        }
+
+        private static void EntityArgumentCheck<TSource>(TSource argument) where TSource : IEntity
+        {
+            CheckArgument<TSource>(argument,
+                                   (arg) => arg == null,
+                                   (arg) => arg.Id == Guid.Empty
+            );
+        }
+    }
+
+    internal class PerformanceTrace : IDisposable
+    {
+        protected bool disposed = false;
+        private Stopwatch watcher;
+        private Stopwatch snapshot;
+        private string actionName;
+
+        public PerformanceTrace(string action)
+        {
+            actionName = action;
+            watcher = new Stopwatch();
+            WriteStartTrace();
+            watcher.Start();
+            snapshot = Stopwatch.StartNew();
+        }
+
+        public void WriteTrace(string currentstep)
+        {
+            Trace.TraceInformation(@" + {0}...{1}",currentstep, snapshot.Elapsed.ToString());
+            snapshot.Restart();
+        }
+
+        private void WriteStartTrace()
+        {
+            Trace.TraceInformation("[{0}] {1}", "START", actionName);
+        }
+
+        private void WriteStopTrace()
+        {
+            Trace.TraceInformation("[{0}] {1}...{2}", "STOP", actionName, watcher.Elapsed.ToString());
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            watcher.Stop();
+            WriteStopTrace();
+            disposed = true;
+        }
+
+        ~ PerformanceTrace()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

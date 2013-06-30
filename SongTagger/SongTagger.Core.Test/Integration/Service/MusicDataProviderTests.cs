@@ -26,6 +26,8 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using SongTagger.Core.Service;
+using System.Diagnostics;
+using System.IO;
 
 namespace SongTagger.Core.Test.Integration.Service
 {
@@ -37,7 +39,7 @@ namespace SongTagger.Core.Test.Integration.Service
         [TestCase("Depresszió", Result="79a8d8a6-012a-4dd9-b5e2-ed4b52a5d55e")]
         [Category("Acceptance")]
         public string A_SearchArtistTest(string name)
-        {
+        {   
             IEnumerable<Artist> result = MusicData.Provider.SearchArtist(name);
 
             Assert.IsNotNull(result, "Result collection null");
@@ -59,7 +61,7 @@ namespace SongTagger.Core.Test.Integration.Service
         [Category("Acceptance")]
         public int B_GetReleaseGroupsTest(Artist artist)
         {
-            IEnumerable<ReleaseGroup> result = MusicData.Provider.GetReleasGroups(artist);
+            IEnumerable<ReleaseGroup> result = MusicData.Provider.BrowseReleaseGroups(artist);
             Assert.IsNotNull(result, "Result collection null");
             CollectionAssert.IsNotEmpty(result, "Result collection is empty");
             Assert.IsTrue(result.All(rg => rg.Artist == artist), "Artist of release group is wrong");

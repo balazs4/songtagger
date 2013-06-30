@@ -74,7 +74,7 @@ namespace SongTagger.Core.Test.Unit.Service
         }
 
         [Test]
-        public void DeserializateContent_ArtistSearch()
+        public void DeserializateContent_Artist()
         {
             string content = GetContent("MusicBrainz.Artist.Search.xml");
 
@@ -94,7 +94,7 @@ namespace SongTagger.Core.Test.Unit.Service
         }
 
         [Test]
-        public void DeserializateContent_ReleaseGroupBrowse()
+        public void DeserializateContent_ReleaseGroup()
         {
             string content = GetContent("MusicBrainz.ReleaseGroup.Browse.xml");
 

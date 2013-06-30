@@ -56,6 +56,7 @@ namespace SongTagger.Core
         public int Score { get; set; }
 
         private static Artist instance;
+
         internal static IEntity Empty
         {
             get { return instance ?? (instance = new Artist());}
@@ -76,10 +77,10 @@ namespace SongTagger.Core
 
         [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
         [XmlElement("first-release-date")]
-        public string RawFirstReleaseDate 
+        public string RawFirstReleaseDate
         {
-            get {return FirstReleaseDate.ToString();}
-            set 
+            get { return FirstReleaseDate.ToString();}
+            set
             {
                 FirstReleaseDate = string.IsNullOrEmpty(value) 
                     ? DateTime.MinValue
@@ -88,9 +89,9 @@ namespace SongTagger.Core
         }
 
         [XmlElement("primary-type")]
-        public ReleaseGroupType PrimaryType {get; set;}
+        public ReleaseGroupType PrimaryType { get; set; }
 
-        internal Artist Artist {get; set;}
+        internal Artist Artist { get; set; }
     }
 
     public class Release : IEntity
@@ -98,6 +99,8 @@ namespace SongTagger.Core
         public Guid Id{ get; set; }
 
         public string Name { get; set; }
+
+        public ReleaseGroup ReleaseGroup { get; set; }
     }
 
     public class Recording  : IEntity
@@ -126,7 +129,7 @@ namespace SongTagger.Core
     }
 
     [Serializable]
-    public enum ArtistType 
+    public enum ArtistType
     {
         Undefined = 0,
         Group,
