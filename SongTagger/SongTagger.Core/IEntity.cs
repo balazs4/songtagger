@@ -36,7 +36,7 @@ namespace SongTagger.Core
     }
 
     [Serializable]
-    [XmlType("artist")]
+    [XmlRootAttribute("artist", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
     public class Artist : IEntity
     {
         [XmlAttribute("id")]
@@ -49,8 +49,13 @@ namespace SongTagger.Core
         [XmlArrayItem(typeof(Tag))]
         public List<Tag> Tags { get; set; }
 
-        private static Artist instance;
+        [XmlAttribute("type")]
+        public ArtistType Type { get; set; }
 
+        [XmlAttribute("score", Namespace="http://musicbrainz.org/ns/ext#-2.0")]
+        public int Score { get; set; }
+
+        private static Artist instance;
         internal static IEntity Empty
         {
             get { return instance ?? (instance = new Artist());}
@@ -58,7 +63,7 @@ namespace SongTagger.Core
     }
 
     [Serializable]
-    [XmlType("release-group")]
+    [XmlRootAttribute("release-group", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
     public class ReleaseGroup : IEntity
     {
         [XmlAttribute("id")]
@@ -103,19 +108,6 @@ namespace SongTagger.Core
     }
 
     [Serializable]
-    [XmlRootAttribute("metadata", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
-    public class MusicBrainzMetadataContainer
-    {
-        [XmlArray(ElementName = "artist-list")]
-        [XmlArrayItem(typeof(Artist))]
-        public List<Artist> ArtistCollection { get; set; }
-
-        [XmlArray(ElementName = "release-group-list")]
-        [XmlArrayItem(typeof(ReleaseGroup))]
-        public List<ReleaseGroup> ReleaseGroupCollection{ get; set; }
-    }
-
-    [Serializable]
     [XmlType("tag")]
     public class Tag
     {
@@ -131,5 +123,13 @@ namespace SongTagger.Core
         EP,
         Live,
         Single
+    }
+
+    [Serializable]
+    public enum ArtistType 
+    {
+        Undefined = 0,
+        Group,
+        Person
     }
 }

@@ -29,6 +29,8 @@ using System.Xml;
 using System.IO;
 using System.Xml.Serialization;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace SongTagger.Core.Service
 {
@@ -47,7 +49,7 @@ namespace SongTagger.Core.Service
         public IEnumerable<Artist> SearchArtist(string name)
         {
             CheckArgument<string>(name, (n) => String.IsNullOrWhiteSpace(n));
-            return Query<Artist>(Artist.Empty.Search(name), (data) => data.ArtistCollection);
+            return Query<Artist>(Artist.Empty.Search(name));
         }
 
         public IEnumerable<ReleaseGroup> GetReleasGroups(Artist artist)
@@ -57,7 +59,7 @@ namespace SongTagger.Core.Service
                                   (a) => a.Id == Guid.Empty
             );
 
-            IEnumerable<ReleaseGroup> result = Query<ReleaseGroup>(artist.Browse<ReleaseGroup>(), (data) => data.ReleaseGroupCollection);
+            IEnumerable<ReleaseGroup> result = Query<ReleaseGroup>(artist.Browse<ReleaseGroup>());
             foreach (ReleaseGroup item in result)
             {
                 item.Artist = artist;
@@ -101,23 +103,36 @@ namespace SongTagger.Core.Service
             return;
         }
         #endregion
-        internal static MusicBrainzMetadataContainer DeserializeContent(string content)
+        internal static IEnumerable<TResult> DeserializeContent<TResult>(string content)
         {
+            ConcurrentBag<TResult> result = new ConcurrentBag<TResult>();
             using (StringReader input = new StringReader(content))
             {
-                using (XmlReader reader = XmlReader.Create(input))
+                XDocument doc = XDocument.Load(input);
+                XName xName = XName.Get(MusicBrainzExtension.GetMusicBrainzEntityName(typeof(TResult)), 
+                                        doc.Root.GetDefaultNamespace().NamespaceName);
+
+                IEnumerable<XElement> elements = doc.Descendants(xName);
+                XmlSerializer serializer = new XmlSerializer(typeof(TResult));
+
+                Action<XElement> deserialization = (element) => 
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(MusicBrainzMetadataContainer));
-                    return (MusicBrainzMetadataContainer)serializer.Deserialize(reader);
-                }
+                    using (XmlReader reader = element.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
+                    {
+                        result.Add((TResult)serializer.Deserialize(reader));
+                    }   
+                };
+
+                Parallel.ForEach(elements.AsParallel(), deserialization);
             }
+            return result;
         }
 
-        private static IEnumerable<TResult> Query<TResult>(Uri url, Func<MusicBrainzMetadataContainer,IEnumerable<TResult>> getResult) 
+        private static IEnumerable<TResult> Query<TResult>(Uri url) 
             where TResult : IEntity
         {
             string content = ServiceClient.DownloadContent(url, MusicBrainzPreparation);
-            return getResult(DeserializeContent(content));
+            return DeserializeContent<TResult>(content);
         }
 
         private static void CheckArgument<T>(T argument, params Predicate<T>[] argumentCheck)
