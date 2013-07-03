@@ -51,6 +51,21 @@ namespace SongTagger.Core.Test.Unit.Service
         {
             return artist.Browse<ReleaseGroup>(444).ToString();
         }
+
+        internal static IEnumerable ReleaseSource
+        {
+            get 
+            {
+                yield return new TestCaseData(TestHelper.AppealToReasonRelease)
+                    .Returns("http://musicbrainz.org/ws/2/release/205f2019-fc18-477a-971c-ecc37aa216fc?inc=recordings");
+            }
+        }
+
+        [TestCaseSource("ReleaseSource")]
+        public string Lookup_Tracks_OfRelease(Release release)
+        {
+            return release.Lookup<Recording>().ToString();
+        }
     }
 }
 

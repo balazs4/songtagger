@@ -22,7 +22,7 @@
     <OutputPath>..\bin\Debug</OutputPath>
     <WarningLevel>4</WarningLevel>
     <DebugSymbols>True</DebugSymbols>
-    <DefineConstants>DEBUG;TEST;CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>DEBUG;TEST;CODE_ANALYSIS;TRACE</DefineConstants>
     <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
@@ -59,6 +59,7 @@
     <Compile Include="Service\MusicBrainzExtension.cs" />
     <Compile Include="Service\ServiceClient.cs" />
     <Compile Include="SongTaggerException.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
