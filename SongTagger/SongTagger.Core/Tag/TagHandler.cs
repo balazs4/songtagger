@@ -27,7 +27,7 @@ using TagLib;
 using System.Collections.Generic;
 using System.Net;
 
-namespace SongTagger.Core.Tag
+namespace SongTagger.Core.Mp3Tag
 {
     internal static class TagHandler
     {
