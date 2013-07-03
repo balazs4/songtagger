@@ -36,20 +36,13 @@ namespace SongTagger.UI.Wpf
             : base(DesignDataProvider.Instance)
         {
             WindowTitle = GetType().Namespace + " | Design data";
-            Artist = new ArtistViewModel();
-            Artist.Status = ArtistViewModelStatus.DisplayInfo;
-            Artist.ArtistName = "Design artist";
-            Artist.ArtistGenres.Add("genre");
-
-
-            GetAlbumsCommand.Execute(null);
-
         }
     }
 
 
     public class DesignDataProvider : SongTagger.Core.Service.IProvider
     {
+        #region Singleton pattern
         private static SongTagger.Core.Service.IProvider instance;
         public static SongTagger.Core.Service.IProvider Instance
         {
@@ -65,73 +58,26 @@ namespace SongTagger.UI.Wpf
         {
 
         }
+        #endregion
 
-        public IArtist GetArtist(string nameStub)
-        {
-            System.Threading.Thread.Sleep(5000);
-            return new ArtistDesignData { Name = "Desing band", Genres = new List<string> { "rock", "metal" } };
-        }
-
-        public IEnumerable<IAlbum> GetAlbums(IArtist artist)
-        {
-            System.Threading.Thread.Sleep(1000);
-            List<IAlbum> albums = new List<IAlbum>
-                {
-                    new AlbumDesignData 
-                    { 
-                        Name = "Retro active", ReleaseDate = new DateTime(1993,1,1), TypeOfRelease = ReleaseType.Album, 
-                        Covers = new List<ICoverArt>{ new CoverArtDesignData{SizeCategory = SizeType.Large, Url = new Uri("http://images.uulyrics.com/cover/d/def-leppard/album-retro-active.jpg") }}
-                    },
-
-                    new AlbumDesignData 
-                    { 
-                        Name = "Hysteria (unrelease B-side tracks live demo)", ReleaseDate = new DateTime(1987,1,1), TypeOfRelease = ReleaseType.Album, 
-                        Covers = new List<ICoverArt>{ new CoverArtDesignData{SizeCategory = SizeType.Large, Url = new Uri("http://4.bp.blogspot.com/-FZCXTJLTFYk/TfMPiqBgw7I/AAAAAAAAALg/yMicagJg3Xk/s1600/HISTERIA.jpg") }}
-                    },
-
-                    new AlbumDesignData
-                    {
-                            Name = "In the round, in your face live",
-                            ReleaseDate = new DateTime(1988,08,08),
-                            TypeOfRelease = ReleaseType.Live,
-                            Covers = new List<ICoverArt>()
-                    }
-                };
-            return albums;
-        }
-
-        public IEnumerable<IRelease> GetReleases(IAlbum album)
+        public IEnumerable<Artist> SearchArtist(string name)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<ISong> GetSongs(IRelease release)
+        public IEnumerable<ReleaseGroup> BrowseReleaseGroups(Artist artist)
         {
             throw new NotImplementedException();
         }
-    }
 
-    public class ArtistDesignData : IArtist
-    {
+        public IEnumerable<Release> BrowseReleases(ReleaseGroup releaseGroup)
+        {
+            throw new NotImplementedException();
+        }
 
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public List<string> Genres { get; set; }
-    }
-
-    public class AlbumDesignData : IAlbum
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public IArtist ArtistOfRelease { get; set; }
-        public IList<ICoverArt> Covers { get; set; }
-        public DateTime ReleaseDate { get; set; }
-        public ReleaseType TypeOfRelease { get; set; }
-    }
-
-    public class CoverArtDesignData : ICoverArt
-    {
-        public Uri Url { get; set; }
-        public SizeType SizeCategory { get; set; }
+        public IEnumerable<Track> LookupTracks(Release release)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
