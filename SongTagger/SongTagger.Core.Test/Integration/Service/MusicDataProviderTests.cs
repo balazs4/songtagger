@@ -83,8 +83,37 @@ namespace SongTagger.Core.Test.Integration.Service
             IEnumerable<Release> result = MusicData.Provider.BrowseReleases(releaseGroup);
             Assert.IsNotNull(result, "Result collection null");
             CollectionAssert.IsNotEmpty(result, "Result collection is empty");
-            Assert.AreEqual(result.Count(),result.Count(r => r.ReleaseGroup == releaseGroup), "Wrong release group");
-            Assert.AreEqual(result.Count(),result.Count(r => r.Name == releaseGroup.Name), "Wrong release in the collection");
+            Assert.AreEqual(result.Count(), result.Count(r => r.ReleaseGroup == releaseGroup), "Wrong release group");
+            Assert.AreEqual(result.Count(), result.Count(r => r.Name == releaseGroup.Name), "Wrong release in the collection");
+            return result.Count();
+        }
+
+        internal static IEnumerable ReleaseSource
+        {
+            get
+            {
+                yield return new TestCaseData(TestHelper.AppealToReasonRelease).Returns(14);
+            }
+        }
+
+        [TestCaseSource("ReleaseSource")]
+        [Category("Acceptance")]
+        public int D_LookupRecordings(Release release)
+        {
+            IEnumerable<Track> result = MusicData.Provider.LookupTracks(release);
+
+            Assert.IsNotNull(result, "Result collection null");
+            CollectionAssert.IsNotEmpty(result, "Result collection is empty");
+            Assert.AreEqual(result.Count(), result.Count(r => r.Release == release), "Wrong release");
+
+            List<Track> resultList = result.ToList();
+            foreach (Track item in resultList)
+            {
+                int actualPosition = resultList.IndexOf(item) + 1;
+                int expectedPosition = item.Posititon;
+                Assert.AreEqual(expectedPosition, actualPosition, "Wrong position");
+            }
+
             return result.Count();
         }
     }

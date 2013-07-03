@@ -42,6 +42,8 @@ namespace SongTagger.Core.Service
         IEnumerable<ReleaseGroup> BrowseReleaseGroups(Artist artist);
 
         IEnumerable<Release> BrowseReleases(ReleaseGroup releaseGroup);
+
+        IEnumerable<Track> LookupTracks(Release release);
     }
 
     public class MusicData : IProvider
@@ -49,24 +51,45 @@ namespace SongTagger.Core.Service
         #region IProvider implementation
         public IEnumerable<Artist> SearchArtist(string name)
         {
-            CheckArgument<string>(name, (n) => String.IsNullOrWhiteSpace(n));
+            if (String.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("name", "Search text cannot be null or empty");
+
             return Query<Artist>(Artist.Empty.Search(name));
         }
 
         public IEnumerable<ReleaseGroup> BrowseReleaseGroups(Artist artist)
         {
-            EntityArgumentCheck<Artist>(artist);
+            CheckArgument<Artist>(artist);
             Action<ReleaseGroup> postProcess = (item) => item.Artist = artist;
             return Query<ReleaseGroup>(artist.Browse<ReleaseGroup>(), postProcess);
         }
 
         public IEnumerable<Release> BrowseReleases(ReleaseGroup releaseGroup)
         {
-            EntityArgumentCheck<ReleaseGroup>(releaseGroup);
+            CheckArgument<ReleaseGroup>(releaseGroup);
             Action<Release> postProcess = (item) => item.ReleaseGroup = releaseGroup;
             return Query<Release>(releaseGroup.Browse<Release>(), postProcess);
         }
+
+        public IEnumerable<Track> LookupTracks(Release release)
+        {
+            CheckArgument<Release>(release);
+            Action<Track> postProcess = (item) => item.Release = release;
+            return Query<Track>(release.Lookup<Recording>(), postProcess)
+                .OrderBy(t => t.Posititon);
+        }
         #endregion
+        private static void CheckArgument<TSource>(TSource entity) where TSource : IEntity
+        {
+            if (entity == null)
+                throw new ArgumentNullException(typeof(TSource).Name, " cannot be null");
+
+            if (entity.Id == null)
+                throw new ArgumentNullException(typeof(TSource).Name, ".Id cannot be null");
+
+            if (entity.Id == Guid.Empty)
+                throw new ArgumentException(typeof(TSource).Name, ".Id cannot be " + Guid.Empty.ToString());
+        }
         #region Singleton pattern
         private MusicData()
         {
@@ -123,13 +146,7 @@ namespace SongTagger.Core.Service
             return result;
         }
 
-        private static IEnumerable<TResult> Query<TResult>(Uri url) 
-            where TResult : IEntity
-        {
-            return Query<TResult>(url, null);
-        }
-
-        private static IEnumerable<TResult> Query<TResult>(Uri url, Action<TResult> postProcess)
+        private static IEnumerable<TResult> Query<TResult>(Uri url, params Action<TResult>[] postProcessActions)
             where TResult : IEntity
         {
             using (PerformanceTrace tracer = new PerformanceTrace("Query " + typeof(TResult).Name))
@@ -140,84 +157,16 @@ namespace SongTagger.Core.Service
                 IEnumerable<TResult> result = DeserializeContent<TResult>(content);
                 tracer.WriteTrace("Deserialization finished");
 
-                if (postProcess != null)
+                if (postProcessActions != null)
                 {
-                    Parallel.ForEach(result.AsParallel(), postProcess);
+                    foreach (Action<TResult> post in postProcessActions)
+                    {
+                        Parallel.ForEach(result.AsParallel(), post);    
+                    }
                     tracer.WriteTrace("Postprocessing finished");
                 }
                 return result;
             }
-        }
-
-        private static void CheckArgument<T>(T argument, params Predicate<T>[] argumentCheck)
-        {
-            Predicate<T> failedCheck = argumentCheck.FirstOrDefault(checker => checker(argument) == true);
-            if (failedCheck != null)
-            {
-                throw new ArgumentException(typeof(T).Name);
-            }
-        }
-
-        private static void EntityArgumentCheck<TSource>(TSource argument) where TSource : IEntity
-        {
-            CheckArgument<TSource>(argument,
-                                   (arg) => arg == null,
-                                   (arg) => arg.Id == Guid.Empty
-            );
-        }
-    }
-
-    internal class PerformanceTrace : IDisposable
-    {
-        protected bool disposed = false;
-        private Stopwatch watcher;
-        private Stopwatch snapshot;
-        private string actionName;
-
-        public PerformanceTrace(string action)
-        {
-            actionName = action;
-            watcher = new Stopwatch();
-            WriteStartTrace();
-            watcher.Start();
-            snapshot = Stopwatch.StartNew();
-        }
-
-        public void WriteTrace(string currentstep)
-        {
-            Trace.TraceInformation(@" + {0}...{1}",currentstep, snapshot.Elapsed.ToString());
-            snapshot.Restart();
-        }
-
-        private void WriteStartTrace()
-        {
-            Trace.TraceInformation("[{0}] {1}", "START", actionName);
-        }
-
-        private void WriteStopTrace()
-        {
-            Trace.TraceInformation("[{0}] {1}...{2}", "STOP", actionName, watcher.Elapsed.ToString());
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed)
-                return;
-
-            watcher.Stop();
-            WriteStopTrace();
-            disposed = true;
-        }
-
-        ~ PerformanceTrace()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

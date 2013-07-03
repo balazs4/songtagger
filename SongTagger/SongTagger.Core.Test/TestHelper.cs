@@ -63,6 +63,21 @@ namespace SongTagger.Core.Test
                 };
             }
         }
+
+        public static Release AppealToReasonRelease
+        {
+            get
+            {
+                return new Release
+                {
+                    ReleaseGroup = AppealToReason,
+                    Id = new Guid("205f2019-fc18-477a-971c-ecc37aa216fc"),
+                    Name = AppealToReason.Name,
+                    Country = "DE",
+                    Status = "Official"
+                };
+            }
+        }
     }
 }
 

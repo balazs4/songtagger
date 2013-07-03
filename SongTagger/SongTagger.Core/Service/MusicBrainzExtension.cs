@@ -43,7 +43,9 @@ namespace SongTagger.Core
         {
             {typeof(Artist),"artist"},
             {typeof(ReleaseGroup), "release-group"},
-            {typeof(Release), "release"}
+            {typeof(Release), "release"},
+            {typeof(Recording), "recording"},
+            {typeof(Track), "track"}
         };
 
         private static Uri baseUri = new Uri("http://musicbrainz.org/ws/2/");
@@ -60,9 +62,15 @@ namespace SongTagger.Core
             return new Uri(baseUri, relativeUrl);
         }
 
-        internal static Uri Lookup(this IEntity entity)
+        internal static Uri Lookup<T>(this IEntity entity)
         {
-            throw new NotImplementedException();
+            string relativeUrl = string.Format("{0}/{1}?inc={2}s",
+                                               GetMusicBrainzEntityName(entity.GetType()),
+                                               entity.Id.ToString(),
+                                               GetMusicBrainzEntityName(typeof(T))
+                                               );
+
+            return new Uri(baseUri, relativeUrl);
         }
 
         internal static Uri Browse<T>(this IEntity entity,int limit = 200) where T : IEntity

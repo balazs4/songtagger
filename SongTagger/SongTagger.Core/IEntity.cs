@@ -91,7 +91,7 @@ namespace SongTagger.Core
         [XmlElement("primary-type")]
         public ReleaseGroupType PrimaryType { get; set; }
 
-        internal Artist Artist { get; set; }
+        public Artist Artist { get; internal set; }
     }
 
     [Serializable]
@@ -110,14 +110,45 @@ namespace SongTagger.Core
         [XmlElement("country")]
         public string Country { get; set; }
 
-        public ReleaseGroup ReleaseGroup { get; set; }
+        public ReleaseGroup ReleaseGroup { get; internal set; }
     }
 
-    public class Recording  : IEntity
+    [Serializable]
+    [XmlRootAttribute("track", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
+    public class Track  : IEntity
     {
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+        [XmlElement("recording")]
+        public Recording Record  { get; set; }
+
+        [XmlAttribute("id")]
         public Guid Id{ get; set; }
 
+        public string Name { get { return Record.Name; } }
+
+        public TimeSpan Length { get { return TimeSpan.FromMilliseconds(Record.Length); } }
+
+        [XmlElement("position")]
+        public int Posititon { get; set; }
+
+        [XmlElement("number")]
+        public int Number { get; set; }
+
+        public Release Release { get; internal set; }
+    }
+
+    [Serializable]
+    [XmlRootAttribute("recording", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
+    public class Recording : IEntity
+    {
+        [XmlAttribute("id")]
+        public Guid Id{ get; set; }
+
+        [XmlElement("title")]
         public string Name { get; set; }
+
+        [XmlElement("length")]
+        public int Length { get; set; }
     }
 
     [Serializable]
