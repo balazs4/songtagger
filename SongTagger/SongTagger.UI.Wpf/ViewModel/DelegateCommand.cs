@@ -8,7 +8,6 @@ namespace SongTagger.UI.Wpf.ViewModel
 {
     public class DelegateCommand : ICommand
     {
-
         public DelegateCommand(Action<object> action) : 
             this (action, null)
         {
@@ -23,9 +22,8 @@ namespace SongTagger.UI.Wpf.ViewModel
             CanExecuteCommandAction = canExecute;
         }
 
-        
-
         public Action<object> CommandAction { get; private set; }
+
         public Predicate<object> CanExecuteCommandAction { get; private set; }
 
         public void Execute(object parameter)
@@ -45,12 +43,10 @@ namespace SongTagger.UI.Wpf.ViewModel
             return canexecute;
         }
 
-
         public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
-        
     }
 }
