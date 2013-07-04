@@ -134,9 +134,17 @@ namespace SongTagger.Core
         [XmlAttribute("id")]
         public Guid Id{ get; set; }
 
-        public string Name { get { return Record.Name; } }
+        public string Name 
+        { 
+            get { return Record.Name; }
+            set { Record.Name = value;}
+        }
 
-        public TimeSpan Length { get { return TimeSpan.FromMilliseconds(Record.Length); } }
+        public TimeSpan Length 
+        { 
+            get { return TimeSpan.FromMilliseconds(Record.Length); } 
+            set { Record.Length = Convert.ToInt32(value.TotalMilliseconds); }
+        }
 
         [XmlElement("position")]
         public int Posititon { get; set; }
