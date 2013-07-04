@@ -61,6 +61,7 @@
     <Compile Include="Unit\Service\MusicBrainzExtensionTests.cs" />
     <Compile Include="Unit\Service\MusicDataProviderTests.cs" />
     <Compile Include="Unit\Service\ServiceClientTest.cs" />
+    <Compile Include="Integration\Tag\TagHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
@@ -89,6 +90,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="inputData\MusicBrainz.ReleaseGroup.Browse.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="inputData\office.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
