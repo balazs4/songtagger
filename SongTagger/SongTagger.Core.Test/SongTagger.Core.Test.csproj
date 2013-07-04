@@ -62,6 +62,7 @@
     <Compile Include="Unit\Service\MusicDataProviderTests.cs" />
     <Compile Include="Unit\Service\ServiceClientTest.cs" />
     <Compile Include="Integration\Tag\TagHandlerTests.cs" />
+    <Compile Include="Unit\Service\CoverArtExtensionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SongTagger.Core\SongTagger.Core.csproj">
