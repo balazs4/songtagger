@@ -54,14 +54,17 @@ namespace SongTagger.Core.Service
             if (String.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("name", "Search text cannot be null or empty");
 
-            return Query<Artist>(Artist.Empty.Search(name));
+            return Query<Artist>(Artist.Empty.Search(name))
+                .OrderBy(a => a.Score)
+                .OrderBy(a => a.Name);
         }
 
         public IEnumerable<ReleaseGroup> BrowseReleaseGroups(Artist artist)
         {
             CheckArgument<Artist>(artist);
             Action<ReleaseGroup> postProcess = (item) => item.Artist = artist;
-            return Query<ReleaseGroup>(artist.Browse<ReleaseGroup>(), postProcess);
+            return Query<ReleaseGroup>(artist.Browse<ReleaseGroup>(), postProcess)
+                .OrderBy(rg => rg.FirstReleaseDate.Year);
         }
 
         public IEnumerable<Release> BrowseReleases(ReleaseGroup releaseGroup)
@@ -79,17 +82,7 @@ namespace SongTagger.Core.Service
                 .OrderBy(t => t.Posititon);
         }
         #endregion
-        private static void CheckArgument<TSource>(TSource entity) where TSource : IEntity
-        {
-            if (entity == null)
-                throw new ArgumentNullException(typeof(TSource).Name, " cannot be null");
 
-            if (entity.Id == null)
-                throw new ArgumentNullException(typeof(TSource).Name, ".Id cannot be null");
-
-            if (entity.Id == Guid.Empty)
-                throw new ArgumentException(typeof(TSource).Name, ".Id cannot be " + Guid.Empty.ToString());
-        }
         #region Singleton pattern
         private MusicData()
         {
@@ -106,8 +99,9 @@ namespace SongTagger.Core.Service
             }
         }
         #endregion
+
         #region Download prepare actions
-        internal static readonly TimeSpan MINIMUM_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 0, 1, 5);
+        internal static readonly TimeSpan MINIMUM_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 0, 1, 300);
 
         internal static void MusicBrainzPreparation(DateTime date)
         {
@@ -121,6 +115,7 @@ namespace SongTagger.Core.Service
             return;
         }
         #endregion
+
         internal static IEnumerable<TResult> DeserializeContent<TResult>(string content)
         {
             ConcurrentBag<TResult> result = new ConcurrentBag<TResult>();
@@ -146,8 +141,7 @@ namespace SongTagger.Core.Service
             return result;
         }
 
-        private static IEnumerable<TResult> Query<TResult>(Uri url, params Action<TResult>[] postProcessActions)
-            where TResult : IEntity
+        private static IEnumerable<TResult> Query<TResult>(Uri url, params Action<TResult>[] postProcessActions) where TResult : IEntity
         {
             using (PerformanceTrace tracer = new PerformanceTrace("Query " + typeof(TResult).Name))
             {
@@ -167,6 +161,18 @@ namespace SongTagger.Core.Service
                 }
                 return result;
             }
+        }
+
+        private static void CheckArgument<TSource>(TSource entity) where TSource : IEntity
+        {
+            if (entity == null)
+                throw new ArgumentNullException(typeof(TSource).Name, " cannot be null");
+
+            if (entity.Id == null)
+                throw new ArgumentNullException(typeof(TSource).Name, ".Id cannot be null");
+
+            if (entity.Id == Guid.Empty)
+                throw new ArgumentException(typeof(TSource).Name, ".Id cannot be " + Guid.Empty.ToString());
         }
     }
 }

@@ -24,6 +24,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using System.Collections.Concurrent;
+using System.Xml.Linq;
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Threading.Tasks;
 
 namespace SongTagger.Core
 {

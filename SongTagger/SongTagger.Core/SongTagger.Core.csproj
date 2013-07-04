@@ -60,6 +60,7 @@
     <Compile Include="Service\ServiceClient.cs" />
     <Compile Include="SongTaggerException.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="Service\CoverArtExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
