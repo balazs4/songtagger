@@ -16,3 +16,13 @@ http://musicbrainz.org/ws/2/release?release-group=0b0e4477-4b04-3683-8f01-3a4544
 
 Recording (lookup)
 http://musicbrainz.org/ws/2/release/205f2019-fc18-477a-971c-ecc37aa216fc?inc=recordings
+
+
+
+==== CoverArt ===
+
+JSON
+http://coverartarchive.org/release/205f2019-fc18-477a-971c-ecc37aa216fc
+
+Front 500
+http://coverartarchive.org/release/205f2019-fc18-477a-971c-ecc37aa216fc/front-500

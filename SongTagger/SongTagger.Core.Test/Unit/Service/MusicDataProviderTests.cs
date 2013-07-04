@@ -56,11 +56,11 @@ namespace SongTagger.Core.Test.Unit.Service
             watcher = Stopwatch.StartNew();
             MusicData.MusicBrainzPreparation(DateTime.Now);
             watcher.Stop();
-            int actualTimeInSeconds = Convert.ToInt32(watcher.Elapsed.TotalSeconds);
-            int expectedTimeInSeconds = Convert.ToInt32(MusicData.MINIMUM_TIME_BETWEEN_QUERIES.TotalSeconds);
+            double actualTime = Math.Round(watcher.Elapsed.TotalSeconds,2);
+            double expectedTime = Math.Round(MusicData.MINIMUM_TIME_BETWEEN_QUERIES.TotalSeconds,2);
 
-            Assert.That(actualTimeInSeconds, 
-                        Is.GreaterThanOrEqualTo(expectedTimeInSeconds),
+            Assert.That(actualTime, 
+                        Is.GreaterThanOrEqualTo(expectedTime),
                         "Time diff between queries..");
         }
 
