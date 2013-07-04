@@ -24,6 +24,7 @@ using System;
 using System.IO;
 using System.Collections;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace SongTagger.Core.Test
 {
@@ -41,11 +42,14 @@ namespace SongTagger.Core.Test
         {
             get
             {
-                return new Artist
+                Artist artist = new Artist
                 {
                     Id = new Guid("606bf117-494f-4864-891f-09d63ff6aa4b"),
-                    Name = "Rise Against"
+                    Name = "Rise Against",
+                    Tags = new List<Tag>() { new Tag{Name = "rock"}, new Tag {Name = "punk"}  }
                 };
+
+                return artist;
             }
         }
 

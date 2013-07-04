@@ -61,6 +61,11 @@ namespace SongTagger.Core
         {
             get { return instance ?? (instance = new Artist());}
         }
+
+        public Artist()
+        {
+            Tags = new List<Tag>();
+        }
     }
 
     [Serializable]
@@ -120,6 +125,11 @@ namespace SongTagger.Core
         [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
         [XmlElement("recording")]
         public Recording Record  { get; set; }
+
+        public Track()
+        {
+            Record = new Recording();
+        }
 
         [XmlAttribute("id")]
         public Guid Id{ get; set; }
