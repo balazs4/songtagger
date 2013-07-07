@@ -42,4 +42,37 @@ namespace SongTagger.UI.Wpf
             throw new NotImplementedException();
         }
     }
+
+    public class StringPaddingConverter : IValueConverter
+    {
+        public int MaxTextLengthIncPaddingString { get; set; }
+
+        private string paddingString;
+        public string PaddingString
+        {
+            get { return paddingString ?? (paddingString = "..."); }
+            set { paddingString = value; }
+        }
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string text = value as String;
+            if (String.IsNullOrWhiteSpace(text))
+                return text;
+
+            int length = text.Length;
+            int paddingLength = PaddingString.Length;
+
+            if (length <= MaxTextLengthIncPaddingString)
+                return text;
+
+            string substring = text.Substring(0, MaxTextLengthIncPaddingString - paddingLength);
+            return substring + PaddingString;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

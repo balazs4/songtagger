@@ -37,12 +37,19 @@ namespace SongTagger.UI.Wpf
             : base(DesignDataProvider.Instance)
         {
             WindowTitle = "Design data";
-            Workspace.IsQueryRunning = true;
+            InitArtistMarket();
+            Workspace = new MarketViewModel(State.SelectArtist,
+                new EntityViewModel[0],
+                Reset
+                );
         }
 
         private void InitArtistMarket()
         {
-            Workspace = new MarketViewModel(State.SelectArtist, provider.SearchArtist("Rise Against").Select(e => new EntityViewModel(e)));
+            Workspace = new MarketViewModel(State.SelectArtist, 
+                provider.SearchArtist("Rise Against").Select(e => new EntityViewModel(e)),
+                Reset
+                );
         }
 
     }

@@ -14,29 +14,37 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="Bool2Visibility"/>
         <viewModel:BooleanInverter x:Key="BoolInverter"/>
+        <viewModel:ColorToBrushConverter x:Key="ColorConvert"/>
     </Window.Resources>
     <Grid ShowGridLines="False">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="9*"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="2*"/>
-            <RowDefinition Height="9*"/>
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom">
-            <Image Source="Images/unknown-cover.png" 
+        <StackPanel Grid.Column="0" VerticalAlignment="Top">
+            <Image Source="Images/logo.png" 
                    VerticalAlignment="Center" HorizontalAlignment="Center"
-                   Width="90" Height="90" />
+                   Width="64" Height="64" />
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,20,0,0">
-            <StackPanel.Resources>
-
-            </StackPanel.Resources>
-        </StackPanel>
-        <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Name="workspace">
+        <Grid Grid.Column="1" Name="workspace">
             <Grid.Resources>
                 <DataTemplate x:Key="searchDataTemplate" DataType="{x:Type viewModel:SearchViewmodel}">
+                    <DataTemplate.Resources>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                                 Duration="0:0:1.5" From="0.0" To="1.0"  />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataTemplate.Resources>
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,150,0">
                         <TextBlock Text="{Binding Header}" FontSize="48"/>
                         <Grid>
@@ -85,19 +93,37 @@
                                                 </ItemsPanelTemplate>
                                             </ItemsControl.ItemsPanel>
                                         </ItemsControl>
+                                        <Image Width="16" Height="16" HorizontalAlignment="Right" Opacity=".2">
+                                            <Image.Style>
+                                                <Style TargetType="Image">
+                                                    <Setter Property="ToolTip" Value="{Binding Type}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Type}" Value="Group">
+                                                            <Setter Property="Source"  Value="Images/artist.group.png"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="Person">
+                                                            <Setter Property="Source"  Value="Images/artist.person.png"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Image.Style>
+                                        </Image>
                                     </Grid>
                                 </DataTemplate>
                                 <viewModel:EntityDataTemplateSelector x:Key="entitySelector"
                                     ArtistDataTemplate="{StaticResource artistEntityTemplate}"
                                     />
-                                <viewModel:ColorToBrushConverter x:Key="ColorConvert"/>
+                                <viewModel:StringPaddingConverter x:Key="PaddingConverter" MaxTextLengthIncPaddingString="12"/>
+
                             </DataTemplate.Resources>
                             <DockPanel LastChildFill="True" Width="200" Height="80">
                                 <Rectangle DockPanel.Dock="Left" 
                                                Fill="{Binding EntityColor, Converter={StaticResource ColorConvert}}" 
                                                Width="10" Margin="2,5,0,0"/>
                                 <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,0">
-                                    <TextBlock Text="{Binding Entity.Name}" FontSize="18"/>
+                                    <TextBlock Text="{Binding Entity.Name, Converter={StaticResource PaddingConverter}}" 
+                                               ToolTip="{Binding Entity.Name}"
+                                               FontSize="18"/>
                                     <ContentControl 
                                             Content="{Binding Entity}"
                                             ContentTemplateSelector="{StaticResource entitySelector}"/>
@@ -110,7 +136,19 @@
                             <RowDefinition Height="2*"/>
                             <RowDefinition Height="9*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Text="{Binding Header}" FontSize="48" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <Grid>
+                            <Button HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Command="{Binding Reset}">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Image Source="Images/back.png" Width="50" Height="50"/>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <TextBlock Grid.Row="0" Text="{Binding Header}" 
+                                   FontSize="48" Margin="0,0,20,0"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
                         <ListBox Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                             ItemsSource="{Binding Entities}"
                             ItemTemplate="{StaticResource entityTemplate}">
@@ -135,7 +173,9 @@
                                                         <Setter Property="Background" Value="LightGray" />
                                                     </MultiTrigger>
                                                     <Trigger Property="IsSelected" Value="True">
-                                                        <Setter Property="Background" Value="LightGreen" />
+                                                        <Setter Property="Background" 
+                                                                Value="LightSteelBlue"
+                                                                />
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -157,15 +197,31 @@
                                     </Style.Triggers>
                                 </Style>
                             </ListBox.Resources>
-                            <ListBox.Style>
-                                <Style>
-                                </Style>
-                            </ListBox.Style>
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel Orientation="Horizontal"/>
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
+                            <ListBox.Style>
+                                <Style TargetType="ListBox">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Items.Count}" 
+                                                     Value="0">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate>
+                                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                                    Opacity=".5">
+                                                            <Image Source="Images/noresult.png" Height="48" Width="48"/>
+                                                            <TextBlock FontSize="48">No result</TextBlock>
+                                                        </StackPanel>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.Style>
                         </ListBox>
                     </Grid>
                 </DataTemplate>
