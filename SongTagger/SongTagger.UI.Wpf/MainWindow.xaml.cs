@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -35,10 +36,16 @@ namespace SongTagger.UI.Wpf
         public MainWindowViewModelDesignData()
             : base(DesignDataProvider.Instance)
         {
-            WindowTitle = GetType().Namespace + " | Design data";
+            WindowTitle = "Design data";
+            Workspace.IsQueryRunning = true;
         }
-    }
 
+        private void InitArtistMarket()
+        {
+            Workspace = new MarketViewModel(State.SelectArtist, provider.SearchArtist("Rise Against").Select(e => new EntityViewModel(e)));
+        }
+
+    }
 
     public class DesignDataProvider : SongTagger.Core.Service.IProvider
     {
@@ -60,24 +67,88 @@ namespace SongTagger.UI.Wpf
         }
         #endregion
 
+        private static List<Tag> CreateTagList(params string[] tags)
+        {
+            return tags.Select(tag => new Tag { Name = tag }).ToList();
+        }
+
+        internal static Artist RiseAgainst
+        {
+            get
+            {
+                Artist artist = new Artist
+                {
+                    Id = new Guid("606bf117-494f-4864-891f-09d63ff6aa4b"),
+                    Name = "Rise Against",
+                    Tags = CreateTagList("rock", "punk", "american"),
+                    Score = 100
+                };
+
+                return artist;
+            }
+        }
+
+        internal static ReleaseGroup AppealToReason
+        {
+            get
+            {
+                return new ReleaseGroup(RiseAgainst)
+                {
+                    Id = new Guid("0b0e4477-4b04-3683-8f01-3a4544c36b41"),
+                    Name = "Appeal to Reason",
+                    PrimaryType = ReleaseGroupType.Album,
+                    FirstReleaseDate = new DateTime(2008, 10, 2),
+                };
+            }
+        }
+
+        internal static Release AppealToReasonRelease
+        {
+            get
+            {
+                return new Release(AppealToReason)
+                {
+                    Id = new Guid("205f2019-fc18-477a-971c-ecc37aa216fc"),
+                    Name = AppealToReason.Name,
+                    Country = "DE",
+                    Status = "Official"
+                };
+            }
+        }
+
         public IEnumerable<Artist> SearchArtist(string name)
         {
-            throw new NotImplementedException();
+            return new[]
+                {
+                    new Artist {Name = "Def Leppard", Score = 100, Type = ArtistType.Group, Tags = CreateTagList("british","classic pop and rock","english","glam metal","hard rock","heavy metal","metal","nwobhm","pop rock","rock","uk")},
+                    RiseAgainst,
+                    new Artist {Name = "Rise", Score = 80, Type = ArtistType.Person, Tags = CreateTagList("pop", "shit")},
+                    new Artist {Name = "Foobar", Score = 10, Type = ArtistType.Person, Tags = CreateTagList("wtf", "this", "shit")},
+                };
         }
 
         public IEnumerable<ReleaseGroup> BrowseReleaseGroups(Artist artist)
         {
-            throw new NotImplementedException();
+            return new[]
+                {
+                    AppealToReason
+                };
         }
 
         public IEnumerable<Release> BrowseReleases(ReleaseGroup releaseGroup)
         {
-            throw new NotImplementedException();
+            return new[]
+                {
+                    AppealToReasonRelease
+                };
         }
 
         public IEnumerable<Track> LookupTracks(Release release)
         {
-            throw new NotImplementedException();
+            return new[]
+                {
+                    new Track(AppealToReasonRelease) {Name = "Savior", Number = 11, Posititon = 11, Length = TimeSpan.FromSeconds(123456)}, 
+                };
         }
     }
 }

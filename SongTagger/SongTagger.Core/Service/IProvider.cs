@@ -55,8 +55,7 @@ namespace SongTagger.Core.Service
                 throw new ArgumentException("name", "Search text cannot be null or empty");
 
             return Query<Artist>(Artist.Empty.Search(name))
-                .OrderBy(a => a.Score)
-                .OrderBy(a => a.Name);
+                .OrderByDescending(a => a.Score);
         }
 
         public IEnumerable<ReleaseGroup> BrowseReleaseGroups(Artist artist)

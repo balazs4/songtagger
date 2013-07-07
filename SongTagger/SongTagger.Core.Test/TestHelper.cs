@@ -68,7 +68,7 @@ namespace SongTagger.Core.Test
             }
         }
 
-        public static Release AppealToReasonRelease
+        internal static Release AppealToReasonRelease
         {
             get
             {
