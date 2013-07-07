@@ -73,6 +73,11 @@ namespace SongTagger.UI.Wpf
             //TODO
         }
 
+        protected void Reset()
+        {
+            Workspace = new SearchViewmodel(SearchArtistAsync);
+        }
+
         private void SearchArtistAsync(string searchText)
         {
             Workspace.IsQueryRunning = true;
@@ -80,10 +85,15 @@ namespace SongTagger.UI.Wpf
                 () => provider.SearchArtist(searchText)
                 );
 
-            search.ContinueWith(artists =>
+            search.ContinueWith(prevTask =>
                 {
                     Workspace.IsQueryRunning = false;
-                    Workspace = new MarketViewModel(State.SelectArtist, artists.Result.Select(a => new EntityViewModel(a)));
+                    if (prevTask.IsFaulted)
+                    {
+                        Reset(); //TODO: Expcetion handling...
+                        return;
+                    }
+                    Workspace = new MarketViewModel(State.SelectArtist, prevTask.Result.Select(a => new EntityViewModel(a)), Reset);
                 });
 
             search.Start();
@@ -230,7 +240,7 @@ namespace SongTagger.UI.Wpf
 
     public class SearchViewmodel : WorkspaceViewModel
     {
-        
+
         public SearchViewmodel(Action<string> searchCallback)
             : base(State.SearchForAritst)
         {
@@ -257,10 +267,11 @@ namespace SongTagger.UI.Wpf
 
     public class MarketViewModel : WorkspaceViewModel
     {
-        public MarketViewModel(State state, IEnumerable<EntityViewModel> entities) : 
-            base(state)
+        public MarketViewModel(State state, IEnumerable<EntityViewModel> entities, Action resetCallback)
+            : base(state)
         {
             Entities = new ObservableCollection<EntityViewModel>(entities);
+            Reset = new DelegateCommand(param => resetCallback());
         }
 
         private ObservableCollection<EntityViewModel> entities;
@@ -273,6 +284,8 @@ namespace SongTagger.UI.Wpf
                 RaisePropertyChangedEvent("Entities");
             }
         }
+
+        public ICommand Reset { get; private set; }
     }
 
     public class CartViewModel : ViewModelBase, IDropTarget
