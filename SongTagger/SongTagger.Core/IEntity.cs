@@ -97,6 +97,17 @@ namespace SongTagger.Core
         public ReleaseGroupType PrimaryType { get; set; }
 
         public Artist Artist { get; internal set; }
+
+        public ReleaseGroup()
+        {
+            
+        }
+
+        public ReleaseGroup(Artist artist)
+            : this()
+        {
+            Artist = artist;
+        }
     }
 
     [Serializable]
@@ -116,6 +127,17 @@ namespace SongTagger.Core
         public string Country { get; set; }
 
         public ReleaseGroup ReleaseGroup { get; internal set; }
+
+        public Release()
+        {
+            
+        }
+
+        public Release(ReleaseGroup group)
+            : this()
+        {
+            ReleaseGroup = group;
+        }
     }
 
     [Serializable]
@@ -153,6 +175,12 @@ namespace SongTagger.Core
         public int Number { get; set; }
 
         public Release Release { get; internal set; }
+
+
+        public Track(Release release) : this()
+        {
+            Release = release;
+        }
     }
 
     [Serializable]

@@ -67,24 +67,5 @@ namespace SongTagger.Core.Test.Unit.Service
             return release.Lookup<Recording>().ToString();
         }
     }
-
-    [TestFixture]
-    public class CoverArtExtensionTests
-    {
-        internal static IEnumerable ReleaseSource
-        {
-            get 
-            {
-                yield return new TestCaseData(TestHelper.AppealToReasonRelease)
-                    .Returns("http://coverartarchive.org/release/205f2019-fc18-477a-971c-ecc37aa216fc/front-500");
-            }
-        }
-
-        [TestCaseSource("ReleaseSource")]
-        public string Get_CoverArt(Release release)
-        {
-            return release.GetCoverArt().ToString();
-        }
-    }
 }
 
