@@ -78,25 +78,32 @@ namespace SongTagger.UI.Wpf
             Workspace = new SearchViewmodel(SearchArtistAsync);
         }
 
+        private static void CreateAndStartTask<T>(Func<T> action, Action<Task<T>> done, Action<Task<T>> error)
+        {
+            Task<T> task = Task<T>.Factory.StartNew(action);
+            task.ContinueWith(error, TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith(done, TaskContinuationOptions.OnlyOnRanToCompletion);
+        }
+
+
         private void SearchArtistAsync(string searchText)
         {
-            Workspace.IsQueryRunning = true;
-            var search = new Task<IEnumerable<Artist>>(
-                () => provider.SearchArtist(searchText)
-                );
-
-            search.ContinueWith(prevTask =>
+            CreateAndStartTask(
+                () =>
+                {
+                    Workspace.IsQueryRunning = true;
+                    return provider.SearchArtist(searchText);
+                },
+                action =>
+                {
+                    Workspace = new MarketViewModel(State.SelectArtist, action.Result.Select(a => new EntityViewModel(a)), Reset);
+                },
+                action =>
                 {
                     Workspace.IsQueryRunning = false;
-                    if (prevTask.IsFaulted)
-                    {
-                        Reset(); //TODO: Expcetion handling...
-                        return;
-                    }
-                    Workspace = new MarketViewModel(State.SelectArtist, prevTask.Result.Select(a => new EntityViewModel(a)), Reset);
-                });
-
-            search.Start();
+                    ShowErrorMessage(action.Exception.InnerException);
+                }
+                );
         }
 
         private string windowTitle;
@@ -131,6 +138,99 @@ namespace SongTagger.UI.Wpf
                 RaisePropertyChangedEvent("Cart");
             }
         }
+
+        private ErrorViewModel error;
+        public ErrorViewModel Error
+        {
+            get { return error; }
+            set
+            {
+                error = value;
+                RaisePropertyChangedEvent("Error");
+            }
+        }
+
+        private void CloseErrorMessage()
+        {
+            Error = null;
+        }
+
+        protected void ShowErrorMessage(Exception exception, params ErrorActionViewModel[] actions)
+        {
+            if (actions == null || !actions.Any())
+                Error = new ErrorViewModel(exception, new ErrorActionViewModel("Ok", CloseErrorMessage));
+            else
+                Error = new ErrorViewModel(exception, actions);
+        }
+    }
+
+    public class ErrorViewModel : ViewModelBase
+    {
+        public ErrorViewModel(Exception exception, params ErrorActionViewModel[] actions)
+        {
+            if (actions == null)
+                Actions = new ObservableCollection<ErrorActionViewModel>();
+            else
+                Actions = new ObservableCollection<ErrorActionViewModel>(actions.ToList());
+
+            Exception = exception;
+            Title = "Opps something went wrong...";
+        }
+
+        private Exception exception;
+        public Exception Exception
+        {
+            get { return exception; }
+            set
+            {
+                exception = value;
+                RaisePropertyChangedEvent("Exception");
+            }
+        }
+
+        private ObservableCollection<ErrorActionViewModel> actions;
+        public ObservableCollection<ErrorActionViewModel> Actions
+        {
+            get { return actions; }
+            set
+            {
+                actions = value;
+                RaisePropertyChangedEvent("Actions");
+            }
+        }
+
+        private string title;
+        public string Title
+        {
+            get { return title; }
+            set
+            {
+                title = value;
+                RaisePropertyChangedEvent("Title");
+            }
+        }
+    }
+
+    public class ErrorActionViewModel : ViewModelBase
+    {
+        private string caption;
+        public string Caption
+        {
+            get { return caption; }
+            set
+            {
+                caption = value;
+                RaisePropertyChangedEvent("Caption");
+            }
+        }
+
+        public ErrorActionViewModel(string title, Action action)
+        {
+            Caption = title;
+            HandlerCommand = new DelegateCommand(param => action());
+        }
+
+        public ICommand HandlerCommand { get; private set; }
     }
 
     public class EntityViewModel : ViewModelBase
