@@ -8,7 +8,7 @@ namespace SongTagger.UI.Wpf
     {
         public DataTemplate SearchArtistDataTemplate { get; set; }
         public DataTemplate MarketDataTemplate { get; set; }
-        
+
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             if (item is SearchViewmodel)
@@ -33,6 +33,26 @@ namespace SongTagger.UI.Wpf
 
 
             return base.SelectTemplate(item, container);
+        }
+    }
+
+    public class CartDataTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate NonVisibleTemplate { get; set; }
+        public DataTemplate EmptyDataTemplate { get; set; }
+        public DataTemplate DefaultDataTemplate { get; set; }
+
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            CartViewModel viewModel = item as CartViewModel;
+
+            if (viewModel == null)
+                return NonVisibleTemplate;
+
+            if (viewModel.Collection.Count == 0)
+                return EmptyDataTemplate;
+
+            return DefaultDataTemplate;
         }
     }
 }

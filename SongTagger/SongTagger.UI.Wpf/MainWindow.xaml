@@ -35,11 +35,63 @@
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="9*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" VerticalAlignment="Top">
-                <Image Source="Images/logo.png" 
-                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                   Width="64" Height="64" />
-            </StackPanel>
+            <Grid Grid.Column="0" Name="logoAndcart">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="9*"/>
+                </Grid.RowDefinitions>
+                <Grid.Resources>
+                    <DataTemplate x:Key="nonVisibleTemplate"/>
+                    <DataTemplate x:Key="emptyCartTemplate">
+                        <Grid>
+                            <Rectangle Stroke="Gray" StrokeDashArray="3 3"/>
+                            <Grid Margin="5 5 5 5">
+                                <Image Source="Images/cart.png" Width="64" Opacity=".4"/>
+                                <TextBlock Text="Drag an item here"
+                                   Width="Auto" Height="Auto" 
+                                   Foreground="Gray" FontSize="14" 
+                                   Padding="5,5,5,5" Margin="0,0,0,100"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate x:Key="defaultCartTemplate" DataType="{x:Type viewModel:CartViewModel}">
+                        <Border BorderThickness=".3" BorderBrush="DarkGray">
+                            <ItemsControl ItemsSource="{Binding Collection}"
+                                          AllowDrop="True"
+                                          gong:DragDrop.IsDropTarget="True"
+                                          gong:DragDrop.DropHandler="{Binding}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type viewModel:EntityViewModel}">
+                                        <DockPanel LastChildFill="True" Height="40">
+                                            <Rectangle DockPanel.Dock="Left" 
+                                               Fill="{Binding EntityColor, Converter={StaticResource ColorConvert}}" 
+                                               Width="10" Margin="2,5,0,0"/>
+                                            <TextBlock Text="{Binding Entity.Name}" 
+                                                   ToolTip="{Binding Entity.Name}"
+                                                   FontSize="12"
+                                                   VerticalAlignment="Center"
+                                                   Margin="2,0,0,0"    
+                                                   />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </DataTemplate>
+                    <viewModel:CartDataTemplateSelector x:Key="cartTemplateSelector"
+                                                        NonVisibleTemplate="{StaticResource nonVisibleTemplate}"
+                                                        EmptyDataTemplate="{StaticResource emptyCartTemplate}"
+                                                        DefaultDataTemplate="{StaticResource defaultCartTemplate}"/>
+                </Grid.Resources>
+
+                <Image Grid.Row="0"  Source="Images/logo.png" Width="64" />
+                <ContentControl Grid.Row="1" Margin="15,16,15,14"
+                                ContentTemplateSelector="{StaticResource cartTemplateSelector}"
+                                Content="{Binding Cart}"
+                                
+                                />
+            </Grid>
             <Grid Grid.Column="1" Name="workspace">
                 <Grid.Resources>
                     <DataTemplate x:Key="searchDataTemplate" DataType="{x:Type viewModel:SearchViewmodel}">
@@ -68,7 +120,7 @@
                                     <TextBox.InputBindings>
                                         <KeyBinding Key="Enter" Command="{Binding Search}"/>
                                     </TextBox.InputBindings>
-                                    </TextBox>
+                                </TextBox>
                                 <Button HorizontalAlignment="Right"
                                     Command="{Binding Search}"
                                     IsEnabled="{Binding IsQueryRunning, Converter={StaticResource BoolInverter}}">
@@ -86,17 +138,34 @@
                                 <DataTemplate.Resources>
                                     <DataTemplate x:Key="artistEntityTemplate" DataType="{x:Type songtagger:Artist}">
                                         <Grid>
-                                            <TextBlock Text="{Binding Score}" 
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Score}" 
                                                    HorizontalAlignment="Right"
-                                                   FontSize="48"
+                                                   FontSize="36"
                                                    Foreground="LightGray"
-                                                   Opacity=".75"
+                                                   Opacity=".9"
                                                    FontWeight="ExtraLight"
-                                                   Margin="0,-38,-10,0">
-                                                <TextBlock.RenderTransform>
-                                                    <ScaleTransform ScaleX=".8" ScaleY="0.75"/>
-                                                </TextBlock.RenderTransform>
-                                            </TextBlock>
+                                                   Margin="0,-30,-10,15">
+                                                    <TextBlock.RenderTransform>
+                                                        <ScaleTransform ScaleX=".8" ScaleY="0.75"/>
+                                                    </TextBlock.RenderTransform>
+                                                </TextBlock>
+                                                <Image Width="16" Height="16" HorizontalAlignment="Right" Opacity=".2">
+                                                    <Image.Style>
+                                                        <Style TargetType="Image">
+                                                            <Setter Property="ToolTip" Value="{Binding Type}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Type}" Value="Group">
+                                                                    <Setter Property="Source"  Value="Images/artist.group.png"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Type}" Value="Person">
+                                                                    <Setter Property="Source"  Value="Images/artist.person.png"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Image.Style>
+                                                </Image>
+                                            </StackPanel>
                                             <ItemsControl  ItemsSource="{Binding Tags}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
@@ -111,21 +180,6 @@
                                                     </ItemsPanelTemplate>
                                                 </ItemsControl.ItemsPanel>
                                             </ItemsControl>
-                                            <Image Width="16" Height="16" HorizontalAlignment="Right" Opacity=".2">
-                                                <Image.Style>
-                                                    <Style TargetType="Image">
-                                                        <Setter Property="ToolTip" Value="{Binding Type}"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Type}" Value="Group">
-                                                                <Setter Property="Source"  Value="Images/artist.group.png"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Type}" Value="Person">
-                                                                <Setter Property="Source"  Value="Images/artist.person.png"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Image.Style>
-                                            </Image>
                                         </Grid>
                                     </DataTemplate>
                                     <viewModel:EntityDataTemplateSelector x:Key="entitySelector"
@@ -163,13 +217,17 @@
                                         </ControlTemplate>
                                     </Button.Template>
                                 </Button>
-                                <TextBlock Grid.Row="0" Text="{Binding Header}" 
-                                   FontSize="48" Margin="0,0,20,0"
-                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <StackPanel Grid.Row="0" Margin="0,0,20,0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock  Text="{Binding Header}" FontSize="48" />
+                                    <TextBox Background="White" Width="150" BorderThickness="1" BorderBrush="Gray" HorizontalAlignment="Right"
+                                             FontSize="14"/>
+                                </StackPanel>
                             </Grid>
                             <ListBox Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                            ItemsSource="{Binding Entities}"
-                            ItemTemplate="{StaticResource entityTemplate}">
+                                     BorderThickness="0"
+                                     ItemsSource="{Binding Entities}"
+                                     ItemTemplate="{StaticResource entityTemplate}"
+                                     gong:DragDrop.IsDragSource="True">
                                 <ListBox.Resources>
                                     <Style TargetType="ListBoxItem">
                                         <Setter Property="HorizontalAlignment" Value="Stretch" />
