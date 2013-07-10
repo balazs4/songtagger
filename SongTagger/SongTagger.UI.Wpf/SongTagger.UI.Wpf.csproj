@@ -136,6 +136,9 @@
   <ItemGroup>
     <Resource Include="Images\error.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\cart.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

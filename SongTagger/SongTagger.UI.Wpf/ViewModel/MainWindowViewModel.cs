@@ -63,8 +63,9 @@ namespace SongTagger.UI.Wpf
 
             PropertyChanged += OnPropertyChangedDispatcher;
             provider = dataProvider;
-            Workspace = new SearchViewmodel(SearchArtistAsync);
-            Cart = new CartViewModel();
+
+            Reset();
+
             WindowTitle = GetType().Namespace.Split('.').FirstOrDefault();
         }
 
@@ -76,6 +77,7 @@ namespace SongTagger.UI.Wpf
         protected void Reset()
         {
             Workspace = new SearchViewmodel(SearchArtistAsync);
+            Cart = null;
         }
 
         private static void CreateAndStartTask<T>(Func<T> action, Action<Task<T>> done, Action<Task<T>> error)
@@ -97,6 +99,7 @@ namespace SongTagger.UI.Wpf
                 action =>
                 {
                     Workspace = new MarketViewModel(State.SelectArtist, action.Result.Select(a => new EntityViewModel(a)), Reset);
+                    Cart = new CartViewModel(LoadEntitiesAsync);
                 },
                 action =>
                 {
@@ -104,6 +107,51 @@ namespace SongTagger.UI.Wpf
                     ShowErrorMessage(action.Exception.InnerException);
                 }
                 );
+        }
+
+        protected void LoadEntitiesAsync(EntityViewModel entityViewModel)
+        {
+            if (entityViewModel == null)
+                return;
+
+            IEntity sourceEntity = entityViewModel.Entity;
+
+            if (sourceEntity is Artist)
+            {
+                LoadReleaseGroupsAsync((Artist) sourceEntity);
+                return;
+            }
+
+            if (sourceEntity is ReleaseGroup)
+            {
+                return;
+            }
+
+            if (sourceEntity is Release)
+            {
+                return;
+            }
+        }
+
+        private void LoadReleaseGroupsAsync(Artist artist)
+        {
+            CreateAndStartTask(
+                () =>
+            {
+                Workspace.IsQueryRunning = true;
+                return provider.BrowseReleaseGroups(artist);
+            },
+            action =>
+            {
+                Workspace = new MarketViewModel(State.SelectReleaseGroup, action.Result.Select(a => new EntityViewModel(a)), Reset);
+            },
+            action =>
+            {
+                Workspace.IsQueryRunning = false;
+                ShowErrorMessage(action.Exception.InnerException);
+            }
+            );
+            
         }
 
         private string windowTitle;
@@ -386,28 +434,103 @@ namespace SongTagger.UI.Wpf
         }
 
         public ICommand Reset { get; private set; }
+
     }
 
     public class CartViewModel : ViewModelBase, IDropTarget
     {
         public void DragOver(IDropInfo dropInfo)
         {
-            throw new NotImplementedException();
+            if (dropInfo.Data is EntityViewModel)
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+                dropInfo.Effects = DragDropEffects.Move;
+            }
+            else
+            {
+                dropInfo.Effects = DragDropEffects.None;
+            }            
         }
 
         public void Drop(IDropInfo dropInfo)
         {
-            throw new NotImplementedException();
+            EntityItem = (EntityViewModel)dropInfo.Data;
+        }
+
+
+        private Action<EntityViewModel> loadSubEntities;
+        public CartViewModel(Action<EntityViewModel> entityChangedCallback)
+        {
+            loadSubEntities = entityChangedCallback;
+            PropertyChanged += OnPropertyChangedDispatcher;
+            Collection = new ObservableCollection<EntityViewModel>();
+        }
+
+        private void OnPropertyChangedDispatcher(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (eventArgs.PropertyName == "EntityItem")
+            {
+                Collection = CreateCollection(EntityItem);
+                loadSubEntities(EntityItem);
+                return;
+            }
+        }
+
+        private ObservableCollection<EntityViewModel> CreateCollection(EntityViewModel selectedViewModel)
+        {
+            if (selectedViewModel == null)
+                return new ObservableCollection<EntityViewModel>();
+
+            ObservableCollection<EntityViewModel> list = new ObservableCollection<EntityViewModel>();
+            IEntity currentEntity = selectedViewModel.Entity;
+
+            if (currentEntity is Artist)
+            {
+                Artist item = (Artist) currentEntity;
+                list.Add(new EntityViewModel(item));
+                return list;
+            }
+
+            if (currentEntity is ReleaseGroup)
+            {
+                ReleaseGroup item = (ReleaseGroup) currentEntity;
+                list.Add(new EntityViewModel(item.Artist));
+                list.Add(new EntityViewModel(item));
+                return list;
+            }
+
+
+            if (currentEntity is Release)
+            {
+                Release item = (Release) currentEntity;
+                list.Add(new EntityViewModel(item.ReleaseGroup.Artist));
+                list.Add(new EntityViewModel(item.ReleaseGroup));
+                list.Add(new EntityViewModel(item));
+                return list;
+            }
+
+            return list;
+        }
+
+        private ObservableCollection<EntityViewModel> collection;
+        public ObservableCollection<EntityViewModel> Collection
+        {
+            get { return collection; }
+            set
+            {
+                collection = value;
+                RaisePropertyChangedEvent("Collection");
+            }
         }
 
         private EntityViewModel entity;
-        public EntityViewModel Entity
+        internal EntityViewModel EntityItem
         {
-            get { return entity; }
+            private get { return entity; }
             set
             {
                 entity = value;
-                RaisePropertyChangedEvent("Entity");
+                RaisePropertyChangedEvent("EntityItem");
             }
         }
     }

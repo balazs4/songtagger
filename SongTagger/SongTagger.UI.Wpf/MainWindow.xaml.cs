@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GongSolutions.Wpf.DragDrop;
 using SongTagger.Core;
 using SongTagger.UI.Wpf.ViewModel;
 
@@ -37,7 +38,7 @@ namespace SongTagger.UI.Wpf
             : base(DesignDataProvider.Instance)
         {
             WindowTitle = "Design data";
-            InitDesignData();
+            InitDesignData(CartInit, ArtistMarket);
         }
 
         private void InitDesignData(params Action[] initActions)
@@ -54,6 +55,12 @@ namespace SongTagger.UI.Wpf
                 provider.SearchArtist("Rise Against").Select(e => new EntityViewModel(e)),
                 Reset
                 );
+        }
+
+        private void CartInit()
+        {
+            Cart = new CartViewModel(LoadEntitiesAsync);
+            Cart.EntityItem = new EntityViewModel(DesignDataProvider.AppealToReasonRelease);
         }
 
         private void ErrorMessage()

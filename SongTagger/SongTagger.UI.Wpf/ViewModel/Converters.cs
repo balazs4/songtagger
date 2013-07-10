@@ -88,4 +88,6 @@ namespace SongTagger.UI.Wpf
             throw new InvalidOperationException("IsNullConverter can only be used OneWay.");
         }
     }
+
+
 }
