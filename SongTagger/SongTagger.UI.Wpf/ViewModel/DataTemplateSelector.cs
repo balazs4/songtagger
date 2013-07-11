@@ -39,7 +39,6 @@ namespace SongTagger.UI.Wpf
     public class CartDataTemplateSelector : DataTemplateSelector
     {
         public DataTemplate NonVisibleTemplate { get; set; }
-        public DataTemplate EmptyDataTemplate { get; set; }
         public DataTemplate DefaultDataTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
@@ -48,9 +47,6 @@ namespace SongTagger.UI.Wpf
 
             if (viewModel == null)
                 return NonVisibleTemplate;
-
-            if (viewModel.Collection.Count == 0)
-                return EmptyDataTemplate;
 
             return DefaultDataTemplate;
         }
