@@ -213,7 +213,9 @@ namespace SongTagger.Core
         Album,
         EP,
         Live,
-        Single
+        Single,
+        Other,
+        Broadcast
     }
 
     [Serializable]

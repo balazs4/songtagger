@@ -87,6 +87,8 @@ namespace SongTagger.UI.Wpf
             task.ContinueWith(done, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
+        
+
 
         private void SearchArtistAsync(string searchText)
         {
@@ -98,13 +100,13 @@ namespace SongTagger.UI.Wpf
                 },
                 action =>
                 {
-                    Workspace.IsQueryRunning = false;
                     Workspace = new MarketViewModel(State.SelectArtist, action.Result.Select(a => new EntityViewModel(a)), Reset);
                     Cart = new CartViewModel(LoadEntitiesAsync);
                 },
                 action =>
                 {
                     Workspace.IsQueryRunning = false;
+                    //TODO: get the first not AggregateException
                     ShowErrorMessage(action.Exception.InnerException);
                 }
                 );
@@ -223,7 +225,7 @@ namespace SongTagger.UI.Wpf
                 Actions = new ObservableCollection<ErrorActionViewModel>(actions.ToList());
 
             Exception = exception;
-            Title = "Opps something went wrong...";
+            Title = "Oops something went wrong...";
         }
 
         private Exception exception;
@@ -423,6 +425,18 @@ namespace SongTagger.UI.Wpf
             Reset = new DelegateCommand(param => resetCallback());
         }
 
+        private string filterText;
+        public string FilterText
+        {
+            get { return filterText; }
+            set
+            {
+                filterText = value;
+                RaisePropertyChangedEvent("FilterText");
+                RaisePropertyChangedEvent("EntitiesView");
+            }
+        }
+
         private ObservableCollection<EntityViewModel> entities;
         public ObservableCollection<EntityViewModel> Entities
         {
@@ -431,7 +445,51 @@ namespace SongTagger.UI.Wpf
             {
                 entities = value;
                 RaisePropertyChangedEvent("Entities");
+                RaisePropertyChangedEvent("EntitiesView");
             }
+        }
+
+        public ICollectionView EntitiesView
+        {
+            get
+            {
+                ICollectionView view = CollectionViewSource.GetDefaultView(Entities);
+                if (String.IsNullOrWhiteSpace(FilterText))
+                    view.Filter = null;
+                else
+                    view.Filter = Filter;    
+                return view;
+            }
+        }
+
+        private bool Filter(object parameter)
+        {
+            if (String.IsNullOrWhiteSpace(FilterText))
+                return true;
+
+            string text = FilterText.ToLower();
+            EntityViewModel item = (EntityViewModel) parameter;
+
+            if (item.Entity.Name.ToLower().Contains(text))
+                return true;
+
+            IEntity entity = item.Entity;
+
+            if (entity is Artist)
+            {
+                Artist artist = (Artist) entity;
+                return PerformFilter(text, 
+                                     artist.Type.ToString(), 
+                                     string.Join(" ", artist.Tags.Select(t => t.Name)),
+                                     artist.Score.ToString());
+            }
+
+            return false;
+        }
+
+        private static bool PerformFilter(string text, params string[] properties)
+        {
+            return properties.Any(s => s.ToLower().Contains(text));
         }
 
         public ICommand Reset { get; private set; }
