@@ -44,7 +44,8 @@
                     <DataTemplate x:Key="nonVisibleTemplate"/>
                     <DataTemplate x:Key="defaultCartTemplate" DataType="{x:Type viewModel:CartViewModel}">
                         <Border BorderThickness=".3" BorderBrush="DarkGray">
-                            <ItemsControl ItemsSource="{Binding Collection}">
+                            <ItemsControl ItemsSource="{Binding Collection}" Background="Transparent" 
+                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type viewModel:EntityViewModel}">
                                         <DockPanel LastChildFill="True" Height="40">
@@ -66,7 +67,7 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate>
-                                                            <Grid>
+                                                            <Grid Background="Transparent">
                                                                 <Rectangle Stroke="Gray" StrokeDashArray="3 3"/>
                                                                 <Grid Margin="5 5 5 5">
                                                                     <Image Source="Images/cart.png" Width="64" Opacity=".4"/>
@@ -86,13 +87,10 @@
                     <viewModel:CartDataTemplateSelector x:Key="cartTemplateSelector"
                                                         NonVisibleTemplate="{StaticResource nonVisibleTemplate}"
                                                         DefaultDataTemplate="{StaticResource defaultCartTemplate}"/>
-
-
                 </Grid.Resources>
                 <Image Grid.Row="0"  Source="Images/logo.png" Width="64" />
-                <ContentControl Grid.Row="1" Margin="15,16,15,14" 
-                                VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
-                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                <ContentControl Grid.Row="1" Margin="15,16,15,14"
+                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                 ContentTemplateSelector="{StaticResource cartTemplateSelector}"
                                 Content="{Binding Cart}"
                                 AllowDrop="True"
@@ -226,15 +224,21 @@
                                     </Button.Template>
                                 </Button>
                                 <StackPanel Grid.Row="0" Margin="0,0,20,0" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <TextBlock  Text="{Binding Header}" FontSize="48" />
-                                    <TextBox Background="White" Width="150" BorderThickness="1" BorderBrush="Gray" HorizontalAlignment="Right"
-                                             FontSize="14"/>
+                                    <TextBlock Text="{Binding Header}" FontSize="48" />
+                                    <Grid Width="150" HorizontalAlignment="Right">
+                                        <TextBlock Text="Filter..." FontSize="12" Margin="10,2,0,0" TextAlignment="Left" 
+                                                   FontStyle="Italic" Foreground="Gray"
+                                                   Visibility="{Binding ElementName=filter, Path=Text.IsEmpty, 
+                                                                Converter={StaticResource Bool2Visibility}}"/>
+                                        <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" Name="filter"
+                                             Background="Transparent" BorderThickness="1" BorderBrush="Gray" FontSize="14"/>
+                                    </Grid>
                                 </StackPanel>
                             </Grid>
                             <Grid Grid.Row="1" >
                                 <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                      BorderThickness="0"
-                                     ItemsSource="{Binding Entities}"
+                                     ItemsSource="{Binding EntitiesView}"
                                      ItemTemplate="{StaticResource entityTemplate}"
                                      gong:DragDrop.IsDragSource="True">
                                     <ListBox.Resources>
@@ -271,9 +275,9 @@
                                                     <EventTrigger.Actions>
                                                         <BeginStoryboard>
                                                             <Storyboard>
-                                                                <DoubleAnimation Duration="0:0:1.0"
+                                                                <DoubleAnimation Duration="0:0:0.4"
                                                                          Storyboard.TargetProperty="Opacity"
-                                                                         From="0.0"
+                                                                         From="0.6"
                                                                          To="1.0"  />
                                                             </Storyboard>
                                                         </BeginStoryboard>
@@ -311,8 +315,7 @@
                                 <Border Background="Black" Opacity=".55" Margin="-150,-140,0,0" 
                                         Height="256"
                                         IsEnabled="{Binding IsQueryRunning}"
-                                        Visibility="{Binding IsQueryRunning, Converter={StaticResource Bool2Visibility}}"
-                                        >
+                                        Visibility="{Binding IsQueryRunning, Converter={StaticResource Bool2Visibility}}">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                                         <metroControls:ProgressRing IsActive="{Binding IsQueryRunning}" Foreground="White"/>
                                         <TextBlock Text="Please wait..." FontSize="32"  Margin="25,0,0,0" Foreground="White"/>
