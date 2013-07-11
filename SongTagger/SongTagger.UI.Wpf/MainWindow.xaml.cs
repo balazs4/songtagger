@@ -39,6 +39,7 @@ namespace SongTagger.UI.Wpf
         {
             WindowTitle = "Design data";
             InitDesignData(CartInit, ArtistMarket);
+            Workspace.IsQueryRunning = true;
         }
 
         private void InitDesignData(params Action[] initActions)
@@ -60,7 +61,7 @@ namespace SongTagger.UI.Wpf
         private void CartInit()
         {
             Cart = new CartViewModel(LoadEntitiesAsync);
-            Cart.EntityItem = new EntityViewModel(DesignDataProvider.AppealToReasonRelease);
+            //Cart.EntityItem = new EntityViewModel(DesignDataProvider.AppealToReasonRelease);
         }
 
         private void ErrorMessage()

@@ -42,25 +42,9 @@
                 </Grid.RowDefinitions>
                 <Grid.Resources>
                     <DataTemplate x:Key="nonVisibleTemplate"/>
-                    <DataTemplate x:Key="emptyCartTemplate">
-                        <Grid>
-                            <Rectangle Stroke="Gray" StrokeDashArray="3 3"/>
-                            <Grid Margin="5 5 5 5">
-                                <Image Source="Images/cart.png" Width="64" Opacity=".4"/>
-                                <TextBlock Text="Drag an item here"
-                                   Width="Auto" Height="Auto" 
-                                   Foreground="Gray" FontSize="14" 
-                                   Padding="5,5,5,5" Margin="0,0,0,100"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Grid>
-                        </Grid>
-                    </DataTemplate>
                     <DataTemplate x:Key="defaultCartTemplate" DataType="{x:Type viewModel:CartViewModel}">
                         <Border BorderThickness=".3" BorderBrush="DarkGray">
-                            <ItemsControl ItemsSource="{Binding Collection}"
-                                          AllowDrop="True"
-                                          gong:DragDrop.IsDropTarget="True"
-                                          gong:DragDrop.DropHandler="{Binding}">
+                            <ItemsControl ItemsSource="{Binding Collection}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type viewModel:EntityViewModel}">
                                         <DockPanel LastChildFill="True" Height="40">
@@ -71,25 +55,49 @@
                                                    ToolTip="{Binding Entity.Name}"
                                                    FontSize="12"
                                                    VerticalAlignment="Center"
-                                                   Margin="2,0,0,0"    
-                                                   />
+                                                   Margin="2,0,0,0"/>
                                         </DockPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
+                                <ItemsControl.Style>
+                                    <Style TargetType="ItemsControl">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Collection.Count}" Value="0">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate>
+                                                            <Grid>
+                                                                <Rectangle Stroke="Gray" StrokeDashArray="3 3"/>
+                                                                <Grid Margin="5 5 5 5">
+                                                                    <Image Source="Images/cart.png" Width="64" Opacity=".4"/>
+                                                                    <TextBlock Text="Drag an item here" Width="Auto" Height="Auto" Foreground="Gray" FontSize="14" Padding="5,5,5,5" Margin="0,0,0,100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                </Grid>
+                                                            </Grid>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ItemsControl.Style>
                             </ItemsControl>
                         </Border>
                     </DataTemplate>
                     <viewModel:CartDataTemplateSelector x:Key="cartTemplateSelector"
                                                         NonVisibleTemplate="{StaticResource nonVisibleTemplate}"
-                                                        EmptyDataTemplate="{StaticResource emptyCartTemplate}"
                                                         DefaultDataTemplate="{StaticResource defaultCartTemplate}"/>
-                </Grid.Resources>
 
+
+                </Grid.Resources>
                 <Image Grid.Row="0"  Source="Images/logo.png" Width="64" />
-                <ContentControl Grid.Row="1" Margin="15,16,15,14"
+                <ContentControl Grid.Row="1" Margin="15,16,15,14" 
+                                VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                                 ContentTemplateSelector="{StaticResource cartTemplateSelector}"
                                 Content="{Binding Cart}"
-                                
+                                AllowDrop="True"
+                                gong:DragDrop.IsDropTarget="True"
+                                gong:DragDrop.DropHandler="{Binding Cart}"
                                 />
             </Grid>
             <Grid Grid.Column="1" Name="workspace">
@@ -115,8 +123,8 @@
                             <TextBlock Text="{Binding Header}" FontSize="48"/>
                             <Grid>
                                 <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                                 FontSize="28"
-                                 TextAlignment="Center">
+                                         IsEnabled="{Binding IsQueryRunning, Converter={StaticResource BoolInverter}}"
+                                         FontSize="22" TextAlignment="Center" TextWrapping="Wrap" Padding="0,0,32,0">
                                     <TextBox.InputBindings>
                                         <KeyBinding Key="Enter" Command="{Binding Search}"/>
                                     </TextBox.InputBindings>
@@ -183,10 +191,10 @@
                                         </Grid>
                                     </DataTemplate>
                                     <viewModel:EntityDataTemplateSelector x:Key="entitySelector"
-                                    ArtistDataTemplate="{StaticResource artistEntityTemplate}"
+                                                ArtistDataTemplate="{StaticResource artistEntityTemplate}"
                                     />
-                                    <viewModel:StringPaddingConverter x:Key="PaddingConverter" MaxTextLengthIncPaddingString="12"/>
-
+                                    <viewModel:StringPaddingConverter x:Key="PaddingConverter" 
+                                                                      MaxTextLengthIncPaddingString="18"/>
                                 </DataTemplate.Resources>
                                 <DockPanel LastChildFill="True" Width="200" Height="80">
                                     <Rectangle DockPanel.Dock="Left" 
@@ -223,82 +231,94 @@
                                              FontSize="14"/>
                                 </StackPanel>
                             </Grid>
-                            <ListBox Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                            <Grid Grid.Row="1" >
+                                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                      BorderThickness="0"
                                      ItemsSource="{Binding Entities}"
                                      ItemTemplate="{StaticResource entityTemplate}"
                                      gong:DragDrop.IsDragSource="True">
-                                <ListBox.Resources>
-                                    <Style TargetType="ListBoxItem">
-                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                                    <Grid>
-                                                        <Border Background="{TemplateBinding Background}" />
-                                                        <Border Background="#BEFFFFFF" Margin="1,1" />
-                                                        <ContentPresenter Margin="8,5" />
-                                                    </Grid>
-                                                    <ControlTemplate.Triggers>
-                                                        <MultiTrigger>
-                                                            <MultiTrigger.Conditions>
-                                                                <Condition Property="IsMouseOver" Value="True" />
-                                                                <Condition Property="IsSelected" Value="False"/>
-                                                            </MultiTrigger.Conditions>
-                                                            <Setter Property="Background" Value="LightGray" />
-                                                        </MultiTrigger>
-                                                        <Trigger Property="IsSelected" Value="True">
-                                                            <Setter Property="Background" 
+                                    <ListBox.Resources>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                        <Grid>
+                                                            <Border Background="{TemplateBinding Background}" />
+                                                            <Border Background="#BEFFFFFF" Margin="1,1" />
+                                                            <ContentPresenter Margin="8,5" />
+                                                        </Grid>
+                                                        <ControlTemplate.Triggers>
+                                                            <MultiTrigger>
+                                                                <MultiTrigger.Conditions>
+                                                                    <Condition Property="IsMouseOver" Value="True" />
+                                                                    <Condition Property="IsSelected" Value="False"/>
+                                                                </MultiTrigger.Conditions>
+                                                                <Setter Property="Background" Value="LightGray" />
+                                                            </MultiTrigger>
+                                                            <Trigger Property="IsSelected" Value="True">
+                                                                <Setter Property="Background" 
                                                                 Value="LightSteelBlue"
                                                                 />
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Style.Triggers>
-                                            <EventTrigger RoutedEvent="Loaded">
-                                                <EventTrigger.Actions>
-                                                    <BeginStoryboard>
-                                                        <Storyboard>
-                                                            <DoubleAnimation Duration="0:0:1.0"
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <EventTrigger RoutedEvent="Loaded">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="0:0:1.0"
                                                                          Storyboard.TargetProperty="Opacity"
                                                                          From="0.0"
                                                                          To="1.0"  />
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </EventTrigger.Actions>
-                                            </EventTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ListBox.Resources>
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Horizontal"/>
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                                <ListBox.Style>
-                                    <Style TargetType="ListBox">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Items.Count}" 
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ListBox.Resources>
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.Style>
+                                        <Style TargetType="ListBox">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Items.Count}" 
                                                      Value="0">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate>
-                                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate>
+                                                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
                                                                     Opacity=".5">
-                                                                <Image Source="Images/noresult.png" Height="48" Width="48"/>
-                                                                <TextBlock FontSize="48">No result</TextBlock>
-                                                            </StackPanel>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ListBox.Style>
-                            </ListBox>
+                                                                    <Image Source="Images/noresult.png" Height="48" Width="48"/>
+                                                                    <TextBlock FontSize="48">No result</TextBlock>
+                                                                </StackPanel>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ListBox.Style>
+                                </ListBox>
+                                <Border Background="Black" Opacity=".55" Margin="-150,-140,0,0" 
+                                        Height="256"
+                                        IsEnabled="{Binding IsQueryRunning}"
+                                        Visibility="{Binding IsQueryRunning, Converter={StaticResource Bool2Visibility}}"
+                                        >
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <metroControls:ProgressRing IsActive="{Binding IsQueryRunning}" Foreground="White"/>
+                                        <TextBlock Text="Please wait..." FontSize="32"  Margin="25,0,0,0" Foreground="White"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
                         </Grid>
                     </DataTemplate>
                     <viewModel:WorkspaceDataTemplateSelector x:Key="workspaceSelector"

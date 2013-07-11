@@ -96,6 +96,7 @@ namespace SongTagger.Core
         [XmlElement("primary-type")]
         public ReleaseGroupType PrimaryType { get; set; }
 
+        [XmlIgnore]
         public Artist Artist { get; internal set; }
 
         public ReleaseGroup()

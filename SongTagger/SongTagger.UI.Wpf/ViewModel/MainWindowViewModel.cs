@@ -98,6 +98,7 @@ namespace SongTagger.UI.Wpf
                 },
                 action =>
                 {
+                    Workspace.IsQueryRunning = false;
                     Workspace = new MarketViewModel(State.SelectArtist, action.Result.Select(a => new EntityViewModel(a)), Reset);
                     Cart = new CartViewModel(LoadEntitiesAsync);
                 },
@@ -470,25 +471,21 @@ namespace SongTagger.UI.Wpf
         {
             if (eventArgs.PropertyName == "EntityItem")
             {
-                Collection = CreateCollection(EntityItem);
+                FillCollection(Collection, EntityItem);
                 loadSubEntities(EntityItem);
                 return;
             }
         }
 
-        private ObservableCollection<EntityViewModel> CreateCollection(EntityViewModel selectedViewModel)
+        private void FillCollection(ObservableCollection<EntityViewModel> list , EntityViewModel selectedViewModel)
         {
-            if (selectedViewModel == null)
-                return new ObservableCollection<EntityViewModel>();
-
-            ObservableCollection<EntityViewModel> list = new ObservableCollection<EntityViewModel>();
+            list.Clear();
             IEntity currentEntity = selectedViewModel.Entity;
 
             if (currentEntity is Artist)
             {
                 Artist item = (Artist) currentEntity;
                 list.Add(new EntityViewModel(item));
-                return list;
             }
 
             if (currentEntity is ReleaseGroup)
@@ -496,9 +493,7 @@ namespace SongTagger.UI.Wpf
                 ReleaseGroup item = (ReleaseGroup) currentEntity;
                 list.Add(new EntityViewModel(item.Artist));
                 list.Add(new EntityViewModel(item));
-                return list;
             }
-
 
             if (currentEntity is Release)
             {
@@ -506,10 +501,8 @@ namespace SongTagger.UI.Wpf
                 list.Add(new EntityViewModel(item.ReleaseGroup.Artist));
                 list.Add(new EntityViewModel(item.ReleaseGroup));
                 list.Add(new EntityViewModel(item));
-                return list;
+            
             }
-
-            return list;
         }
 
         private ObservableCollection<EntityViewModel> collection;
