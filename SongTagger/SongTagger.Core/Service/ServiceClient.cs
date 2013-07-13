@@ -48,7 +48,10 @@ namespace SongTagger.Core.Service
         private static string DefaultContentDownloader(Uri url)
         {
             string content;
-            using (WebClient client = new WebClient())
+
+            WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
+
+            using (WebClient client = new WebClient { Proxy = WebRequest.DefaultWebProxy })
             {
                 content = client.DownloadString(url);
             }
