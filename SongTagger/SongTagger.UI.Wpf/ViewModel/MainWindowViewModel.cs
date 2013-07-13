@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Globalization;
@@ -9,12 +8,10 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 using System.IO;
 using System.Windows.Input;
 using System.Windows.Threading;
-using GongSolutions.Wpf.DragDrop;
 using SongTagger.Core;
 using SongTagger.Core.Service;
 using SongTagger.UI.Wpf.ViewModel;
@@ -48,8 +45,8 @@ namespace SongTagger.UI.Wpf
         [Description("Select a release")]
         SelectRelease,
 
-        [Description("Pair tracks with mp3s")]
-        PairTracks
+        [Description("Maptracks with mp3s")]
+        MapTracks
     }
 
     public class MainWindowViewModel : ViewModelBase
@@ -215,75 +212,6 @@ namespace SongTagger.UI.Wpf
         }
     }
 
-    public class ErrorViewModel : ViewModelBase
-    {
-        public ErrorViewModel(Exception exception, params ErrorActionViewModel[] actions)
-        {
-            if (actions == null)
-                Actions = new ObservableCollection<ErrorActionViewModel>();
-            else
-                Actions = new ObservableCollection<ErrorActionViewModel>(actions.ToList());
-
-            Exception = exception;
-            Title = "Oops something went wrong...";
-        }
-
-        private Exception exception;
-        public Exception Exception
-        {
-            get { return exception; }
-            set
-            {
-                exception = value;
-                RaisePropertyChangedEvent("Exception");
-            }
-        }
-
-        private ObservableCollection<ErrorActionViewModel> actions;
-        public ObservableCollection<ErrorActionViewModel> Actions
-        {
-            get { return actions; }
-            set
-            {
-                actions = value;
-                RaisePropertyChangedEvent("Actions");
-            }
-        }
-
-        private string title;
-        public string Title
-        {
-            get { return title; }
-            set
-            {
-                title = value;
-                RaisePropertyChangedEvent("Title");
-            }
-        }
-    }
-
-    public class ErrorActionViewModel : ViewModelBase
-    {
-        private string caption;
-        public string Caption
-        {
-            get { return caption; }
-            set
-            {
-                caption = value;
-                RaisePropertyChangedEvent("Caption");
-            }
-        }
-
-        public ErrorActionViewModel(string title, Action action)
-        {
-            Caption = title;
-            HandlerCommand = new DelegateCommand(param => action());
-        }
-
-        public ICommand HandlerCommand { get; private set; }
-    }
-
     public class EntityViewModel : ViewModelBase
     {
         #region Colors
@@ -346,242 +274,6 @@ namespace SongTagger.UI.Wpf
             {
                 entity = value;
                 RaisePropertyChangedEvent("Entity");
-            }
-        }
-    }
-
-    public class WorkspaceViewModel : ViewModelBase
-    {
-        public static string GetDescriptionFromEnumValue(Enum value)
-        {
-            DescriptionAttribute attribute = value.GetType()
-                .GetField(value.ToString())
-                .GetCustomAttributes(typeof(DescriptionAttribute), false)
-                .SingleOrDefault() as DescriptionAttribute;
-            return attribute == null ? value.ToString() : attribute.Description;
-        }
-
-        public WorkspaceViewModel(State state)
-        {
-            Header = GetDescriptionFromEnumValue(state);
-        }
-
-        private string header;
-        public string Header
-        {
-            get { return header; }
-            set
-            {
-                header = value;
-                RaisePropertyChangedEvent("Header");
-            }
-        }
-
-        private bool isQueryRunning;
-        public bool IsQueryRunning
-        {
-            get { return isQueryRunning; }
-            set
-            {
-                isQueryRunning = value;
-                RaisePropertyChangedEvent("IsQueryRunning");
-            }
-        }
-    }
-
-    public class SearchViewmodel : WorkspaceViewModel
-    {
-
-        public SearchViewmodel(Action<string> searchCallback)
-            : base(State.SearchForAritst)
-        {
-            Search = new DelegateCommand
-                (
-                    param => searchCallback(SearchText),
-                    param => !String.IsNullOrWhiteSpace(SearchText)
-                );
-        }
-
-        private string searchText;
-        public string SearchText
-        {
-            get { return searchText; }
-            set
-            {
-                searchText = value;
-                RaisePropertyChangedEvent("SearchText");
-            }
-        }
-
-        public ICommand Search { get; private set; }
-    }
-
-    public class MarketViewModel : WorkspaceViewModel
-    {
-        public MarketViewModel(State state, IEnumerable<EntityViewModel> entities, Action resetCallback)
-            : base(state)
-        {
-            Entities = new ObservableCollection<EntityViewModel>(entities);
-            Reset = new DelegateCommand(param => resetCallback());
-        }
-
-        private string filterText;
-        public string FilterText
-        {
-            get { return filterText; }
-            set
-            {
-                filterText = value;
-                RaisePropertyChangedEvent("FilterText");
-                RaisePropertyChangedEvent("EntitiesView");
-            }
-        }
-
-        private ObservableCollection<EntityViewModel> entities;
-        public ObservableCollection<EntityViewModel> Entities
-        {
-            get { return entities; }
-            set
-            {
-                entities = value;
-                RaisePropertyChangedEvent("Entities");
-                RaisePropertyChangedEvent("EntitiesView");
-            }
-        }
-
-        public ICollectionView EntitiesView
-        {
-            get
-            {
-                ICollectionView view = CollectionViewSource.GetDefaultView(Entities);
-                if (String.IsNullOrWhiteSpace(FilterText))
-                    view.Filter = null;
-                else
-                    view.Filter = Filter;    
-                return view;
-            }
-        }
-
-        private bool Filter(object parameter)
-        {
-            if (String.IsNullOrWhiteSpace(FilterText))
-                return true;
-
-            string text = FilterText.ToLower();
-            EntityViewModel item = (EntityViewModel) parameter;
-
-            if (item.Entity.Name.ToLower().Contains(text))
-                return true;
-
-            IEntity entity = item.Entity;
-
-            if (entity is Artist)
-            {
-                Artist artist = (Artist) entity;
-                return PerformFilter(text, 
-                                     artist.Type.ToString(), 
-                                     string.Join(" ", artist.Tags.Select(t => t.Name)),
-                                     artist.Score.ToString());
-            }
-
-            return false;
-        }
-
-        private static bool PerformFilter(string text, params string[] properties)
-        {
-            return properties.Any(s => s.ToLower().Contains(text));
-        }
-
-        public ICommand Reset { get; private set; }
-
-    }
-
-    public class CartViewModel : ViewModelBase, IDropTarget
-    {
-        public void DragOver(IDropInfo dropInfo)
-        {
-            if (dropInfo.Data is EntityViewModel)
-            {
-                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
-                dropInfo.Effects = DragDropEffects.Move;
-            }
-            else
-            {
-                dropInfo.Effects = DragDropEffects.None;
-            }            
-        }
-
-        public void Drop(IDropInfo dropInfo)
-        {
-            EntityItem = (EntityViewModel)dropInfo.Data;
-        }
-
-
-        private Action<EntityViewModel> loadSubEntities;
-        public CartViewModel(Action<EntityViewModel> entityChangedCallback)
-        {
-            loadSubEntities = entityChangedCallback;
-            PropertyChanged += OnPropertyChangedDispatcher;
-            Collection = new ObservableCollection<EntityViewModel>();
-        }
-
-        private void OnPropertyChangedDispatcher(object sender, PropertyChangedEventArgs eventArgs)
-        {
-            if (eventArgs.PropertyName == "EntityItem")
-            {
-                FillCollection(Collection, EntityItem);
-                loadSubEntities(EntityItem);
-                return;
-            }
-        }
-
-        private void FillCollection(ObservableCollection<EntityViewModel> list , EntityViewModel selectedViewModel)
-        {
-            list.Clear();
-            IEntity currentEntity = selectedViewModel.Entity;
-
-            if (currentEntity is Artist)
-            {
-                Artist item = (Artist) currentEntity;
-                list.Add(new EntityViewModel(item));
-            }
-
-            if (currentEntity is ReleaseGroup)
-            {
-                ReleaseGroup item = (ReleaseGroup) currentEntity;
-                list.Add(new EntityViewModel(item.Artist));
-                list.Add(new EntityViewModel(item));
-            }
-
-            if (currentEntity is Release)
-            {
-                Release item = (Release) currentEntity;
-                list.Add(new EntityViewModel(item.ReleaseGroup.Artist));
-                list.Add(new EntityViewModel(item.ReleaseGroup));
-                list.Add(new EntityViewModel(item));
-            
-            }
-        }
-
-        private ObservableCollection<EntityViewModel> collection;
-        public ObservableCollection<EntityViewModel> Collection
-        {
-            get { return collection; }
-            set
-            {
-                collection = value;
-                RaisePropertyChangedEvent("Collection");
-            }
-        }
-
-        private EntityViewModel entity;
-        internal EntityViewModel EntityItem
-        {
-            private get { return entity; }
-            set
-            {
-                entity = value;
-                RaisePropertyChangedEvent("EntityItem");
             }
         }
     }
