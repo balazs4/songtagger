@@ -62,7 +62,10 @@ namespace SongTagger.UI.Wpf
             PropertyChanged += OnPropertyChangedDispatcher;
             provider = dataProvider;
 
-            Reset();
+            //Reset();
+            Workspace = new SearchViewmodel(SearchArtistAsync);
+            Cart = null;
+
             WindowTitle = GetType().Namespace.Split('.').FirstOrDefault();
         }
 
@@ -73,8 +76,14 @@ namespace SongTagger.UI.Wpf
 
         protected void Reset()
         {
-            Workspace = new SearchViewmodel(SearchArtistAsync);
-            Cart = null;
+            if (Cart == null || Cart.Collection.Count <= 1)
+            {
+                Workspace = new SearchViewmodel(SearchArtistAsync);
+                Cart = null;
+                return;
+            }
+            Cart.Collection.Remove(Cart.Collection.Last());
+            Cart.EntityItem = Cart.Collection.LastOrDefault();
         }
 
         private void CreateAndStartQueryTask<T>(Func<T> action, State nextWorkspaceState)

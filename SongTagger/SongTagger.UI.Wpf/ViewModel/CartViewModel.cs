@@ -88,7 +88,7 @@ namespace SongTagger.UI.Wpf
         private EntityViewModel entity;
         internal EntityViewModel EntityItem
         {
-            private get { return entity; }
+            get { return entity; }
             set
             {
                 entity = value;
