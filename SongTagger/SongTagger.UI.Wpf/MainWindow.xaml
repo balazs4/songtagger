@@ -7,14 +7,17 @@
         xmlns:gong="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
         xmlns:songtagger="clr-namespace:SongTagger.Core;assembly=SongTagger.Core"
         xmlns:metroControls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:metroNativeControls="clr-namespace:MahApps.Metro.Behaviours;assembly=MahApps.Metro"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=viewModel:MainWindowViewModelDesignData}"
         Title="{Binding WindowTitle}" Height="650" Width="850" ResizeMode="NoResize"
+        
         >
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="View/DataTemplates.xaml" />
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -36,7 +39,7 @@
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="9*"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Name="logoAndcart">
+            <Grid Grid.Column="0" Name="logoAndcart" KeyboardNavigation.IsTabStop="True">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="9*"/>
@@ -46,7 +49,7 @@
                                                         NonVisibleTemplate="{StaticResource nonVisibleTemplate}"
                                                         DefaultDataTemplate="{StaticResource defaultCartTemplate}"/>
                 </Grid.Resources>
-                <Image Grid.Row="0"  Source="View/Images/logo.png" Width="64" />
+                <Image Grid.Row="0" Source="View/Images/logo.png" Width="64" />
                 <ContentControl Grid.Row="1" Margin="15,16,15,14"
                                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                 ContentTemplateSelector="{StaticResource cartTemplateSelector}"
@@ -54,9 +57,10 @@
                                 AllowDrop="True"
                                 gong:DragDrop.IsDropTarget="True"
                                 gong:DragDrop.DropHandler="{Binding Cart}"
+                                gong:DragDrop.DragAdornerTemplate="{StaticResource entityTemplate}"
                                 />
             </Grid>
-            <Grid Grid.Column="1" Name="workspace">
+            <Grid Grid.Column="1" Name="workspace" KeyboardNavigation.IsTabStop="False" FocusManager.IsFocusScope="False">
                 <Grid.Resources>
                     <viewModel:WorkspaceDataTemplateSelector x:Key="workspaceSelector"
                                                              SearchArtistDataTemplate="{StaticResource searchDataTemplate}"
@@ -80,8 +84,8 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-            <Grid Height="200" VerticalAlignment="Center" Margin="25">
-                <Border Background="White" Opacity="0.90" 
+            <Grid Height="200" VerticalAlignment="Top" Margin="25">
+                <Border Background="White" Opacity="0.98" 
                         BorderThickness="2" BorderBrush="Gray"/>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -102,8 +106,12 @@
                     <TextBlock Text="{Binding Error.Title}" Grid.Row="0" Grid.Column="1"
                                FontSize="24" FontWeight="Bold"
                                Margin="0,10,0,0"/>
-                    <TextBlock Text="{Binding Error.Exception.Message}" Grid.Row="1" Grid.Column="1"
-                               FontSize="18" Margin="5,0,0,0"/>
+                    <StackPanel Grid.Row="1" Grid.Column="1">
+                        <TextBlock Text="{Binding Error.Exception.Message}" FontSize="18" Margin="5,0,0,0"/>
+                        <Expander Header="Details" Opacity=".6" FontSize="9"
+                                  Content="{Binding Error.Exception.StackTrace}" 
+                                  IsExpanded="False"/>
+                    </StackPanel>
                     <ItemsControl ItemsSource="{Binding Error.Actions}" Grid.Row="2" Grid.Column="1"
                                   HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10,10,50,10">
                         <ItemsControl.ItemTemplate>

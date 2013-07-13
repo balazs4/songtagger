@@ -25,7 +25,7 @@ namespace SongTagger.UI.Wpf
             : base(DesignDataProvider.Instance)
         {
             WindowTitle = "Design data";
-            InitDesignData(CartInit, ArtistMarket);
+            InitDesignData(CartInit, ReleaseMarket);
         }
 
         private void InitDesignData(params Action[] initActions)
@@ -44,10 +44,28 @@ namespace SongTagger.UI.Wpf
                 );
         }
 
+        private void ReleaseGroupMarket()
+        {
+            Cart.EntityItem = new EntityViewModel(DesignDataProvider.RiseAgainst);
+            Workspace = new MarketViewModel(State.SelectReleaseGroup,
+               provider.BrowseReleaseGroups(DesignDataProvider.RiseAgainst).Select(e => new EntityViewModel(e)),
+               Reset
+               );
+        }
+
+        private void ReleaseMarket()
+        {
+            Cart.EntityItem = new EntityViewModel(DesignDataProvider.AppealToReason);
+            Workspace = new MarketViewModel(State.SelectRelease,
+               provider.BrowseReleases(DesignDataProvider.AppealToReason).Select(e => new EntityViewModel(e)),
+               Reset
+               );
+        }
+
+
         private void CartInit()
         {
-            Cart = new CartViewModel(LoadEntitiesAsync);
-            Cart.EntityItem = new EntityViewModel(DesignDataProvider.AppealToReasonRelease);
+            Cart = new CartViewModel(LoadEntitiesAsync);  
         }
 
         private void ErrorMessage()
@@ -144,7 +162,10 @@ namespace SongTagger.UI.Wpf
         {
             return new[]
                 {
-                    AppealToReason
+                    AppealToReason, AppealToReason,
+                    new ReleaseGroup(RiseAgainst) {Name = "One single", PrimaryType = ReleaseGroupType.Single},
+                    new ReleaseGroup(RiseAgainst) {Name = "EP (maxi)", PrimaryType = ReleaseGroupType.EP},
+                    new ReleaseGroup(RiseAgainst) {Name = "Another single", PrimaryType = ReleaseGroupType.Single},
                 };
         }
 
@@ -152,7 +173,9 @@ namespace SongTagger.UI.Wpf
         {
             return new[]
                 {
-                    AppealToReasonRelease
+                    AppealToReasonRelease,
+                    new Release(AppealToReason) {Country = "UK", Name = "Foobar", Status = "Unreleased"},
+                    new Release(AppealToReason) {Country = "HU", Name = "Another release", Status = "Official"} 
                 };
         }
 

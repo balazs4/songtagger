@@ -45,12 +45,13 @@ namespace SongTagger.UI.Wpf
         [Description("Select a release")]
         SelectRelease,
 
-        [Description("Maptracks with mp3s")]
+        [Description("Map tracks")]
         MapTracks
     }
 
     public class MainWindowViewModel : ViewModelBase
     {
+        private static object lockObject = new object();
         protected readonly IProvider provider;
 
         public MainWindowViewModel(IProvider dataProvider)
@@ -62,7 +63,6 @@ namespace SongTagger.UI.Wpf
             provider = dataProvider;
 
             Reset();
-
             WindowTitle = GetType().Namespace.Split('.').FirstOrDefault();
         }
 
@@ -77,36 +77,28 @@ namespace SongTagger.UI.Wpf
             Cart = null;
         }
 
-        private static void CreateAndStartTask<T>(Func<T> action, Action<Task<T>> done, Action<Task<T>> error)
+        private void CreateAndStartQueryTask<T>(Func<T> action, State nextWorkspaceState)
+            where T : IEnumerable<IEntity>
         {
-            Task<T> task = Task<T>.Factory.StartNew(action);
-            task.ContinueWith(error, TaskContinuationOptions.OnlyOnFaulted);
-            task.ContinueWith(done, TaskContinuationOptions.OnlyOnRanToCompletion);
-        }
 
-        
-
-
-        private void SearchArtistAsync(string searchText)
-        {
-            CreateAndStartTask(
-                () =>
+            Action<Task<T>> doneTask = task1 =>
                 {
-                    Workspace.IsQueryRunning = true;
-                    return provider.SearchArtist(searchText);
-                },
-                action =>
-                {
-                    Workspace = new MarketViewModel(State.SelectArtist, action.Result.Select(a => new EntityViewModel(a)), Reset);
-                    Cart = new CartViewModel(LoadEntitiesAsync);
-                },
-                action =>
+                    Workspace = new MarketViewModel(nextWorkspaceState, task1.Result.Select(a => new EntityViewModel(a)), Reset);
+                    if (Cart == null)
+                        Cart = new CartViewModel(LoadEntitiesAsync);
+                };
+
+            Action<Task<T>> errorTask = task1 =>
                 {
                     Workspace.IsQueryRunning = false;
-                    //TODO: get the first not AggregateException
-                    ShowErrorMessage(action.Exception.InnerException);
-                }
-                );
+                    ShowErrorMessage(task1.Exception.InnerException);
+                };
+
+            Workspace.IsQueryRunning = true;
+
+            Task<T> task = Task<T>.Factory.StartNew(action);
+            task.ContinueWith(errorTask, TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith(doneTask, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         protected void LoadEntitiesAsync(EntityViewModel entityViewModel)
@@ -118,40 +110,26 @@ namespace SongTagger.UI.Wpf
 
             if (sourceEntity is Artist)
             {
-                LoadReleaseGroupsAsync((Artist) sourceEntity);
+                CreateAndStartQueryTask(() => provider.BrowseReleaseGroups((Artist)sourceEntity), State.SelectReleaseGroup);
                 return;
             }
 
             if (sourceEntity is ReleaseGroup)
             {
+                CreateAndStartQueryTask(() => provider.BrowseReleases((ReleaseGroup)sourceEntity), State.SelectRelease);
                 return;
             }
 
             if (sourceEntity is Release)
             {
+                CreateAndStartQueryTask(() => provider.LookupTracks((Release)sourceEntity), State.MapTracks);
                 return;
             }
         }
 
-        private void LoadReleaseGroupsAsync(Artist artist)
+        private void SearchArtistAsync(string searchText)
         {
-            CreateAndStartTask(
-                () =>
-            {
-                Workspace.IsQueryRunning = true;
-                return provider.BrowseReleaseGroups(artist);
-            },
-            action =>
-            {
-                Workspace = new MarketViewModel(State.SelectReleaseGroup, action.Result.Select(a => new EntityViewModel(a)), Reset);
-            },
-            action =>
-            {
-                Workspace.IsQueryRunning = false;
-                ShowErrorMessage(action.Exception.InnerException);
-            }
-            );
-            
+            CreateAndStartQueryTask(() => provider.SearchArtist(searchText), State.SelectArtist);
         }
 
         private string windowTitle;
@@ -217,10 +195,10 @@ namespace SongTagger.UI.Wpf
         #region Colors
         private static Dictionary<Type, Color> colors = new Dictionary<Type, Color>
             {
-                {typeof(Artist), Color.LightGreen},
+                {typeof(Artist), Color.CornflowerBlue},
                 {typeof(ReleaseGroup), Color.Orange},
-                {typeof(Release), Color.Red},
-                {typeof(Track), Color.LightBlue}
+                {typeof(Release), Color.Gray},
+                {typeof(Track), Color.MediumPurple}
             };
 
         private static Color fallBackColor = Color.Purple;

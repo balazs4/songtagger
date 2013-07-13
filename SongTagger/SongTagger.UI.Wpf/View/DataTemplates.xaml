@@ -14,52 +14,6 @@
     <viewModel:IsNullConverter x:Key="NullChecker"/>
 
 
-    <!-- #Region Cart  -->
-    <DataTemplate x:Key="nonVisibleTemplate"/>
-    <DataTemplate x:Key="defaultCartTemplate" DataType="{x:Type viewModel:CartViewModel}">
-        <Border BorderThickness=".3" BorderBrush="DarkGray">
-            <ItemsControl ItemsSource="{Binding Collection}" Background="Transparent" 
-                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type viewModel:EntityViewModel}">
-                        <DockPanel LastChildFill="True" Height="40">
-                            <Rectangle DockPanel.Dock="Left" 
-                                               Fill="{Binding EntityColor, Converter={StaticResource ColorConvert}}" 
-                                               Width="10" Margin="2,5,0,0"/>
-                            <TextBlock Text="{Binding Entity.Name}" 
-                                                   ToolTip="{Binding Entity.Name}"
-                                                   FontSize="12"
-                                                   VerticalAlignment="Center"
-                                                   Margin="2,0,0,0"/>
-                        </DockPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.Style>
-                    <Style TargetType="ItemsControl">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Collection.Count}" Value="0">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate>
-                                            <Grid Background="Transparent">
-                                                <Rectangle Stroke="Gray" StrokeDashArray="3 3"/>
-                                                <Grid Margin="5 5 5 5">
-                                                    <Image Source="Images/cart.png" Width="64" Opacity=".4"/>
-                                                    <TextBlock Text="Drag an item here" Width="Auto" Height="Auto" Foreground="Gray" FontSize="14" Padding="5,5,5,5" Margin="0,0,0,100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Grid>
-                                            </Grid>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ItemsControl.Style>
-            </ItemsControl>
-        </Border>
-    </DataTemplate>
-    <!-- #EndRegion  -->
-
 
     <!-- #Region Entity -->
     <DataTemplate x:Key="artistEntityTemplate" DataType="{x:Type songtagger:Artist}">
@@ -107,10 +61,95 @@
         </Grid>
     </DataTemplate>
 
+    <DataTemplate x:Key="releaseGroupEntityTemplate" DataType="{x:Type songtagger:ReleaseGroup}">
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Grid.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="DarkGray"/>
+                    <Setter Property="FontSize" Value="14"/>
+                </Style>
+            </Grid.Resources>
+            <TextBlock Text="{Binding PrimaryType}" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                       Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"/>
+            <TextBlock Text="{Binding FirstReleaseDate.Year}" 
+                       HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,0"
+                       Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
+                <TextBlock.Resources>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding FirstReleaseDate.Year}" Value="1">
+                                <Setter Property="Opacity" Value="0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Resources>
+            </TextBlock>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="releaseEntityTemplate" DataType="{x:Type songtagger:Release}">
+        <Grid Height="50" ShowGridLines="False">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Image Source="Images/disc.png" Width="50" Opacity=".45" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <Image Source="{Binding CoverArt}" MaxWidth="50" VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Style.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:1.0" From="0.0" To="1.0"  />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="ImageFailed">
+                                </EventTrigger>
+                                <Trigger Property="IsVisible" Value="True">
+                                    <Setter Property="ToolTip">
+                                        <Setter.Value>
+                                            <Image Source="{Binding CoverArt}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+            </Grid>
+            <StackPanel Grid.Column="1"  VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                <StackPanel.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Foreground" Value="LightGray"/>
+                    </Style>
+                </StackPanel.Resources>
+                <TextBlock Text="{Binding Status}"/>
+                <TextBlock Text="{Binding Country}" TextAlignment="Right"/>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+
     <DataTemplate x:Key="entityTemplate" DataType="{x:Type viewModel:EntityViewModel}">
         <DataTemplate.Resources>
             <viewModel:EntityDataTemplateSelector x:Key="entitySelector"
-                                                ArtistDataTemplate="{StaticResource artistEntityTemplate}"/>
+                                                  ArtistDataTemplate="{StaticResource artistEntityTemplate}"
+                                                  ReleaseGroupDataTemplate="{StaticResource releaseGroupEntityTemplate}"
+                                                  ReleaseDataTemplate="{StaticResource releaseEntityTemplate}"
+                                                  />
             <viewModel:StringPaddingConverter x:Key="PaddingConverter" MaxTextLengthIncPaddingString="18"/>
         </DataTemplate.Resources>
         <DockPanel LastChildFill="True" Width="200" Height="80">
@@ -125,7 +164,6 @@
         </DockPanel>
     </DataTemplate>
     <!-- #EndRegion  -->
-
 
     <!-- #Region Workspace -->
     <DataTemplate x:Key="searchDataTemplate" DataType="{x:Type viewModel:SearchViewmodel}">
@@ -147,7 +185,7 @@
             </StackPanel.Resources>
             <TextBlock Text="{Binding Header}" FontSize="48"/>
             <Grid>
-                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" BorderBrush="DarkGray" BorderThickness="1"
                                          IsEnabled="{Binding IsQueryRunning, Converter={StaticResource BoolInverter}}"
                                          FontSize="22" TextAlignment="Center" TextWrapping="Wrap" Padding="0,0,32,0">
                     <TextBox.InputBindings>
@@ -182,13 +220,13 @@
                 </Button>
                 <StackPanel Grid.Row="0" Margin="0,0,20,0" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <TextBlock Text="{Binding Header}" FontSize="48" />
-                    <Grid Width="150" HorizontalAlignment="Right" Opacity=".5">
-                        <TextBlock Text="Filter..." FontSize="12" Margin="10,2,0,0" TextAlignment="Left" 
+                    <Grid Width="150" HorizontalAlignment="Right" Opacity=".5" Margin="0,5,0,0">
+                        <TextBlock Text="Filter..." FontSize="12" Margin="10,1,0,0" TextAlignment="Left" 
                                                    FontStyle="Italic" Foreground="Gray"
                                                    Visibility="{Binding ElementName=filter, Path=Text.IsEmpty, 
                                                                 Converter={StaticResource Bool2Visibility}}"/>
                         <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" Name="filter"
-                                             Background="Transparent" BorderThickness="1" BorderBrush="Gray" FontSize="14"/>
+                                             Background="Transparent" BorderThickness="1" BorderBrush="Gray" FontSize="12"/>
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -220,9 +258,7 @@
                                                 <Setter Property="Background" Value="LightGray" />
                                             </MultiTrigger>
                                             <Trigger Property="IsSelected" Value="True">
-                                                <Setter Property="Background" 
-                                                                Value="LightSteelBlue"
-                                                                />
+                                                <Setter Property="Background" Value="LightSteelBlue"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -283,5 +319,51 @@
         </Grid>
     </DataTemplate>
     <!-- #EndRegion -->
+
+    <!-- #Region Cart  -->
+    <DataTemplate x:Key="nonVisibleTemplate"/>
+    <DataTemplate x:Key="defaultCartTemplate" DataType="{x:Type viewModel:CartViewModel}">
+        <Border BorderThickness=".3" BorderBrush="DarkGray">
+            <ItemsControl ItemsSource="{Binding Collection}" Background="Transparent" 
+                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewModel:EntityViewModel}">
+                        <DockPanel LastChildFill="True" Height="40">
+                            <Rectangle DockPanel.Dock="Left" 
+                                               Fill="{Binding EntityColor, Converter={StaticResource ColorConvert}}" 
+                                               Width="10" Margin="2,5,0,0"/>
+                            <TextBlock Text="{Binding Entity.Name}" 
+                                                   ToolTip="{Binding Entity.Name}"
+                                                   FontSize="12"
+                                                   VerticalAlignment="Center"
+                                                   Margin="2,0,0,0"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.Style>
+                    <Style TargetType="ItemsControl">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Collection.Count}" Value="0">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Grid Background="Transparent">
+                                                <Rectangle Stroke="Gray" StrokeDashArray="3 3" Opacity=".3"/>
+                                                <Grid Margin="5 5 5 5">
+                                                    <Image Source="Images/cart.png" Width="64" Opacity=".4"/>
+                                                    <TextBlock Text="Drag an item here" Width="Auto" Height="Auto" Foreground="Gray" FontSize="14" Padding="5,5,5,5" Margin="0,0,0,100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ItemsControl.Style>
+            </ItemsControl>
+        </Border>
+    </DataTemplate>
+    <!-- #EndRegion  -->
 
 </ResourceDictionary>
