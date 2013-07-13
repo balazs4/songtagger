@@ -104,21 +104,26 @@ namespace SongTagger.UI.Wpf
             set
             {
                 entities = value;
-                RaisePropertyChangedEvent("Entities");
+                //RaisePropertyChangedEvent("Entities");
                 RaisePropertyChangedEvent("EntitiesView");
             }
         }
 
+
+        private ICollectionView entitiesView;
         public ICollectionView EntitiesView
         {
             get
             {
-                ICollectionView view = CollectionViewSource.GetDefaultView(Entities);
+                if (entitiesView == null)
+                    entitiesView = CollectionViewSource.GetDefaultView(Entities);
+
                 if (String.IsNullOrWhiteSpace(FilterText))
-                    view.Filter = null;
+                    entitiesView.Filter = null;
                 else
-                    view.Filter = Filter;
-                return view;
+                    entitiesView.Filter = Filter;
+
+                return entitiesView;
             }
         }
 
@@ -142,6 +147,12 @@ namespace SongTagger.UI.Wpf
                                      artist.Type.ToString(),
                                      string.Join(" ", artist.Tags.Select(t => t.Name)),
                                      artist.Score.ToString());
+            }
+
+            if (entity is ReleaseGroup)
+            {
+                ReleaseGroup group = (ReleaseGroup)entity;
+                return PerformFilter(text,group.PrimaryType.ToString(), group.FirstReleaseDate.Year.ToString());
             }
 
             return false;

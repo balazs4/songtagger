@@ -4,6 +4,9 @@
                     xmlns:gong="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
                     xmlns:songtagger="clr-namespace:SongTagger.Core;assembly=SongTagger.Core"
                     xmlns:metroControls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ScrollViewer.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
 
     <BooleanToVisibilityConverter x:Key="Bool2Visibility"/>
     <viewModel:BooleanInverter x:Key="BoolInverter"/>
@@ -92,9 +95,7 @@
             <ItemsControl  ItemsSource="{Binding Tags}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name}" 
-                                                           FontSize="12" Foreground="Gray"
-                                                           Margin="1,0,1,0"/>
+                        <TextBlock Text="{Binding Name}" FontSize="12" Foreground="Gray" Margin="1,0,1,0"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>
@@ -113,9 +114,7 @@
             <viewModel:StringPaddingConverter x:Key="PaddingConverter" MaxTextLengthIncPaddingString="18"/>
         </DataTemplate.Resources>
         <DockPanel LastChildFill="True" Width="200" Height="80">
-            <Rectangle DockPanel.Dock="Left" 
-                                               Fill="{Binding EntityColor, Converter={StaticResource ColorConvert}}" 
-                                               Width="10" Margin="2,5,0,0"/>
+            <Rectangle DockPanel.Dock="Left" Fill="{Binding EntityColor, Converter={StaticResource ColorConvert}}" Width="10" Margin="2,5,0,0"/>
             <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,0">
                 <TextBlock Text="{Binding Entity.Name, Converter={StaticResource PaddingConverter}}" 
                                                ToolTip="{Binding Entity.Name}"
@@ -194,7 +193,8 @@
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="1" Name="content">
-                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                         ScrollViewer.VerticalScrollBarVisibility="Visible"
                                      BorderThickness="0"
                                      ItemsSource="{Binding EntitiesView}"
                                      ItemTemplate="{StaticResource entityTemplate}"
