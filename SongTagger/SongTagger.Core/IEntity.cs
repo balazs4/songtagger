@@ -127,6 +127,14 @@ namespace SongTagger.Core
         [XmlElement("country")]
         public string Country { get; set; }
 
+        private Uri coverArt;
+        [XmlIgnore]
+        public Uri CoverArt
+        {
+            get { return coverArt ?? (coverArt = this.GetCoverArt()); }
+        }
+
+        [XmlIgnore]
         public ReleaseGroup ReleaseGroup { get; internal set; }
 
         public Release()
@@ -157,12 +165,14 @@ namespace SongTagger.Core
         [XmlAttribute("id")]
         public Guid Id{ get; set; }
 
+        [XmlIgnore]
         public string Name 
         { 
             get { return Record.Name; }
             set { Record.Name = value;}
         }
 
+        [XmlIgnore]
         public TimeSpan Length 
         { 
             get { return TimeSpan.FromMilliseconds(Record.Length); } 
@@ -175,6 +185,7 @@ namespace SongTagger.Core
         [XmlElement("number")]
         public int Number { get; set; }
 
+        [XmlIgnore]
         public Release Release { get; internal set; }
 
 

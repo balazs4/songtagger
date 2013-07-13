@@ -116,7 +116,9 @@ namespace SongTagger.UI.Wpf
             get
             {
                 if (entitiesView == null)
+                {
                     entitiesView = CollectionViewSource.GetDefaultView(Entities);
+                }
 
                 if (String.IsNullOrWhiteSpace(FilterText))
                     entitiesView.Filter = null;
@@ -162,6 +164,7 @@ namespace SongTagger.UI.Wpf
         {
             return properties.Any(s => s.ToLower().Contains(text));
         }
+
 
         public ICommand Reset { get; private set; }
 

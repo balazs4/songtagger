@@ -24,13 +24,19 @@ namespace SongTagger.UI.Wpf
     public class EntityDataTemplateSelector : DataTemplateSelector
     {
         public DataTemplate ArtistDataTemplate { get; set; }
-
+        public DataTemplate ReleaseGroupDataTemplate { get; set; }
+        public DataTemplate ReleaseDataTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             if (item is Artist)
                 return ArtistDataTemplate;
 
+            if (item is ReleaseGroup)
+                return ReleaseGroupDataTemplate;
+
+            if (item is Release)
+                return ReleaseDataTemplate;
 
             return base.SelectTemplate(item, container);
         }

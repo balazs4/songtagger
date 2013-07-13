@@ -63,7 +63,7 @@ namespace SongTagger.Core.Service
             CheckArgument<Artist>(artist);
             Action<ReleaseGroup> postProcess = (item) => item.Artist = artist;
             return Query<ReleaseGroup>(artist.Browse<ReleaseGroup>(), postProcess)
-                .OrderBy(rg => rg.FirstReleaseDate.Year);
+                .OrderByDescending(rg => rg.FirstReleaseDate.Year);
         }
 
         public IEnumerable<Release> BrowseReleases(ReleaseGroup releaseGroup)
