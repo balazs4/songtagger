@@ -89,5 +89,17 @@ namespace SongTagger.UI.Wpf
         }
     }
 
+    public class TimeSpanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            TimeSpan span = value is TimeSpan ? (TimeSpan) value : new TimeSpan();
+            return string.Format("{0:D2}:{1:D2}", span.Minutes, span.Seconds);
+        }
 
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using SongTagger.Core;
@@ -25,7 +26,7 @@ namespace SongTagger.UI.Wpf
             : base(DesignDataProvider.Instance)
         {
             WindowTitle = "Design data";
-            InitDesignData(CartInit, ReleaseMarket);
+            InitDesignData(CartInit, Tracks);
         }
 
         private void InitDesignData(params Action[] initActions)
@@ -62,6 +63,13 @@ namespace SongTagger.UI.Wpf
                );
         }
 
+        private void Tracks()
+        {
+            Cart.EntityItem = new EntityViewModel(DesignDataProvider.AppealToReasonRelease);
+            Workspace = new MapViewModel(provider.LookupTracks(DesignDataProvider.AppealToReasonRelease).Select(e => new MapEntityViewModel(e) {File = new FileInfo(Path.GetTempFileName())}),
+              Reset
+              );
+        }
 
         private void CartInit()
         {
@@ -183,7 +191,9 @@ namespace SongTagger.UI.Wpf
         {
             return new[]
                 {
-                    new Track(AppealToReasonRelease) {Name = "Savior", Number = 11, Posititon = 11, Length = TimeSpan.FromSeconds(123456)}, 
+                    new Track(AppealToReasonRelease) {Name = "Savior", Number = 11, Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
+                    new Track(AppealToReasonRelease) {Name = "Savior", Number = 11, Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
+                    new Track(AppealToReasonRelease) {Name = "Savior", Number = 11, Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
                 };
         }
     }

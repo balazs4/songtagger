@@ -64,7 +64,9 @@
                 <Grid.Resources>
                     <viewModel:WorkspaceDataTemplateSelector x:Key="workspaceSelector"
                                                              SearchArtistDataTemplate="{StaticResource searchDataTemplate}"
-                                                             MarketDataTemplate="{StaticResource marketDataTemplate}"/>
+                                                             MarketDataTemplate="{StaticResource marketDataTemplate}"
+                                                             MapDataTemplate="{StaticResource mapDataTemplate}"
+                                                             />
                 </Grid.Resources>
                 <ContentControl Content="{Binding Workspace}"
                                 ContentTemplateSelector="{StaticResource workspaceSelector}"/>

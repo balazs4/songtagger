@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml.Linq;
 using System.Net;
 using System.Threading;
@@ -76,6 +77,11 @@ namespace SongTagger.Core.Service
                 lastFinishedDownload = DateTime.Now;
                 return content;
             }
+        }
+
+        public static string DownloadData(Uri url, DirectoryInfo target)
+        {
+            throw new NotImplementedException();
         }
     }
 }

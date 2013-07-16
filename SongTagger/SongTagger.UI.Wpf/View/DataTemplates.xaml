@@ -12,7 +12,7 @@
     <viewModel:BooleanInverter x:Key="BoolInverter"/>
     <viewModel:ColorToBrushConverter x:Key="ColorConvert"/>
     <viewModel:IsNullConverter x:Key="NullChecker"/>
-
+    <viewModel:TimeSpanConverter x:Key="TimeSpanConvert"/>
 
 
     <!-- #Region Entity -->
@@ -116,8 +116,6 @@
                                         </BeginStoryboard>
                                     </EventTrigger.Actions>
                                 </EventTrigger>
-                                <EventTrigger RoutedEvent="ImageFailed">
-                                </EventTrigger>
                                 <Trigger Property="IsVisible" Value="True">
                                     <Setter Property="ToolTip">
                                         <Setter.Value>
@@ -162,7 +160,59 @@
                                         ContentTemplateSelector="{StaticResource entitySelector}"/>
             </StackPanel>
         </DockPanel>
+
     </DataTemplate>
+
+    <DataTemplate x:Key="mapEntityTemplate" DataType="{x:Type viewModel:MapEntityViewModel}">
+        <Expander Header="{Binding Track}"  HorizontalContentAlignment="Stretch"
+                  Background="Transparent" IsExpanded="True" Margin="0,0,0,4">
+            <Expander.HeaderTemplate>
+                <DataTemplate DataType="{x:Type songtagger:Track}">
+                    <Border Background="LightGray" HorizontalAlignment="Center">
+                        <Grid >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontSize" Value="18"/>
+                                </Style>
+                            </Grid.Resources>
+                            <TextBlock Text="{Binding Posititon}" Grid.Column="0" Margin="0,0,20,0"/>
+                            <TextBlock Text="{Binding Name}" Grid.Column="1"/>
+                            <TextBlock Text="{Binding Length, Converter={StaticResource TimeSpanConvert}}" 
+                                       Grid.Column="2" Margin="50,0,0,0"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </Expander.HeaderTemplate>
+            <Grid Background="WhiteSmoke"
+                  AllowDrop="True"
+                   gong:DragDrop.IsDropTarget="True"
+                   gong:DragDrop.DropHandler="{Binding}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding File.Name}" ToolTip="{Binding File}" 
+                           Grid.Column="0" Margin="50,0,0,0" FontSize="14"
+                           HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" Grid.Column="1" 
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Button Command="{Binding EjectFile}">
+                        <Button.ContentTemplate>
+                            <DataTemplate>
+                                <Image Source="Images/eject.png" Width="18"/>
+                            </DataTemplate>
+                        </Button.ContentTemplate>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Expander>
+    </DataTemplate>
+
     <!-- #EndRegion  -->
 
     <!-- #Region Workspace -->
@@ -318,6 +368,47 @@
             </Grid>
         </Grid>
     </DataTemplate>
+
+    <DataTemplate x:Key="mapDataTemplate" DataType="{x:Type viewModel:MapViewModel}">
+        <Grid>
+            <!--
+            <Grid.Background>
+                <ImageBrush ImageSource="{Binding Release.CoverArt}"/>
+            </Grid.Background>
+            -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="9*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Name="header" Background="Transparent">
+                <Button HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Reset}">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Image Source="Images/back.png" Width="50" Height="50"/>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <StackPanel Grid.Row="0" Margin="0,0,20,0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Artist.Name}"/>
+                    <TextBlock Text="{Binding Release.Name}"/>
+                    <TextBlock Text="{Binding ReleaseGroup.PrimaryType}"/>
+                    <TextBlock Text="{Binding ReleaseGroup.FirstReleaseDate.Year}"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1" Name="content"  Background="Transparent" >
+                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                         ScrollViewer.VerticalScrollBarVisibility="Visible"
+                         HorizontalContentAlignment="Stretch"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         ItemsSource="{Binding Entities}"
+                         ItemTemplate="{StaticResource mapEntityTemplate}"
+                         gong:DragDrop.IsDragSource="True">
+                </ListBox>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+
     <!-- #EndRegion -->
 
     <!-- #Region Cart  -->
