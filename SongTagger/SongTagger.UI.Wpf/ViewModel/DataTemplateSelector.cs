@@ -8,6 +8,7 @@ namespace SongTagger.UI.Wpf
     {
         public DataTemplate SearchArtistDataTemplate { get; set; }
         public DataTemplate MarketDataTemplate { get; set; }
+        public DataTemplate MapDataTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -16,6 +17,9 @@ namespace SongTagger.UI.Wpf
 
             if (item is MarketViewModel)
                 return MarketDataTemplate;
+
+            if (item is MapViewModel)
+                return MapDataTemplate;
 
             return base.SelectTemplate(item, container);
         }

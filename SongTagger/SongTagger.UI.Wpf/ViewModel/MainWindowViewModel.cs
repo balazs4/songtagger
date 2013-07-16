@@ -86,10 +86,9 @@ namespace SongTagger.UI.Wpf
             Cart.EntityItem = Cart.Collection.LastOrDefault();
         }
 
-        private void CreateAndStartQueryTask<T>(Func<T> action, State nextWorkspaceState)
+        private void StartMarketQueryTask<T>(Func<T> action, State nextWorkspaceState)
             where T : IEnumerable<IEntity>
         {
-
             Action<Task<T>> doneTask = task1 =>
                 {
                     Workspace = new MarketViewModel(nextWorkspaceState, task1.Result.Select(a => new EntityViewModel(a)), Reset);
@@ -97,14 +96,20 @@ namespace SongTagger.UI.Wpf
                         Cart = new CartViewModel(LoadEntitiesAsync);
                 };
 
+            StartQueryTask(action, doneTask);
+        }
+
+        private void StartQueryTask<T>(Func<T> action, Action<Task<T>> doneTask)
+             where T : IEnumerable<IEntity>
+        {
+
             Action<Task<T>> errorTask = task1 =>
-                {
-                    Workspace.IsQueryRunning = false;
-                    ShowErrorMessage(task1.Exception.InnerException);
-                };
+            {
+                Workspace.IsQueryRunning = false;
+                ShowErrorMessage(task1.Exception.InnerException);
+            };
 
             Workspace.IsQueryRunning = true;
-
             Task<T> task = Task<T>.Factory.StartNew(action);
             task.ContinueWith(errorTask, TaskContinuationOptions.OnlyOnFaulted);
             task.ContinueWith(doneTask, TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -119,26 +124,29 @@ namespace SongTagger.UI.Wpf
 
             if (sourceEntity is Artist)
             {
-                CreateAndStartQueryTask(() => provider.BrowseReleaseGroups((Artist)sourceEntity), State.SelectReleaseGroup);
+                StartMarketQueryTask(() => provider.BrowseReleaseGroups((Artist)sourceEntity), State.SelectReleaseGroup);
                 return;
             }
 
             if (sourceEntity is ReleaseGroup)
             {
-                CreateAndStartQueryTask(() => provider.BrowseReleases((ReleaseGroup)sourceEntity), State.SelectRelease);
+                StartMarketQueryTask(() => provider.BrowseReleases((ReleaseGroup)sourceEntity), State.SelectRelease);
                 return;
             }
 
             if (sourceEntity is Release)
             {
-                CreateAndStartQueryTask(() => provider.LookupTracks((Release)sourceEntity), State.MapTracks);
+                StartQueryTask(() => provider.LookupTracks((Release)sourceEntity), task1 =>
+                    {
+                        Workspace = new MapViewModel(task1.Result.Select(a => new MapEntityViewModel(a)), Reset);
+                    });
                 return;
             }
         }
 
         private void SearchArtistAsync(string searchText)
         {
-            CreateAndStartQueryTask(() => provider.SearchArtist(searchText), State.SelectArtist);
+            StartMarketQueryTask(() => provider.SearchArtist(searchText), State.SelectArtist);
         }
 
         private string windowTitle;
@@ -254,7 +262,7 @@ namespace SongTagger.UI.Wpf
         }
 
         private IEntity entity;
-        public IEntity Entity
+        public  IEntity Entity
         {
             get { return entity; }
             set
