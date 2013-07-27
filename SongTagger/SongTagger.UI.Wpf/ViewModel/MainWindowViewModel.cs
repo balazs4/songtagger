@@ -62,7 +62,6 @@ namespace SongTagger.UI.Wpf
             PropertyChanged += OnPropertyChangedDispatcher;
             provider = dataProvider;
 
-            //Reset();
             Workspace = new SearchViewmodel(SearchArtistAsync);
             Cart = null;
 
@@ -130,7 +129,17 @@ namespace SongTagger.UI.Wpf
 
             if (sourceEntity is ReleaseGroup)
             {
-                StartMarketQueryTask(() => provider.BrowseReleases((ReleaseGroup)sourceEntity), State.SelectRelease);
+                Func<IEnumerable<Release>> action = () => provider.BrowseReleases((ReleaseGroup) sourceEntity);
+
+                Action<Task<IEnumerable<Release>>> doneTask = task1 =>
+                {
+                    Workspace = new MarketViewModel(State.SelectRelease, task1.Result.Select(a => new ReleaseEntityViewModel(a)), Reset);
+                    if (Cart == null)
+                        Cart = new CartViewModel(LoadEntitiesAsync);
+                };
+
+                StartQueryTask(action, doneTask);
+
                 return;
             }
 
@@ -262,7 +271,7 @@ namespace SongTagger.UI.Wpf
         }
 
         private IEntity entity;
-        public  IEntity Entity
+        public IEntity Entity
         {
             get { return entity; }
             set
@@ -271,5 +280,39 @@ namespace SongTagger.UI.Wpf
                 RaisePropertyChangedEvent("Entity");
             }
         }
+    }
+
+    public class ReleaseEntityViewModel : EntityViewModel
+    {
+        public ReleaseEntityViewModel(IEntity entity)
+            : base(entity)
+        {
+            PropertyChanged += OnPropertyChangedDispatcher;
+        }
+
+        private void OnPropertyChangedDispatcher(object sender, PropertyChangedEventArgs eventArgs)
+        {
+            if (eventArgs.PropertyName == "Entity")
+            {
+                RaisePropertyChangedEvent("Release");
+                return;
+            }
+
+            if (eventArgs.PropertyName == "Release")
+            {
+
+                return;
+            }
+
+        }
+
+        public Release Release
+        {
+            get { return (Release) Entity; }
+        }
+
+
+
+
     }
 }
