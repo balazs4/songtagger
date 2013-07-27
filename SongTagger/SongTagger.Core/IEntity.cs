@@ -146,29 +146,29 @@ namespace SongTagger.Core
             ReleaseGroup = group;
         }
 
-        private Uri coverArt;
+        private CoverArt coverArt;
         [XmlIgnore]
-        public Uri CoverArt
+        public CoverArt CoverArt
         {
             get { return coverArt ?? (coverArt = GetSpeculativeCoverArt(CoverArtStrategies.ToArray())); }
         }
 
-        private static Uri GetSpeculativeCoverArt(params Uri[] uriArray)
+        private static CoverArt GetSpeculativeCoverArt(params Uri[] uriArray)
         {
             CancellationTokenSource cancellation = new CancellationTokenSource();
 
-            Task<Uri>[] tasks = uriArray
-                .Select(url => Task<Uri>.Factory.StartNew(() => GetOptimisticCoverArt(url, cancellation.Token), cancellation.Token))
+            Task<CoverArt>[] tasks = uriArray
+                .Select(url => Task<CoverArt>.Factory.StartNew(() => GetOptimisticCoverArt(url, cancellation.Token), cancellation.Token))
                 .ToArray();
 
-            int index = Task<Uri>.WaitAny(tasks);
+            int index = Task<CoverArt>.WaitAny(tasks);
             cancellation.Cancel();
             return tasks[index].Result;
         }
 
-        private static Uri GetOptimisticCoverArt(Uri uri, CancellationToken token)
+        private static CoverArt GetOptimisticCoverArt(Uri uri, CancellationToken token)
         {
-            Uri url = null;
+            CoverArt cover = CoverArt.Empty;
             WebClient client = Service.ServiceClient.CreateWebClient();
             EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.AutoReset);
             client.DownloadDataCompleted += (sender, args) =>
@@ -185,9 +185,9 @@ namespace SongTagger.Core
                     return;
                 }
 
-                url = IsDataImage(args.Result)
-                    ? uri
-                    : null;
+                cover = IsDataImage(args.Result)
+                            ? new CoverArt(uri, args.Result)
+                            : CoverArt.Empty;
 
                 handle.Set();
             };
@@ -200,7 +200,7 @@ namespace SongTagger.Core
 
             client.DownloadDataAsync(uri);
             handle.WaitOne(TimeSpan.FromSeconds(10));
-            return url;
+            return cover;
         }
 
         [XmlIgnore]
@@ -327,5 +327,22 @@ namespace SongTagger.Core
         Undefined = 0,
         Group,
         Person
+    }
+
+    public class CoverArt
+    {
+        public CoverArt(Uri url, byte[] content)
+        {
+            Url = url;
+            Data = content;
+        }
+
+        public Uri Url { get; private set; }
+        public byte[] Data { get; private set; }
+
+        public static CoverArt Empty
+        {
+            get { return new CoverArt(null, null); }
+        }
     }
 }

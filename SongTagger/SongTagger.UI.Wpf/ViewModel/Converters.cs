@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace SongTagger.UI.Wpf
 {
@@ -25,7 +27,7 @@ namespace SongTagger.UI.Wpf
             System.Drawing.Color col = System.Drawing.Color.FromArgb(c.Color.A, c.Color.R, c.Color.G, c.Color.B);
             return col;
         }
-    }   
+    }
 
     public class BooleanInverter : IValueConverter
     {
@@ -93,8 +95,29 @@ namespace SongTagger.UI.Wpf
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            TimeSpan span = value is TimeSpan ? (TimeSpan) value : new TimeSpan();
+            TimeSpan span = value is TimeSpan ? (TimeSpan)value : new TimeSpan();
             return string.Format("{0:D2}:{1:D2}", span.Minutes, span.Seconds);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ByteArrayToBitmapConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return null;
+
+            BitmapImage bitmapImage = new BitmapImage();
+            MemoryStream stream = new MemoryStream((byte[])value);
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = stream;
+            bitmapImage.EndInit();
+            return bitmapImage as ImageSource;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
