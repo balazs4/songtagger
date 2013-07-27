@@ -76,9 +76,7 @@ namespace SongTagger.Core.Mp3Tag
 
         private static IPicture[] DownloadCoverArt(Track songInfo, DirectoryInfo targetDir)
         {
-            string data = Service.ServiceClient.DownloadData(songInfo.Release.GetCoverArt(), targetDir);
             throw new NotImplementedException();
-            return new IPicture[] { };
         }
     }
 }

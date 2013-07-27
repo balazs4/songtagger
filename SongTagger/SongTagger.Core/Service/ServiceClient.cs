@@ -22,11 +22,7 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Xml.Linq;
 using System.Net;
-using System.Threading;
 
 namespace SongTagger.Core.Service
 {
@@ -46,13 +42,17 @@ namespace SongTagger.Core.Service
             set {download = value;}
         }
             
+
+        internal static WebClient CreateWebClient()
+        {
+            WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
+            return new WebClient {Proxy = WebRequest.DefaultWebProxy};
+        }
+
         private static string DefaultContentDownloader(Uri url)
         {
             string content;
-
-            WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
-
-            using (WebClient client = new WebClient { Proxy = WebRequest.DefaultWebProxy })
+            using (WebClient client = CreateWebClient())
             {
                 content = client.DownloadString(url);
             }
@@ -79,9 +79,5 @@ namespace SongTagger.Core.Service
             }
         }
 
-        public static string DownloadData(Uri url, DirectoryInfo target)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

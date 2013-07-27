@@ -26,7 +26,7 @@ namespace SongTagger.UI.Wpf
             : base(DesignDataProvider.Instance)
         {
             WindowTitle = "Design data";
-            InitDesignData(CartInit, Tracks);
+            InitDesignData(CartInit, ReleaseMarket);
         }
 
         private void InitDesignData(params Action[] initActions)

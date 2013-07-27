@@ -22,7 +22,12 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.ComponentModel;
 
@@ -36,11 +41,11 @@ namespace SongTagger.Core
     }
 
     [Serializable]
-    [XmlRootAttribute("artist", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
+    [XmlRootAttribute("artist", Namespace = "http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
     public class Artist : IEntity
     {
         [XmlAttribute("id")]
-        public Guid Id{ get; set; }
+        public Guid Id { get; set; }
 
         [XmlElement("name")]
         public string Name { get; set; }
@@ -52,14 +57,14 @@ namespace SongTagger.Core
         [XmlAttribute("type")]
         public ArtistType Type { get; set; }
 
-        [XmlAttribute("score", Namespace="http://musicbrainz.org/ns/ext#-2.0")]
+        [XmlAttribute("score", Namespace = "http://musicbrainz.org/ns/ext#-2.0")]
         public int Score { get; set; }
 
         private static Artist instance;
 
         internal static IEntity Empty
         {
-            get { return instance ?? (instance = new Artist());}
+            get { return instance ?? (instance = new Artist()); }
         }
 
         public Artist()
@@ -69,11 +74,11 @@ namespace SongTagger.Core
     }
 
     [Serializable]
-    [XmlRootAttribute("release-group", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
+    [XmlRootAttribute("release-group", Namespace = "http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
     public class ReleaseGroup : IEntity
     {
         [XmlAttribute("id")]
-        public Guid Id{ get; set; }
+        public Guid Id { get; set; }
 
         [XmlElement("title")]
         public string Name { get; set; }
@@ -84,13 +89,13 @@ namespace SongTagger.Core
         [XmlElement("first-release-date")]
         public string RawFirstReleaseDate
         {
-            get { return FirstReleaseDate.ToString();}
+            get { return FirstReleaseDate.ToString(); }
             set
             {
-                FirstReleaseDate = string.IsNullOrEmpty(value) 
+                FirstReleaseDate = string.IsNullOrEmpty(value)
                     ? DateTime.MinValue
                     : System.Xml.XmlConvert.ToDateTime(value);
-            }     
+            }
         }
 
         [XmlElement("primary-type")]
@@ -101,7 +106,7 @@ namespace SongTagger.Core
 
         public ReleaseGroup()
         {
-            
+
         }
 
         public ReleaseGroup(Artist artist)
@@ -112,11 +117,11 @@ namespace SongTagger.Core
     }
 
     [Serializable]
-    [XmlRootAttribute("release", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
+    [XmlRootAttribute("release", Namespace = "http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
     public class Release : IEntity
     {
         [XmlAttribute("id")]
-        public Guid Id{ get; set; }
+        public Guid Id { get; set; }
 
         [XmlElement("title")]
         public string Name { get; set; }
@@ -127,19 +132,12 @@ namespace SongTagger.Core
         [XmlElement("country")]
         public string Country { get; set; }
 
-        private Uri coverArt;
-        [XmlIgnore]
-        public Uri CoverArt
-        {
-            get { return coverArt ?? (coverArt = this.GetCoverArt()); }
-        }
-
         [XmlIgnore]
         public ReleaseGroup ReleaseGroup { get; internal set; }
 
         public Release()
         {
-            
+
         }
 
         public Release(ReleaseGroup group)
@@ -147,15 +145,108 @@ namespace SongTagger.Core
         {
             ReleaseGroup = group;
         }
+
+        private Uri coverArt;
+        [XmlIgnore]
+        public Uri CoverArt
+        {
+            get { return coverArt ?? (coverArt = GetSpeculativeCoverArt(CoverArtStrategies.ToArray())); }
+        }
+
+        private static Uri GetSpeculativeCoverArt(params Uri[] uriArray)
+        {
+            CancellationTokenSource cancellation = new CancellationTokenSource();
+
+            Task<Uri>[] tasks = uriArray
+                .Select(url => Task<Uri>.Factory.StartNew(() => GetOptimisticCoverArt(url, cancellation.Token), cancellation.Token))
+                .ToArray();
+
+            int index = Task<Uri>.WaitAny(tasks);
+            cancellation.Cancel();
+            return tasks[index].Result;
+        }
+
+        private static Uri GetOptimisticCoverArt(Uri uri, CancellationToken token)
+        {
+            Uri url = null;
+            WebClient client = Service.ServiceClient.CreateWebClient();
+            EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.AutoReset);
+            client.DownloadDataCompleted += (sender, args) =>
+            {
+                if (args.Cancelled)
+                {
+                    handle.Set();
+                    return;
+                }
+
+                if (args.Error != null)
+                {
+                    handle.Set();
+                    return;
+                }
+
+                url = IsDataImage(args.Result)
+                    ? uri
+                    : null;
+
+                handle.Set();
+            };
+
+            token.Register(() =>
+            {
+                client.CancelAsync();
+                handle.Set();
+            });
+
+            client.DownloadDataAsync(uri);
+            handle.WaitOne(TimeSpan.FromSeconds(10));
+            return url;
+        }
+
+        [XmlIgnore]
+        private List<Uri> coverArtUriList;
+        [XmlIgnore]
+        internal List<Uri> CoverArtStrategies
+        {
+            get
+            {
+                if (coverArtUriList == null)
+                    coverArtUriList = new List<Uri>();
+
+                if (coverArtUriList.Count == 0)
+                    coverArtUriList.Add(this.GetCoverArt());
+
+                return coverArtUriList;
+            }
+        }
+
+        private static bool IsDataImage(byte[] data)
+        {
+            try
+            {
+                using (MemoryStream stream = new MemoryStream(data))
+                {
+                    using (Image.FromStream(stream))
+                    {
+
+                    }
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 
     [Serializable]
-    [XmlRootAttribute("track", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
-    public class Track  : IEntity
+    [XmlRootAttribute("track", Namespace = "http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
+    public class Track : IEntity
     {
         [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
         [XmlElement("recording")]
-        public Recording Record  { get; set; }
+        public Recording Record { get; set; }
 
         public Track()
         {
@@ -163,19 +254,19 @@ namespace SongTagger.Core
         }
 
         [XmlAttribute("id")]
-        public Guid Id{ get; set; }
+        public Guid Id { get; set; }
 
         [XmlIgnore]
-        public string Name 
-        { 
+        public string Name
+        {
             get { return Record.Name; }
-            set { Record.Name = value;}
+            set { Record.Name = value; }
         }
 
         [XmlIgnore]
-        public TimeSpan Length 
-        { 
-            get { return TimeSpan.FromMilliseconds(Record.Length); } 
+        public TimeSpan Length
+        {
+            get { return TimeSpan.FromMilliseconds(Record.Length); }
             set { Record.Length = Convert.ToInt32(value.TotalMilliseconds); }
         }
 
@@ -189,18 +280,19 @@ namespace SongTagger.Core
         public Release Release { get; internal set; }
 
 
-        public Track(Release release) : this()
+        public Track(Release release)
+            : this()
         {
             Release = release;
         }
     }
 
     [Serializable]
-    [XmlRootAttribute("recording", Namespace="http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
+    [XmlRootAttribute("recording", Namespace = "http://musicbrainz.org/ns/mmd-2.0#", IsNullable = false)]
     public class Recording : IEntity
     {
         [XmlAttribute("id")]
-        public Guid Id{ get; set; }
+        public Guid Id { get; set; }
 
         [XmlElement("title")]
         public string Name { get; set; }
