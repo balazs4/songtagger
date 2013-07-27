@@ -13,6 +13,7 @@
     <viewModel:ColorToBrushConverter x:Key="ColorConvert"/>
     <viewModel:IsNullConverter x:Key="NullChecker"/>
     <viewModel:TimeSpanConverter x:Key="TimeSpanConvert"/>
+    <viewModel:ByteArrayToBitmapConverter x:Key="ByteImageConverter"/>
 
 
     <!-- #Region Entity -->
@@ -103,6 +104,7 @@
             </Grid.ColumnDefinitions>
             <Grid.Resources>
                 <BitmapImage x:Key="NoCover" UriSource="Images/disc.png"/>
+                <BitmapImage x:Key="NoCoverTooltip" UriSource="Images/noresult.png"/>
                 <DrawingImage x:Key="InitImage">
                     <DrawingImage.Drawing>
                         <GeometryDrawing>
@@ -143,7 +145,8 @@
                                 <Trigger Property="IsVisible" Value="True">
                                     <Setter Property="ToolTip">
                                         <Setter.Value>
-                                            <Image Source="{Binding CoverArt}"/>
+                                            <Image Source="{Binding CoverArt.Data, Converter={StaticResource ByteImageConverter}, 
+                                                TargetNullValue={StaticResource NoCoverTooltip}}"/>
                                         </Setter.Value>
                                     </Setter>
                                 </Trigger>
@@ -152,7 +155,8 @@
                     </Image.Style>
                     <Image.Source>
                         <PriorityBinding>
-                            <Binding Path="CoverArt" IsAsync="True" TargetNullValue="{StaticResource NoCover}"/>
+                            <Binding Path="CoverArt.Data" Converter="{StaticResource ByteImageConverter}"  
+                                     IsAsync="True" TargetNullValue="{StaticResource NoCover}"/>
                             <Binding Source="{StaticResource InitImage}"/>
                         </PriorityBinding>
                     </Image.Source>

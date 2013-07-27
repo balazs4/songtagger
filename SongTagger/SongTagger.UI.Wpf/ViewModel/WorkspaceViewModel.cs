@@ -183,7 +183,7 @@ namespace SongTagger.UI.Wpf
             Entities = new ObservableCollection<MapEntityViewModel>(entities);
             if (Entities.Count == 0)
                 return;
-            Track = Entities.First().Track;
+            Track = Entities.First().Entity as Track;
         }
 
         private ObservableCollection<MapEntityViewModel> entities;
@@ -228,16 +228,15 @@ namespace SongTagger.UI.Wpf
 
         public ICommand Reset { get; private set; }
 
-        internal MediaPlayer Player { get; set; }
     }
 
-    public class MapEntityViewModel : ViewModelBase, IDropTarget
+    public class MapEntityViewModel : EntityViewModel
     {
-        public MapEntityViewModel(IEntity entity)
+        public MapEntityViewModel(IEntity entity) 
+            : base(entity)
         {
-            Track = (Track)entity;
             EjectFile = new DelegateCommand(
-                (param) => File = null,
+                param => File = null,
                 IsFileSelected
                 );
         }
@@ -253,20 +252,10 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        private Track track;
-        public Track Track
-        {
-            get { return track; }
-            set
-            {
-                track = value;
-                RaisePropertyChangedEvent("Track");
-            }
-        }
+
+
 
         public ICommand EjectFile { get; private set; }
-
-        public ICommand Play { get; private set; }
 
         private bool IsFileSelected(object param)
         {
