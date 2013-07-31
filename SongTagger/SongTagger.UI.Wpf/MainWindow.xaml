@@ -10,7 +10,8 @@
         xmlns:metroNativeControls="clr-namespace:MahApps.Metro.Behaviours;assembly=MahApps.Metro"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=viewModel:MainWindowViewModelDesignData}"
-        Title="{Binding WindowTitle}" Height="650" Width="850" ResizeMode="NoResize"
+        Title="{Binding WindowTitle}" Height="650" Width="850" 
+        ResizeMode="CanResizeWithGrip" MinWidth="700" MinHeight="450"
         Icon="View/Images/logo.png"
         >
     <Window.Resources>
