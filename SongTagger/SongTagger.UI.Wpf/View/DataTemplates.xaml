@@ -184,7 +184,7 @@
                                                   />
             <viewModel:StringPaddingConverter x:Key="PaddingConverter" MaxTextLengthIncPaddingString="18"/>
         </DataTemplate.Resources>
-        <DockPanel LastChildFill="True" Width="200" Height="80">
+        <DockPanel LastChildFill="True" Width="180" Height="80">
             <Rectangle DockPanel.Dock="Left" Fill="{Binding EntityColor, Converter={StaticResource ColorConvert}}" Width="10" Margin="2,5,0,0"/>
             <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,0">
                 <TextBlock Text="{Binding Entity.Name, Converter={StaticResource PaddingConverter}}" 
