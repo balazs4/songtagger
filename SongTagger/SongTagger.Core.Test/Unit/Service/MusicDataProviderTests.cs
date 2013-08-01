@@ -126,6 +126,7 @@ namespace SongTagger.Core.Test.Unit.Service
             Assert.AreEqual("DE", release.Country, "Release country");
             Assert.AreEqual("Official", release.Status, "Release status");
             Assert.AreEqual("Appeal to Reason", release.Name, "Release name");
+
         }
 
         [Test]

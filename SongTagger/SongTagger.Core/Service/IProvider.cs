@@ -44,6 +44,8 @@ namespace SongTagger.Core.Service
         IEnumerable<Release> BrowseReleases(ReleaseGroup releaseGroup);
 
         IEnumerable<Track> LookupTracks(Release release);
+
+        VirtualRelease MergeReleases(IEnumerable<Release> releaseList);
     }
 
     public class MusicData : IProvider
@@ -80,8 +82,14 @@ namespace SongTagger.Core.Service
             return Query<Track>(release.Lookup<Recording>(), postProcess)
                 .OrderBy(t => t.Posititon);
         }
-        #endregion
 
+        public VirtualRelease MergeReleases(IEnumerable<Release> releaseList)
+        {
+            IEnumerable<Track> rawList = releaseList.SelectMany(release => LookupTracks(release));
+            VirtualRelease result = VirtualRelease.Create(rawList);
+            return result;
+        }
+        #endregion
         #region Singleton pattern
         private MusicData()
         {
@@ -98,7 +106,6 @@ namespace SongTagger.Core.Service
             }
         }
         #endregion
-
         #region Download prepare actions
         internal static readonly TimeSpan MINIMUM_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 0, 1, 300);
 
@@ -114,7 +121,6 @@ namespace SongTagger.Core.Service
             return;
         }
         #endregion
-
         internal static IEnumerable<TResult> DeserializeContent<TResult>(string content)
         {
             ConcurrentBag<TResult> result = new ConcurrentBag<TResult>();

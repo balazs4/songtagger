@@ -147,6 +147,7 @@ namespace SongTagger.Core
         }
 
         private CoverArt coverArt;
+
         [XmlIgnore]
         public CoverArt CoverArt
         {
@@ -163,7 +164,7 @@ namespace SongTagger.Core
 
             int index = Task<CoverArt>.WaitAny(tasks);
             cancellation.Cancel();
-            return tasks[index].Result;
+            return tasks [index].Result;
         }
 
         private static CoverArt GetOptimisticCoverArt(Uri uri, CancellationToken token)
@@ -205,6 +206,7 @@ namespace SongTagger.Core
 
         [XmlIgnore]
         private List<Uri> coverArtUriList;
+
         [XmlIgnore]
         internal List<Uri> CoverArtStrategies
         {
@@ -232,8 +234,7 @@ namespace SongTagger.Core
                     }
                 }
                 return true;
-            }
-            catch
+            } catch
             {
                 return false;
             }
@@ -278,7 +279,6 @@ namespace SongTagger.Core
 
         [XmlIgnore]
         public Release Release { get; internal set; }
-
 
         public Track(Release release)
             : this()
@@ -329,6 +329,7 @@ namespace SongTagger.Core
         Person
     }
 
+    [Serializable]
     public class CoverArt
     {
         public CoverArt(Uri url, byte[] content)
@@ -338,11 +339,41 @@ namespace SongTagger.Core
         }
 
         public Uri Url { get; private set; }
+
         public byte[] Data { get; private set; }
 
         public static CoverArt Empty
         {
             get { return new CoverArt(null, null); }
         }
+    }
+
+    [Serializable]
+    public class VirtualRelease
+    {
+        public IEnumerable<Song> SongList{ get; private set; }
+
+        public static VirtualRelease Create(IEnumerable<Track> tracks)
+        {
+            return new VirtualRelease(tracks);
+        }
+
+        private VirtualRelease(IEnumerable<Track> tracks)
+        {
+            SongList = CreateVirtualSongList(tracks);
+        }
+
+        private static IEnumerable<Song> CreateVirtualSongList(IEnumerable<Track> tracks)
+        {
+            List<Song> songs = new List<Song>();
+            //TODO
+            return songs;
+        }
+    }
+
+    [Serializable]
+    public class Song
+    {
+        public IEnumerable<Track> Tracks { get; set; }
     }
 }
