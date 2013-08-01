@@ -68,7 +68,7 @@ namespace SongTagger.Core.Mp3Tag
 
                 tag.Genres = songInfo.Release.ReleaseGroup.Artist.Tags.Select(t => t.Name).ToArray();
 
-                tag.Pictures = DownloadCoverArt(songInfo, mp3File.Directory);
+                //tag.Pictures = DownloadCoverArt(songInfo, mp3File.Directory);
             }
 
             mp3.Save();

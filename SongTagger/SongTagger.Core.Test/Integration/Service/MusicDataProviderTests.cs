@@ -53,7 +53,7 @@ namespace SongTagger.Core.Test.Integration.Service
         {
             get
             {
-                yield return new TestCaseData(TestHelper.RiseAgainst).Returns(20);
+                yield return new TestCaseData(TestHelper.RiseAgainst).Returns(22);
             }
         }
 
