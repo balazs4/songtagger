@@ -42,7 +42,7 @@ namespace SongTagger.Core.Test.Integration.Tag
             string tmpDir = Path.Combine(Path.GetTempPath(), "songtagger");
 
             if (Directory.Exists(tmpDir))
-                Directory.Delete(tmpDir);
+                Directory.Delete(tmpDir, true);
 
             Directory.CreateDirectory(tmpDir);
 
