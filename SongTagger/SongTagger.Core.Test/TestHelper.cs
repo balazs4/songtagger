@@ -30,7 +30,6 @@ namespace SongTagger.Core.Test
 {
     internal class TestHelper
     {
-
         private static DirectoryInfo inputDataRoot = new DirectoryInfo("inputData");
 
         internal static string GetInputDataFilePath(string fileName)
@@ -80,6 +79,29 @@ namespace SongTagger.Core.Test
                     Country = "DE",
                     Status = "Official"
                 };
+            }
+        }
+
+        internal static ReleaseGroup Endgame
+        {
+            get
+            {
+                return new ReleaseGroup
+                { 
+                    Id = new Guid("875b2ff0-604b-4db3-a2f8-b427d725caf2"), 
+                    Name = "Endgame",
+                    PrimaryType = ReleaseGroupType.Album,
+                    FirstReleaseDate = new DateTime(2011,1,1),
+                    Artist = RiseAgainst
+                };
+            }
+        }
+
+        internal static IEnumerable<string> EndgameBonusTrackNames
+        {
+            get
+            {
+                return new List<string> { "The Good Left Undone (live)", "Lanterns" };
             }
         }
     }

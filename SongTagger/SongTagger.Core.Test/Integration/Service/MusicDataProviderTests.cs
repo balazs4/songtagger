@@ -98,7 +98,7 @@ namespace SongTagger.Core.Test.Integration.Service
 
         [TestCaseSource("ReleaseSource")]
         [Category("Acceptance")]
-        public int D_LookupRecordings(Release release)
+        public int D_LookupTracks(Release release)
         {
             IEnumerable<Track> result = MusicData.Provider.LookupTracks(release);
 
@@ -115,6 +115,35 @@ namespace SongTagger.Core.Test.Integration.Service
             }
 
             return result.Count();
+        }
+
+        internal static IEnumerable MergeReleaseSource
+        {
+            get
+            {
+                yield return new TestCaseData(TestHelper.Endgame).Returns(14);  //12 +1 +1 bonus tracks
+            }
+        }
+
+        [TestCaseSource("MergeReleaseSource")]
+        [Category("Acceptance")]
+        public int E_MergeReleases(ReleaseGroup releaseGroup)
+        {
+            IEnumerable<Release> releaseList = MusicData.Provider.BrowseReleases(releaseGroup);
+
+            VirtualRelease virtualRelease = MusicData.Provider.MergeReleases(releaseList);
+
+            Assert.IsNotNull(virtualRelease, "VirtualRelease is null");
+            Assert.IsNotNull(virtualRelease.SongList, "VirtualRelease.SongList is null");
+            CollectionAssert.IsNotEmpty(virtualRelease.SongList, "Song list collection is empty");
+            CollectionAssert.AllItemsAreUnique(virtualRelease.SongList, "Not all item are unique in the song list");
+
+            Assert.IsTrue(
+                TestHelper.EndgameBonusTrackNames.All(bonus => virtualRelease.SongList.Any(s => s.ToString() == bonus)), 
+                "Not all bonus tracks was added to the songlist");
+
+
+            return virtualRelease.SongList.Count();
         }
     }
 }
