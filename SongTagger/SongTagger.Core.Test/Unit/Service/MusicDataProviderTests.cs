@@ -56,8 +56,8 @@ namespace SongTagger.Core.Test.Unit.Service
             watcher = Stopwatch.StartNew();
             MusicData.MusicBrainzPreparation(DateTime.Now);
             watcher.Stop();
-            double actualTime = Math.Round(watcher.Elapsed.TotalSeconds,2);
-            double expectedTime = Math.Round(MusicData.MINIMUM_TIME_BETWEEN_QUERIES.TotalSeconds,2);
+            double actualTime = Math.Round(watcher.Elapsed.TotalSeconds, 2);
+            double expectedTime = Math.Round(MusicData.MINIMUM_TIME_BETWEEN_QUERIES.TotalSeconds, 2);
 
             Assert.That(actualTime, 
                         Is.GreaterThanOrEqualTo(expectedTime),
@@ -127,6 +127,7 @@ namespace SongTagger.Core.Test.Unit.Service
             Assert.AreEqual("Official", release.Status, "Release status");
             Assert.AreEqual("Appeal to Reason", release.Name, "Release name");
 
+            Assert.AreEqual(result.Count(r => r.HasPreferredCoverArt), 3, "Preferred cover art count");
         }
 
         [Test]
@@ -142,8 +143,8 @@ namespace SongTagger.Core.Test.Unit.Service
 
             Track track = result.First(a => a.Id.ToString() == "e5265bc0-c138-34c4-ba9c-a8c366acad6c");
             Assert.AreEqual("The Dirt Whispered", track.Name, "wrong title");
-            Assert.AreEqual(4,track.Number, "wrong number");
-            Assert.AreEqual(4,track.Posititon, "wrong position");
+            Assert.AreEqual(4, track.Number, "wrong number");
+            Assert.AreEqual(4, track.Posititon, "wrong position");
             Assert.AreEqual(TimeSpan.FromMilliseconds(189126), track.Length, "wrong length");
         }
     }

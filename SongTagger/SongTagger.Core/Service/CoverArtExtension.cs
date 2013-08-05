@@ -29,7 +29,7 @@ using System.Diagnostics;
 namespace SongTagger.Core
 {
 
-    public static class CoverArtExtension 
+    public static class CoverArtArchiveExtension 
     {
         private static Uri baseUrl = new Uri("http://coverartarchive.org/");
 

@@ -135,109 +135,22 @@ namespace SongTagger.Core
         [XmlIgnore]
         public ReleaseGroup ReleaseGroup { get; internal set; }
 
+        [XmlIgnore]
+        public bool HasPreferredCoverArt{ get { return CoverArtArchiveInfo.IsArtworkAvailable; } }
+
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+        [XmlElement("cover-art-archive", typeof(CoverArtArchive))]
+        public CoverArtArchive CoverArtArchiveInfo { get; set; }
+
         public Release()
         {
-
+            CoverArtArchiveInfo = new CoverArtArchive();
         }
 
         public Release(ReleaseGroup group)
             : this()
         {
             ReleaseGroup = group;
-        }
-
-        private CoverArt coverArt;
-
-        [XmlIgnore]
-        public CoverArt CoverArt
-        {
-            get { return coverArt ?? (coverArt = GetSpeculativeCoverArt(CoverArtStrategies.ToArray())); }
-        }
-
-        private static CoverArt GetSpeculativeCoverArt(params Uri[] uriArray)
-        {
-            CancellationTokenSource cancellation = new CancellationTokenSource();
-
-            Task<CoverArt>[] tasks = uriArray
-                .Select(url => Task<CoverArt>.Factory.StartNew(() => GetOptimisticCoverArt(url, cancellation.Token), cancellation.Token))
-                .ToArray();
-
-            int index = Task<CoverArt>.WaitAny(tasks);
-            cancellation.Cancel();
-            return tasks [index].Result;
-        }
-
-        private static CoverArt GetOptimisticCoverArt(Uri uri, CancellationToken token)
-        {
-            CoverArt cover = CoverArt.Empty;
-            WebClient client = Service.ServiceClient.CreateWebClient();
-            EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.AutoReset);
-            client.DownloadDataCompleted += (sender, args) =>
-            {
-                if (args.Cancelled)
-                {
-                    handle.Set();
-                    return;
-                }
-
-                if (args.Error != null)
-                {
-                    handle.Set();
-                    return;
-                }
-
-                cover = IsDataImage(args.Result)
-                            ? new CoverArt(uri, args.Result)
-                            : CoverArt.Empty;
-
-                handle.Set();
-            };
-
-            token.Register(() =>
-            {
-                client.CancelAsync();
-                handle.Set();
-            });
-
-            client.DownloadDataAsync(uri);
-            handle.WaitOne(TimeSpan.FromSeconds(10));
-            return cover;
-        }
-
-        [XmlIgnore]
-        private List<Uri> coverArtUriList;
-
-        [XmlIgnore]
-        internal List<Uri> CoverArtStrategies
-        {
-            get
-            {
-                if (coverArtUriList == null)
-                    coverArtUriList = new List<Uri>();
-
-                if (coverArtUriList.Count == 0)
-                    coverArtUriList.Add(this.GetCoverArt());
-
-                return coverArtUriList;
-            }
-        }
-
-        private static bool IsDataImage(byte[] data)
-        {
-            try
-            {
-                using (MemoryStream stream = new MemoryStream(data))
-                {
-                    using (Image.FromStream(stream))
-                    {
-
-                    }
-                }
-                return true;
-            } catch
-            {
-                return false;
-            }
         }
     }
 
@@ -310,6 +223,14 @@ namespace SongTagger.Core
     }
 
     [Serializable]
+    [XmlType("cover-art-archive")]
+    public class CoverArtArchive
+    {
+        [XmlElement("artwork")]
+        public bool IsArtworkAvailable { get; set; }
+    }
+
+    [Serializable]
     public enum ReleaseGroupType
     {
         Undefined = 0,
@@ -353,6 +274,15 @@ namespace SongTagger.Core
     {
         public IEnumerable<Song> SongList{ get; private set; }
 
+        private CoverArt coverArt;
+
+        public CoverArt CoverArt
+        {
+            get { return coverArt ?? (coverArt = GetSpeculativeCoverArt(CoverArtUriCollection.Reverse<Uri>().ToArray())); }
+        }
+
+        public List<Uri> CoverArtUriCollection { get; private set; }
+
         public static VirtualRelease Create(IEnumerable<Track> tracks)
         {
             return new VirtualRelease(tracks);
@@ -360,20 +290,90 @@ namespace SongTagger.Core
 
         private VirtualRelease(IEnumerable<Track> tracks)
         {
-            SongList = CreateVirtualSongList(tracks);
+            CoverArtUriCollection = tracks.GroupBy(t => t.Release)
+                                          .Where(group => group.Key.HasPreferredCoverArt)
+                                          .SelectMany(group => group.Select(t => t.Release.GetCoverArt()))
+                                          .ToList();
+
+            SongList = CreateSongList(tracks);
         }
 
-        private static IEnumerable<Song> CreateVirtualSongList(IEnumerable<Track> tracks)
+        private static IEnumerable<Song> CreateSongList(IEnumerable<Track> tracks)
         {
             List<Song> songs = new List<Song>();
             //TODO
             return songs;
         }
+        #region CoverArt
+        private static CoverArt GetSpeculativeCoverArt(params Uri[] uriArray)
+        {
+            CancellationTokenSource cancellation = new CancellationTokenSource();
+
+            Task<CoverArt>[] tasks = uriArray
+                .Select(url => Task<CoverArt>.Factory.StartNew(() => GetOptimisticCoverArt(url, cancellation.Token), cancellation.Token))
+                .ToArray();
+
+            int index = Task<CoverArt>.WaitAny(tasks);
+            cancellation.Cancel();
+            return tasks [index].Result;
+        }
+
+        private static CoverArt GetOptimisticCoverArt(Uri uri, CancellationToken token)
+        {
+            CoverArt cover = CoverArt.Empty;
+            WebClient client = Service.ServiceClient.CreateWebClient();
+            EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.AutoReset);
+            client.DownloadDataCompleted += (sender, args) =>
+            {
+                if (args.Cancelled)
+                {
+                    handle.Set();
+                    return;
+                }
+
+                if (args.Error != null)
+                {
+                    handle.Set();
+                    return;
+                }
+
+                cover = IsDataImage(args.Result)
+                        ? new CoverArt(uri, args.Result)
+                        : CoverArt.Empty;
+
+                handle.Set();
+            };
+
+            token.Register(client.CancelAsync);
+
+            client.DownloadDataAsync(uri);
+            handle.WaitOne(TimeSpan.FromSeconds(10));
+            return cover;
+        }
+
+        private static bool IsDataImage(byte[] data)
+        {
+            try
+            {
+                using (MemoryStream stream = new MemoryStream(data))
+                {
+                    using (Image.FromStream(stream))
+                    {
+
+                    }
+                }
+                return true;
+            } catch
+            {
+                return false;
+            }
+        }
+        #endregion
     }
 
     [Serializable]
     public class Song
     {
-        public IEnumerable<Track> Tracks { get; set; }
+        public IEnumerable<Track> SimilarTracks { get; set; }
     }
 }
