@@ -66,7 +66,7 @@
                     <viewModel:WorkspaceDataTemplateSelector x:Key="workspaceSelector"
                                                              SearchArtistDataTemplate="{StaticResource searchDataTemplate}"
                                                              MarketDataTemplate="{StaticResource marketDataTemplate}"
-                                                             MapDataTemplate="{StaticResource mapDataTemplate}"
+                                                             VirtualReleaseDataTemplate="{StaticResource virtualReleaseTemplate}"
                                                              />
                 </Grid.Resources>
                 <ContentControl Content="{Binding Workspace}"
@@ -87,7 +87,7 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-            <Grid Height="200" VerticalAlignment="Top" Margin="25">
+            <Canvas Height="200" VerticalAlignment="Top" Margin="25">
                 <Border Background="White" Opacity="0.98" 
                         BorderThickness="2" BorderBrush="Gray"/>
                 <Grid>
@@ -131,7 +131,7 @@
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
                 </Grid>
-            </Grid>
+            </Canvas>
         </Grid>
     </Grid>
 </Window>

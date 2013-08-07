@@ -129,26 +129,26 @@ namespace SongTagger.UI.Wpf
 
             if (sourceEntity is ReleaseGroup)
             {
-                Func<IEnumerable<Release>> action = () => provider.BrowseReleases((ReleaseGroup) sourceEntity);
+                Func<IEnumerable<Track>> action = () =>
+                    {
+                        IEnumerable<Release> releases = provider.BrowseReleases((ReleaseGroup) sourceEntity);
+                        List<Track> tracks = new List<Track>();
+                        foreach (Release release in releases)
+                        {
+                            tracks.AddRange(provider.LookupTracks(release));
+                        }
+                        return tracks;
+                    };
 
-                Action<Task<IEnumerable<Release>>> doneTask = task1 =>
+                Action<Task<IEnumerable<Track>>> doneTask = task1 =>
                 {
-                    Workspace = new MarketViewModel(State.SelectRelease, task1.Result.Select(a => new ReleaseEntityViewModel(a)), Reset);
+                    Workspace = new VirtualReleaseViewModel(task1.Result, Reset, provider.DownloadCoverArts);
                     if (Cart == null)
                         Cart = new CartViewModel(LoadEntitiesAsync);
                 };
 
                 StartQueryTask(action, doneTask);
 
-                return;
-            }
-
-            if (sourceEntity is Release)
-            {
-                StartQueryTask(() => provider.LookupTracks((Release)sourceEntity), task1 =>
-                    {
-                        Workspace = new MapViewModel(task1.Result.Select(a => new MapEntityViewModel(a)), Reset);
-                    });
                 return;
             }
         }
@@ -308,7 +308,7 @@ namespace SongTagger.UI.Wpf
 
         public Release Release
         {
-            get { return (Release) Entity; }
+            get { return (Release)Entity; }
         }
 
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Windows;
 using SongTagger.Core;
 
@@ -26,7 +27,7 @@ namespace SongTagger.UI.Wpf
             : base(DesignDataProvider.Instance)
         {
             WindowTitle = "Design data";
-            //InitDesignData(CartInit, ReleaseMarket);
+            InitDesignData(CartInit, Tracks);
         }
 
         private void InitDesignData(params Action[] initActions)
@@ -39,7 +40,7 @@ namespace SongTagger.UI.Wpf
 
         private void ArtistMarket()
         {
-            Workspace = new MarketViewModel(State.SelectArtist, 
+            Workspace = new MarketViewModel(State.SelectArtist,
                 provider.SearchArtist("Rise Against").Select(e => new EntityViewModel(e)),
                 Reset
                 );
@@ -66,14 +67,12 @@ namespace SongTagger.UI.Wpf
         private void Tracks()
         {
             Cart.EntityItem = new EntityViewModel(DesignDataProvider.AppealToReasonRelease);
-            Workspace = new MapViewModel(provider.LookupTracks(DesignDataProvider.AppealToReasonRelease).Select(e => new MapEntityViewModel(e) {File = new FileInfo(Path.GetTempFileName())}),
-              Reset
-              );
+            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(DesignDataProvider.AppealToReasonRelease), Reset, provider.DownloadCoverArts);
         }
 
         private void CartInit()
         {
-            Cart = new CartViewModel(LoadEntitiesAsync);  
+            Cart = new CartViewModel(LoadEntitiesAsync);
         }
 
         private void ErrorMessage()
@@ -195,6 +194,23 @@ namespace SongTagger.UI.Wpf
                     new Track(AppealToReasonRelease) {Name = "Savior", Number = 11, Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
                     new Track(AppealToReasonRelease) {Name = "Savior", Number = 11, Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
                 };
+        }
+
+        public void DownloadCoverArts(IEnumerable<Uri> uri, Action<CoverArt> callback)
+        {
+            Uri demo =
+                new Uri(
+                    "http://upload.wikimedia.org/wikipedia/en/thumb/4/40/Def_Leppard_-_Hysteria_(vinyl_version).jpg/220px-Def_Leppard_-_Hysteria_(vinyl_version).jpg");
+
+            byte[] data = new WebClient().DownloadData(demo.ToString());
+
+
+            System.Threading.Thread.Sleep(2000);
+            for (int i = 0; i < 4; i++)
+            {
+                callback(CoverArt.CreateCoverArt(demo, data));
+                System.Threading.Thread.Sleep(1000);
+            }
         }
     }
 }
