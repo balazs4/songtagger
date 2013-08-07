@@ -97,82 +97,7 @@
     </DataTemplate>
 
     <DataTemplate x:Key="releaseEntityTemplate" DataType="{x:Type songtagger:Release}">
-        <Grid Height="50" ShowGridLines="False">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70"/>
-                <ColumnDefinition Width="70"/>
-            </Grid.ColumnDefinitions>
-            <Grid.Resources>
-                <BitmapImage x:Key="NoCover" UriSource="Images/disc.png"/>
-                <BitmapImage x:Key="NoCoverTooltip" UriSource="Images/noresult.png"/>
-                <DrawingImage x:Key="InitImage">
-                    <DrawingImage.Drawing>
-                        <GeometryDrawing>
-                            <GeometryDrawing.Geometry>
-                                <GeometryGroup>
-                                    <RectangleGeometry Rect="5,5,5,5"/>
-                                </GeometryGroup>
-                            </GeometryDrawing.Geometry>
-                            <GeometryDrawing.Brush>
-                                <VisualBrush>
-                                    <VisualBrush.Visual>
-                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <Rectangle Fill="Transparent" Height="15"/>
-                                            <metroControls:MetroProgressBar EllipseDiameter="5" EllipseOffset="1" IsIndeterminate="True" Width="45" Foreground="Gray"/>
-                                            <Rectangle Fill="Transparent" Height="15"/>
-                                        </StackPanel>
-                                    </VisualBrush.Visual>
-                                </VisualBrush>
-                            </GeometryDrawing.Brush>
-                        </GeometryDrawing>
-                    </DrawingImage.Drawing>
-                </DrawingImage>
-            </Grid.Resources>
-            <Grid Grid.Column="0">
-                <Image MaxWidth="50" VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <Image.Style>
-                        <Style TargetType="Image">
-                            <Style.Triggers>
-                                <EventTrigger RoutedEvent="Loaded">
-                                    <EventTrigger.Actions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:1.0" From="0.0" To="1.0"  />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger.Actions>
-                                </EventTrigger>
-                                <Trigger Property="IsVisible" Value="True">
-                                    <Setter Property="ToolTip">
-                                        <Setter.Value>
-                                            <Image Source="{Binding CoverArt.Data, Converter={StaticResource ByteImageConverter}, 
-                                                TargetNullValue={StaticResource NoCoverTooltip}}"/>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Image.Style>
-                    <Image.Source>
-                        <PriorityBinding>
-                            <Binding Path="CoverArt.Data" Converter="{StaticResource ByteImageConverter}"  
-                                     IsAsync="True" TargetNullValue="{StaticResource NoCover}"/>
-                            <Binding Source="{StaticResource InitImage}"/>
-                        </PriorityBinding>
-                    </Image.Source>
-                </Image>
-            </Grid>
-            <StackPanel Grid.Column="1"  VerticalAlignment="Bottom" HorizontalAlignment="Right">
-                <StackPanel.Resources>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="FontSize" Value="12"/>
-                        <Setter Property="Foreground" Value="LightGray"/>
-                    </Style>
-                </StackPanel.Resources>
-                <TextBlock Text="{Binding Status}"/>
-                <TextBlock Text="{Binding Country}" TextAlignment="Right"/>
-            </StackPanel>
-        </Grid>
+
     </DataTemplate>
 
     <DataTemplate x:Key="entityTemplate" DataType="{x:Type viewModel:EntityViewModel}">
@@ -197,7 +122,7 @@
 
     </DataTemplate>
 
-    <DataTemplate x:Key="mapEntityTemplate" DataType="{x:Type viewModel:MapEntityViewModel}">
+    <DataTemplate x:Key="songDataTemplate" DataType="{x:Type viewModel:Song}">
         <Expander Header="{Binding Track}"  HorizontalContentAlignment="Stretch"
                   Background="Transparent" IsExpanded="True" Margin="0,0,0,4">
             <Expander.HeaderTemplate>
@@ -403,30 +328,108 @@
         </Grid>
     </DataTemplate>
 
-    <DataTemplate x:Key="mapDataTemplate" DataType="{x:Type viewModel:MapViewModel}">
+    <DataTemplate x:Key="virtualReleaseTemplate" DataType="{x:Type viewModel:VirtualReleaseViewModel}">
         <Grid>
-            <!--
-            <Grid.Background>
-                <ImageBrush ImageSource="{Binding Release.CoverArt}"/>
-            </Grid.Background>
-            -->
             <Grid.RowDefinitions>
                 <RowDefinition Height="2*"/>
                 <RowDefinition Height="9*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" Name="header" Background="Transparent">
-                <Button HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Reset}">
-                    <Button.Template>
-                        <ControlTemplate>
-                            <Image Source="Images/back.png" Width="50" Height="50"/>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
-                <StackPanel Grid.Row="0" Margin="0,0,20,0" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Artist.Name}"/>
-                    <TextBlock Text="{Binding Release.Name}"/>
-                    <TextBlock Text="{Binding ReleaseGroup.PrimaryType}"/>
-                    <TextBlock Text="{Binding ReleaseGroup.FirstReleaseDate.Year}"/>
+                <StackPanel Orientation="Horizontal">
+
+                    <Button HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Reset}" Margin="0,0,30,0">
+                        <Button.Template>
+                            <ControlTemplate>
+                                <Image Source="Images/back.png" Width="50" Height="50"/>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <ListBox ItemsSource="{Binding Covers, IsAsync=True}" MaxWidth="105" 
+                             ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                             ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                             BorderThickness="0">
+                        <ListBox.Resources>
+                            <Style TargetType="ListBox">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Items.Count}" Value="0">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate>
+                                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity=".8">
+                                                        <metroControls:MetroProgressBar EllipseDiameter="5" EllipseOffset="1" IsIndeterminate="True" Width="105" Foreground="Gray"/>
+                                                    </StackPanel>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.Resources>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Image Stretch="UniformToFill" MaxWidth="90" MaxHeight="90" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    <Image.Resources>
+                                        <BitmapImage x:Key="NoCover" UriSource="Images/disc.png" />
+                                    </Image.Resources>
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <EventTrigger RoutedEvent="Loaded">
+                                                    <EventTrigger.Actions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:1.0" From="0.0" To="1.0"  />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger.Actions>
+                                                </EventTrigger>
+                                                <Trigger Property="IsVisible" Value="True">
+                                                    <Setter Property="ToolTip">
+                                                        <Setter.Value>
+                                                            <Image Source="{Binding Data, Converter={StaticResource ByteImageConverter}}"/>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                    <Image.Source>
+                                        <Binding Path="Data" Converter="{StaticResource ByteImageConverter}"  
+                                                 TargetNullValue="{StaticResource NoCover}"/>
+                                    </Image.Source>
+                                </Image>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True" >
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Foreground" Value="Black" />
+                                    </Trigger>
+                                </Style.Triggers>
+                                <Style.Resources>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Orange" />
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+                                </Style.Resources>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    <StackPanel Grid.Row="0" Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Artist.Name}" FontSize="20"/>
+                        <TextBlock Text="{Binding ReleaseGroup.Name}" FontSize="24" FontWeight="Bold"/>
+                        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,5,0,0">
+                            <TextBlock Text="{Binding ReleaseGroup.PrimaryType}" Foreground="DarkGray"/>
+                            <TextBlock Text="{Binding ReleaseGroup.FirstReleaseDate.Year}"  HorizontalAlignment="Right"/>
+                        </Grid>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="1" Name="content"  Background="Transparent" >
@@ -435,8 +438,8 @@
                          HorizontalContentAlignment="Stretch"
                          Background="Transparent"
                          BorderThickness="0"
-                         ItemsSource="{Binding Entities}"
-                         ItemTemplate="{StaticResource mapEntityTemplate}"
+                         ItemsSource="{Binding Songs}"
+                         ItemTemplate="{StaticResource songDataTemplate}"
                          gong:DragDrop.IsDragSource="True">
                 </ListBox>
             </Grid>

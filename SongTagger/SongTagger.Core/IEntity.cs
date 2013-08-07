@@ -250,10 +250,9 @@ namespace SongTagger.Core
         Person
     }
 
-    [Serializable]
     public class CoverArt
     {
-        public CoverArt(Uri url, byte[] content)
+        private CoverArt(Uri url, byte[] content)
         {
             Url = url;
             Data = content;
@@ -263,92 +262,17 @@ namespace SongTagger.Core
 
         public byte[] Data { get; private set; }
 
-        public static CoverArt Empty
+        internal static CoverArt Empty
         {
             get { return new CoverArt(null, null); }
         }
-    }
 
-    [Serializable]
-    public class VirtualRelease
-    {
-        public IEnumerable<Song> SongList{ get; private set; }
-
-        private CoverArt coverArt;
-
-        public CoverArt CoverArt
+        public static CoverArt CreateCoverArt(Uri uri, byte[] data)
         {
-            get { return coverArt ?? (coverArt = GetSpeculativeCoverArt(CoverArtUriCollection.Reverse<Uri>().ToArray())); }
-        }
+            if (IsDataImage(data))
+                return new CoverArt(uri, data);
 
-        public List<Uri> CoverArtUriCollection { get; private set; }
-
-        public static VirtualRelease Create(IEnumerable<Track> tracks)
-        {
-            return new VirtualRelease(tracks);
-        }
-
-        private VirtualRelease(IEnumerable<Track> tracks)
-        {
-            CoverArtUriCollection = tracks.GroupBy(t => t.Release)
-                                          .Where(group => group.Key.HasPreferredCoverArt)
-                                          .SelectMany(group => group.Select(t => t.Release.GetCoverArt()))
-                                          .ToList();
-
-            SongList = CreateSongList(tracks);
-        }
-
-        private static IEnumerable<Song> CreateSongList(IEnumerable<Track> tracks)
-        {
-            List<Song> songs = new List<Song>();
-            //TODO
-            return songs;
-        }
-        #region CoverArt
-        private static CoverArt GetSpeculativeCoverArt(params Uri[] uriArray)
-        {
-            CancellationTokenSource cancellation = new CancellationTokenSource();
-
-            Task<CoverArt>[] tasks = uriArray
-                .Select(url => Task<CoverArt>.Factory.StartNew(() => GetOptimisticCoverArt(url, cancellation.Token), cancellation.Token))
-                .ToArray();
-
-            int index = Task<CoverArt>.WaitAny(tasks);
-            cancellation.Cancel();
-            return tasks [index].Result;
-        }
-
-        private static CoverArt GetOptimisticCoverArt(Uri uri, CancellationToken token)
-        {
-            CoverArt cover = CoverArt.Empty;
-            WebClient client = Service.ServiceClient.CreateWebClient();
-            EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.AutoReset);
-            client.DownloadDataCompleted += (sender, args) =>
-            {
-                if (args.Cancelled)
-                {
-                    handle.Set();
-                    return;
-                }
-
-                if (args.Error != null)
-                {
-                    handle.Set();
-                    return;
-                }
-
-                cover = IsDataImage(args.Result)
-                        ? new CoverArt(uri, args.Result)
-                        : CoverArt.Empty;
-
-                handle.Set();
-            };
-
-            token.Register(client.CancelAsync);
-
-            client.DownloadDataAsync(uri);
-            handle.WaitOne(TimeSpan.FromSeconds(10));
-            return cover;
+            return CoverArt.Empty;
         }
 
         private static bool IsDataImage(byte[] data)
@@ -357,23 +281,14 @@ namespace SongTagger.Core
             {
                 using (MemoryStream stream = new MemoryStream(data))
                 {
-                    using (Image.FromStream(stream))
-                    {
-
-                    }
+                    using (Image.FromStream(stream)) { }
                 }
                 return true;
-            } catch
+            }
+            catch
             {
                 return false;
             }
         }
-        #endregion
-    }
-
-    [Serializable]
-    public class Song
-    {
-        public IEnumerable<Track> SimilarTracks { get; set; }
     }
 }

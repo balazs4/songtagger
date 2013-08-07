@@ -23,10 +23,10 @@
 
 using System;
 using System.Net;
+using System.Text;
 
 namespace SongTagger.Core.Service
 {
-
     internal static class ServiceClient
     {
         private static object lockObject = new object();
@@ -41,12 +41,12 @@ namespace SongTagger.Core.Service
             }
             set {download = value;}
         }
-            
+
 
         internal static WebClient CreateWebClient()
         {
             WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
-            return new WebClient {Proxy = WebRequest.DefaultWebProxy};
+            return new WebClient {Proxy = WebRequest.DefaultWebProxy, Encoding = new UTF8Encoding()};
         }
 
         private static string DefaultContentDownloader(Uri url)

@@ -45,7 +45,7 @@ namespace SongTagger.Core.Service
 
         IEnumerable<Track> LookupTracks(Release release);
 
-        VirtualRelease MergeReleases(IEnumerable<Release> releaseList);
+        void DownloadCoverArts(IEnumerable<Uri> uri, Action<CoverArt> callback);
     }
 
     public class MusicData : IProvider
@@ -57,7 +57,8 @@ namespace SongTagger.Core.Service
                 throw new ArgumentException("name", "Search text cannot be null or empty");
 
             return Query<Artist>(Artist.Empty.Search(name))
-                .OrderByDescending(a => a.Score);
+                .OrderByDescending(a => a.Score)
+                .ThenBy(a => a.Name);
         }
 
         public IEnumerable<ReleaseGroup> BrowseReleaseGroups(Artist artist)
@@ -65,7 +66,8 @@ namespace SongTagger.Core.Service
             CheckArgument<Artist>(artist);
             Action<ReleaseGroup> postProcess = (item) => item.Artist = artist;
             return Query<ReleaseGroup>(artist.Browse<ReleaseGroup>(), postProcess)
-                .OrderByDescending(rg => rg.FirstReleaseDate.Year);
+                .OrderByDescending(rg => rg.FirstReleaseDate.Year)
+                .ThenBy(rg => rg.Name);
         }
 
         public IEnumerable<Release> BrowseReleases(ReleaseGroup releaseGroup)
@@ -83,26 +85,32 @@ namespace SongTagger.Core.Service
                 .OrderBy(t => t.Posititon);
         }
 
-        public VirtualRelease MergeReleases(IEnumerable<Release> releaseList)
+        public void DownloadCoverArts(IEnumerable<Uri> uri, Action<CoverArt> callback)
         {
-            IEnumerable<Track> rawList = releaseList.SelectMany(release => LookupTracks(release));
-            VirtualRelease result = VirtualRelease.Create(rawList);
-            return result;
+            if (uri == null)
+                return;
+
+            var tasks = uri.Select(url => Task<CoverArt>.Factory.StartNew(() => DownloadCovertArtFromUri(url))
+                                                    .ContinueWith(task => callback(task.Result)))
+                                                    .ToArray();
+
+            Task.WaitAll(tasks);
         }
+
         #endregion
         #region Singleton pattern
         private MusicData()
         {
-            
+
         }
 
         private static MusicData instance;
 
         public static MusicData Provider
-        { 
+        {
             get
-            { 
-                return instance ?? (instance = new MusicData());  
+            {
+                return instance ?? (instance = new MusicData());
             }
         }
         #endregion
@@ -115,11 +123,6 @@ namespace SongTagger.Core.Service
             if (difference < MINIMUM_TIME_BETWEEN_QUERIES)
                 Thread.Sleep(MINIMUM_TIME_BETWEEN_QUERIES - difference);
         }
-
-        internal static void NoPreparaiton(DateTime date)
-        {
-            return;
-        }
         #endregion
         internal static IEnumerable<TResult> DeserializeContent<TResult>(string content)
         {
@@ -127,18 +130,18 @@ namespace SongTagger.Core.Service
             using (StringReader input = new StringReader(content))
             {
                 XDocument doc = XDocument.Load(input);
-                XName xName = XName.Get(MusicBrainzExtension.GetMusicBrainzEntityName(typeof(TResult)), 
+                XName xName = XName.Get(MusicBrainzExtension.GetMusicBrainzEntityName(typeof(TResult)),
                                         doc.Root.GetDefaultNamespace().NamespaceName);
 
                 IEnumerable<XElement> elements = doc.Descendants(xName);
                 XmlSerializer serializer = new XmlSerializer(typeof(TResult));
 
-                Action<XElement> deserialization = (element) => 
+                Action<XElement> deserialization = (element) =>
                 {
                     using (XmlReader reader = element.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
                     {
                         result.Add((TResult)serializer.Deserialize(reader));
-                    }   
+                    }
                 };
 
                 Parallel.ForEach(elements.AsParallel(), deserialization);
@@ -160,7 +163,7 @@ namespace SongTagger.Core.Service
                 {
                     foreach (Action<TResult> post in postProcessActions)
                     {
-                        Parallel.ForEach(result.AsParallel(), post);    
+                        Parallel.ForEach(result.AsParallel(), post);
                     }
                     tracer.WriteTrace("Postprocessing finished");
                 }
@@ -178,6 +181,23 @@ namespace SongTagger.Core.Service
 
             if (entity.Id == Guid.Empty)
                 throw new ArgumentException(typeof(TSource).Name, ".Id cannot be " + Guid.Empty.ToString());
+        }
+
+        private static CoverArt DownloadCovertArtFromUri(Uri uri)
+        {
+            byte[] data;
+            try
+            {
+                using (WebClient client = ServiceClient.CreateWebClient())
+                {
+                    data = client.DownloadData(uri);
+                }
+            }
+            catch (Exception)
+            {
+                data = null;
+            }
+            return CoverArt.CreateCoverArt(uri, data);
         }
     }
 }

@@ -5,10 +5,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using GongSolutions.Wpf.DragDrop;
 using SongTagger.Core;
 using SongTagger.UI.Wpf.ViewModel;
@@ -173,135 +176,121 @@ namespace SongTagger.UI.Wpf
         public ICommand Reset { get; private set; }
     }
 
-    public class MapViewModel : WorkspaceViewModel
+    public class VirtualReleaseViewModel : WorkspaceViewModel
     {
-        public MapViewModel(IEnumerable<MapEntityViewModel> entities, Action resetCallback)
-            : base(State.MapTracks)
+        private Artist artist;
+        public Artist Artist
         {
-            Reset = new DelegateCommand(param => resetCallback());
-
-            Entities = new ObservableCollection<MapEntityViewModel>(entities);
-            if (Entities.Count == 0)
-                return;
-            Track = Entities.First().Entity as Track;
-        }
-
-        private ObservableCollection<MapEntityViewModel> entities;
-        public ObservableCollection<MapEntityViewModel> Entities
-        {
-            get { return entities; }
-            set
+            get { return artist; }
+            private set
             {
-                entities = value;
-                RaisePropertyChangedEvent("Entities");
-            }
-        }
-
-        private Track track;
-        private Track Track
-        {
-            get { return track; }
-            set
-            {
-                track = value;
-                RaisePropertyChangedEvent("Track");
-                RaisePropertyChangedEvent("Release");
-                RaisePropertyChangedEvent("ReleaseGroup");
+                artist = value;
                 RaisePropertyChangedEvent("Artist");
             }
         }
 
-        public Artist Artist
-        {
-            get { return Track.Release.ReleaseGroup.Artist; }
-        }
-
+        private ReleaseGroup releaseGroup;
         public ReleaseGroup ReleaseGroup
         {
-            get { return Track.Release.ReleaseGroup; }
+            get { return releaseGroup; }
+            private set
+            {
+                releaseGroup = value;
+                RaisePropertyChangedEvent("ReleaseGroup");
+            }
         }
 
-        public Release Release
+        private ObservableCollection<CoverArt> covers;
+        public ObservableCollection<CoverArt> Covers
         {
-            get { return Track.Release; }
+            get { return covers; }
+            private set
+            {
+                covers = value;
+                RaisePropertyChangedEvent("Covers");
+            }
+        }
+
+        private ObservableCollection<Song> songs;
+        public ObservableCollection<Song> Songs
+        {
+            get { return songs; }
+            private set
+            {
+                songs = value;
+                RaisePropertyChangedEvent("Songs");
+            }
+        }
+
+        public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action resetCallback, Action<IEnumerable<Uri>, Action<CoverArt>> coverDownloaderService)
+            : base(State.MapTracks)
+        {
+            Reset = new DelegateCommand(p => resetCallback());
+
+            ReleaseGroup = tracks.First().Release.ReleaseGroup;
+            Artist = ReleaseGroup.Artist;
+
+            InitCovers(tracks, coverDownloaderService);
+
+            Songs = new ObservableCollection<Song>(tracks.Select(t => new Song {Track = t}));
         }
 
         public ICommand Reset { get; private set; }
 
+        private void InitCovers(IEnumerable<Track> tracks, Action<IEnumerable<Uri>, Action<CoverArt>> coverDownloaderService)
+        {
+            List<Uri> coverUriList = tracks.ToLookup(t => t.Release)
+                                           .Where(group => group.Key.HasPreferredCoverArt)
+                                           .Select(group => group.Key.GetCoverArt())
+                                           .ToList();
+            //TODO: DisCogs,Last.FM
+            Task download = Task.Factory.StartNew(() => coverDownloaderService(coverUriList, AddToCoverArtCollectionThreadSafety));
+            
+            download.ContinueWith(task =>
+                {
+                    Action addAction = () =>
+                    {
+                        if (Covers == null)
+                            Covers = new ObservableCollection<CoverArt>();
+
+                        if (Covers.Any())
+                            return;
+                        Covers.Add(CoverArt.CreateCoverArt(null, null));
+                    };
+                    Application.Current.Dispatcher.BeginInvoke(addAction, DispatcherPriority.Normal);
+                });
+        }
+
+        private void AddToCoverArtCollectionThreadSafety(CoverArt item)
+        {
+            if (item == null)
+                return;
+
+            if (item.Url == null)
+                return;
+
+            if (item.Data == null)
+                return;
+
+            if (!item.Data.Any())
+                return;
+
+            Action addAction = () =>
+                {
+                    if (Covers == null)
+                        Covers = new ObservableCollection<CoverArt>();
+                    Covers.Add(item);
+                };
+            Application.Current.Dispatcher.BeginInvoke(addAction, DispatcherPriority.Normal);
+        }
+
     }
 
-    public class MapEntityViewModel : EntityViewModel
+
+
+    public class Song
     {
-        public MapEntityViewModel(IEntity entity) 
-            : base(entity)
-        {
-            EjectFile = new DelegateCommand(
-                param => File = null,
-                IsFileSelected
-                );
-        }
-
-        private FileInfo file;
-        public FileInfo File
-        {
-            get { return file; }
-            set
-            {
-                file = value;
-                RaisePropertyChangedEvent("File");
-            }
-        }
-
-
-
-
-        public ICommand EjectFile { get; private set; }
-
-        private bool IsFileSelected(object param)
-        {
-            return File != null;
-        }
-
-        private static bool TryGetFileNameFromDropInfo(IDropInfo info, out FileInfo file)
-        {
-            try
-            {
-                DataObject dataObject = info.Data as DataObject;
-                string filePath = ((string[])dataObject.GetData(DataFormats.FileDrop)).First();
-                file = new FileInfo(filePath);
-
-                if (!file.Extension.ToLower().Contains("mp3"))
-                    throw new NotSupportedException("Not supported extension");
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                file = null;
-                return false;
-            }
-        }
-
-        public void DragOver(IDropInfo dropInfo)
-        {
-            FileInfo file;
-            if (TryGetFileNameFromDropInfo(dropInfo, out file))
-            {
-                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
-                dropInfo.Effects = DragDropEffects.Copy;
-            }
-            else
-            {
-                dropInfo.Effects = DragDropEffects.None;
-            }
-        }
-
-        public void Drop(IDropInfo dropInfo)
-        {
-            FileInfo file;
-            TryGetFileNameFromDropInfo(dropInfo, out file);
-            File = file;
-        }
+        public Track Track { get; set; }
+        public IEnumerable<Track> SimilarTracks { get; set; }
     }
-
 }
