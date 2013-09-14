@@ -222,7 +222,7 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action resetCallback, Action<IEnumerable<Uri>, Action<CoverArt>> coverDownloaderService)
+        public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action resetCallback, Action<IEnumerable<Uri>, Action<CoverArt>, CancellationToken> coverDownloaderService)
             : base(State.MapTracks)
         {
             Reset = new DelegateCommand(p => resetCallback());
@@ -237,14 +237,14 @@ namespace SongTagger.UI.Wpf
 
         public ICommand Reset { get; private set; }
 
-        private void InitCovers(IEnumerable<Track> tracks, Action<IEnumerable<Uri>, Action<CoverArt>> coverDownloaderService)
+        private void InitCovers(IEnumerable<Track> tracks, Action<IEnumerable<Uri>, Action<CoverArt>,CancellationToken> coverDownloaderService)
         {
             List<Uri> coverUriList = tracks.ToLookup(t => t.Release)
                                            .Where(group => group.Key.HasPreferredCoverArt)
                                            .Select(group => group.Key.GetCoverArt())
                                            .ToList();
             //TODO: DisCogs,Last.FM
-            Task download = Task.Factory.StartNew(() => coverDownloaderService(coverUriList, AddToCoverArtCollectionThreadSafety));
+            Task download = Task.Factory.StartNew(() => coverDownloaderService(coverUriList, AddToCoverArtCollectionThreadSafety, CancellationToken.None));
             
             download.ContinueWith(task =>
                 {
