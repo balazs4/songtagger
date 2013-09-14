@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Windows;
 using SongTagger.Core;
 
@@ -196,7 +197,7 @@ namespace SongTagger.UI.Wpf
                 };
         }
 
-        public void DownloadCoverArts(IEnumerable<Uri> uri, Action<CoverArt> callback)
+        public void DownloadCoverArts(IEnumerable<Uri> uri, Action<CoverArt> callback, CancellationToken token)
         {
             Uri demo =
                 new Uri(

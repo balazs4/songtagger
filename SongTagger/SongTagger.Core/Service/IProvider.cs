@@ -208,6 +208,7 @@ namespace SongTagger.Core.Service
                             throw new InvalidOperationException();
 
                         data = args.Result;
+                        autoEvent.Set();
                     };
 
                     client.DownloadDataAsync(uri);
