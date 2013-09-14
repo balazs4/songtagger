@@ -32,12 +32,12 @@ using System.IO;
 namespace SongTagger.Core.Test.Integration.Service
 {
     [TestFixture()]
+    [Category("Acceptance")]
     public class MusicDataProviderTests
     {
         [TestCase("Rise Against", Result = "606bf117-494f-4864-891f-09d63ff6aa4b")]
-        [TestCase("Def Leppard", Result="7249b899-8db8-43e7-9e6e-22f1e736024e")]
+
         [TestCase("Depresszió", Result="79a8d8a6-012a-4dd9-b5e2-ed4b52a5d55e")]
-        [Category("Acceptance")]
         public string A_SearchArtistTest(string name)
         {   
             IEnumerable<Artist> result = MusicData.Provider.SearchArtist(name);
@@ -58,7 +58,6 @@ namespace SongTagger.Core.Test.Integration.Service
         }
 
         [TestCaseSource("ArtistSource")]
-        [Category("Acceptance")]
         public int B_BrowseReleaseGroupsTest(Artist artist)
         {
             IEnumerable<ReleaseGroup> result = MusicData.Provider.BrowseReleaseGroups(artist);
@@ -77,7 +76,6 @@ namespace SongTagger.Core.Test.Integration.Service
         }
 
         [TestCaseSource("ReleaseGroupSource")]
-        [Category("Acceptance")]
         public int C_BrowseReleaseTest(ReleaseGroup releaseGroup)
         {
             IEnumerable<Release> result = MusicData.Provider.BrowseReleases(releaseGroup);
@@ -97,7 +95,6 @@ namespace SongTagger.Core.Test.Integration.Service
         }
 
         [TestCaseSource("ReleaseSource")]
-        [Category("Acceptance")]
         public int D_LookupTracks(Release release)
         {
             IEnumerable<Track> result = MusicData.Provider.LookupTracks(release);
@@ -117,14 +114,33 @@ namespace SongTagger.Core.Test.Integration.Service
             return result.Count();
         }
 
-        internal static IEnumerable MergeReleaseSource
+        [TestCase("Def Leppard", Result="7249b899-8db8-43e7-9e6e-22f1e736024e")]
+        public string E_EntityCacheTest(string name)
         {
-            get
-            {
-                yield return new TestCaseData(TestHelper.Endgame).Returns(14);  //12 +1 +1 bonus tracks
-            }
-        }
+            Stopwatch watcher = Stopwatch.StartNew();
+            IEnumerable<Artist> queryResult = MusicData.Provider.SearchArtist(name);
+            watcher.Stop();
+            Artist artist = queryResult.First(a => a.Name == name);
+            TimeSpan referenceTime = watcher.Elapsed;
 
+            Console.WriteLine("Reference: " + referenceTime);
+            List<TimeSpan> laps = new List<TimeSpan>();
+            for (int i = 0; i < 5; i++)
+            {
+                watcher = Stopwatch.StartNew();
+                queryResult = MusicData.Provider.SearchArtist(name);
+                watcher.Stop();
+                Artist entity = queryResult.First(a => a.Name == name);
+                Assert.AreEqual(artist.Id, entity.Id);
+                Assert.AreEqual(artist.Name, entity.Name);
+                Assert.AreSame(artist, entity);
+                laps.Add(watcher.Elapsed);
+                Console.WriteLine("Reference: " + laps.Last());
+            }
+            Assert.IsTrue(laps.All(time => time < referenceTime), "Time compare...");
+
+            return artist.Id.ToString();
+        }
     }
 }
 
