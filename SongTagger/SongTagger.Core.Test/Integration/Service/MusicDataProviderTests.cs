@@ -123,7 +123,7 @@ namespace SongTagger.Core.Test.Integration.Service
             Artist artist = queryResult.First(a => a.Name == name);
             TimeSpan referenceTime = watcher.Elapsed;
 
-            Console.WriteLine("Reference: " + referenceTime);
+            Console.WriteLine("REF ##: " + referenceTime);
             List<TimeSpan> laps = new List<TimeSpan>();
             for (int i = 0; i < 5; i++)
             {
@@ -135,7 +135,7 @@ namespace SongTagger.Core.Test.Integration.Service
                 Assert.AreEqual(artist.Name, entity.Name);
                 Assert.AreSame(artist, entity);
                 laps.Add(watcher.Elapsed);
-                Console.WriteLine("Reference: " + laps.Last());
+                Console.WriteLine("LAP #" + i + ": " + laps.Last());
             }
             Assert.IsTrue(laps.All(time => time < referenceTime), "Time compare...");
 
