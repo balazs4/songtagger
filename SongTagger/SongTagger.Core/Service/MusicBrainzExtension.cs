@@ -22,21 +22,12 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics;
-using System.Collections.Concurrent;
-using System.Xml.Linq;
-using System.IO;
-using System.Xml.Serialization;
-using System.Xml;
-using System.Threading.Tasks;
 
 namespace SongTagger.Core
 {
     internal static class MusicBrainzExtension
     {
         #region Helper stuff
-
         internal static string GetMusicBrainzEntityName(Type type)
         {
             if (!mapping.ContainsKey(type))
@@ -53,10 +44,8 @@ namespace SongTagger.Core
             {typeof(Recording), "recording"},
             {typeof(Track), "track"}
         };
-
         private static Uri baseUri = new Uri("http://musicbrainz.org/ws/2/");
         #endregion
-
         internal static Uri Search(this IEntity entity, string searchText)
         {
             string mbEntity = GetMusicBrainzEntityName(entity.GetType());
@@ -74,22 +63,21 @@ namespace SongTagger.Core
                                                GetMusicBrainzEntityName(entity.GetType()),
                                                entity.Id.ToString(),
                                                GetMusicBrainzEntityName(typeof(T))
-                                               );
+            );
 
             return new Uri(baseUri, relativeUrl);
         }
 
-        internal static Uri Browse<T>(this IEntity entity,int limit = 200) where T : IEntity
+        internal static Uri Browse<T>(this IEntity entity, int limit = 200) where T : IEntity
         {
             string relativeUrl = string.Format("{0}?{1}={2}&limit={3}",
                                                GetMusicBrainzEntityName(typeof(T)),
                                                GetMusicBrainzEntityName(entity.GetType()),
                                                entity.Id.ToString(),
                                                limit
-                                               );
+            );
 
             return new Uri(baseUri, relativeUrl);
         }
-
     }
 }

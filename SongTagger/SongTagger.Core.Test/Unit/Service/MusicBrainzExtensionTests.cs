@@ -26,7 +26,7 @@ using System.Collections;
 
 namespace SongTagger.Core.Test.Unit.Service
 {
-    [TestFixture()]
+    [TestFixture]
     public class MusicBrainzExtensionTests
     {
         [TestCase("Def Leppard", Result = "http://musicbrainz.org/ws/2/artist?query=Def+Leppard")]
@@ -37,9 +37,9 @@ namespace SongTagger.Core.Test.Unit.Service
             return Artist.Empty.Search(searchText).ToString();
         }
 
-        internal static IEnumerable ArtistSource 
+        internal static IEnumerable ArtistSource
         {
-            get 
+            get
             {
                 yield return new TestCaseData(TestHelper.RiseAgainst)
                     .Returns("http://musicbrainz.org/ws/2/release-group?artist=606bf117-494f-4864-891f-09d63ff6aa4b&limit=444");
@@ -54,7 +54,7 @@ namespace SongTagger.Core.Test.Unit.Service
 
         internal static IEnumerable ReleaseSource
         {
-            get 
+            get
             {
                 yield return new TestCaseData(TestHelper.AppealToReasonRelease)
                     .Returns("http://musicbrainz.org/ws/2/release/205f2019-fc18-477a-971c-ecc37aa216fc?inc=recordings");
