@@ -123,10 +123,10 @@
     </DataTemplate>
 
     <DataTemplate x:Key="songDataTemplate" DataType="{x:Type viewModel:Song}">
-        <Expander Header="{Binding Track}"  HorizontalContentAlignment="Stretch"
+        <Expander Header="{Binding}"  HorizontalContentAlignment="Stretch"
                   Background="Transparent" IsExpanded="True" Margin="0,0,0,4">
             <Expander.HeaderTemplate>
-                <DataTemplate DataType="{x:Type songtagger:Track}">
+                <DataTemplate>
                     <Border Background="LightGray" HorizontalAlignment="Center">
                         <Grid >
                             <Grid.ColumnDefinitions>
@@ -139,9 +139,9 @@
                                     <Setter Property="FontSize" Value="18"/>
                                 </Style>
                             </Grid.Resources>
-                            <TextBlock Text="{Binding Posititon}" Grid.Column="0" Margin="0,0,20,0"/>
-                            <TextBlock Text="{Binding Name}" Grid.Column="1"/>
-                            <TextBlock Text="{Binding Length, Converter={StaticResource TimeSpanConvert}}" 
+                            <TextBlock Text="{Binding Position}" Grid.Column="0" Margin="0,0,20,0"/>
+                            <TextBlock Text="{Binding Track.Name}" Grid.Column="1"/>
+                            <TextBlock Text="{Binding Track.Length, Converter={StaticResource TimeSpanConvert}}" 
                                        Grid.Column="2" Margin="50,0,0,0"/>
                         </Grid>
                     </Border>

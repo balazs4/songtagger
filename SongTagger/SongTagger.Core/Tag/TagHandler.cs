@@ -57,7 +57,7 @@ namespace SongTagger.Core.Mp3Tag
 
                 tag.Title = songInfo.Name;
 
-                tag.Track = (uint)songInfo.Number;
+                tag.Track = (uint)songInfo.Posititon;
 
                 tag.Album = songInfo.Release.ReleaseGroup.Name;
 

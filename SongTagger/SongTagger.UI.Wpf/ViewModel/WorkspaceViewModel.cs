@@ -225,27 +225,53 @@ namespace SongTagger.UI.Wpf
         public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action resetCallback, Action<IEnumerable<Uri>, Action<CoverArt>, CancellationToken> coverDownloaderService)
             : base(State.MapTracks)
         {
-            Reset = new DelegateCommand(p => resetCallback());
+            CancellationTokenSource source = new CancellationTokenSource();
+            Reset = new DelegateCommand(p =>
+                {
+                    source.Cancel(true);
+                    resetCallback();
+                });
 
             ReleaseGroup = tracks.First().Release.ReleaseGroup;
             Artist = ReleaseGroup.Artist;
 
-            InitCovers(tracks, coverDownloaderService);
+            InitCovers(tracks, coverDownloaderService, source.Token);
 
-            Songs = new ObservableCollection<Song>(tracks.Select(t => new Song {Track = t}));
+            var tracksByRelease = tracks.ToLookup(tr => tr.Release);
+            var longestRelease = tracksByRelease.OrderByDescending(r => r.Count()).First();
+
+            Songs = new ObservableCollection<Song>();
+
+
+            foreach (var track in longestRelease.OrderBy(t => t.DiscNumber).ThenBy(t => t.Posititon))
+            {
+                Songs.Add(new Song{Track = track, Position = Songs.Count + 1 });
+            }
+
+            foreach (var altenative in tracksByRelease.Except(new[] { longestRelease }))
+            {
+                foreach (var track in altenative.OrderBy(t => t.DiscNumber).ThenBy(t => t.Posititon))
+                {
+                    if (Songs.Any(song => song.Track.Name.ToLower() == track.Name.ToLower()))
+                        continue;
+
+                    Songs.Add(new Song { Track = track, Position = Songs.Count + 1 });
+                }
+            }
+
         }
 
         public ICommand Reset { get; private set; }
 
-        private void InitCovers(IEnumerable<Track> tracks, Action<IEnumerable<Uri>, Action<CoverArt>,CancellationToken> coverDownloaderService)
+        private void InitCovers(IEnumerable<Track> tracks, Action<IEnumerable<Uri>, Action<CoverArt>, CancellationToken> coverDownloaderService, CancellationToken token)
         {
             List<Uri> coverUriList = tracks.ToLookup(t => t.Release)
                                            .Where(group => group.Key.HasPreferredCoverArt)
                                            .Select(group => group.Key.GetCoverArt())
                                            .ToList();
             //TODO: DisCogs,Last.FM
-            Task download = Task.Factory.StartNew(() => coverDownloaderService(coverUriList, AddToCoverArtCollectionThreadSafety, CancellationToken.None));
-            
+            Task download = Task.Factory.StartNew(() => coverDownloaderService(coverUriList, AddToCoverArtCollectionThreadSafety, token), token);
+
             download.ContinueWith(task =>
                 {
                     Action addAction = () =>
@@ -258,7 +284,7 @@ namespace SongTagger.UI.Wpf
                         Covers.Add(CoverArt.CreateCoverArt(null, null));
                     };
                     Application.Current.Dispatcher.BeginInvoke(addAction, DispatcherPriority.Normal);
-                });
+                }, token);
         }
 
         private void AddToCoverArtCollectionThreadSafety(CoverArt item)
@@ -288,9 +314,28 @@ namespace SongTagger.UI.Wpf
 
 
 
-    public class Song
+    public class Song : ViewModelBase
     {
-        public Track Track { get; set; }
-        public IEnumerable<Track> SimilarTracks { get; set; }
+        private int position;
+        public int Position
+        {
+            get { return position; }
+            set
+            {
+                position = value;
+                RaisePropertyChangedEvent("Position");
+            }
+        }
+
+        private Track track;
+        public Track Track
+        {
+            get { return track; }
+            set
+            {
+                track = value;
+                RaisePropertyChangedEvent("Track");
+            }
+        }
     }
 }

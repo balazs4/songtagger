@@ -80,8 +80,16 @@ namespace SongTagger.Core.Service
         {
             CheckArgument<Release>(release);
             Action<Track> postProcess = (item) => item.Release = release;
-            return Query<Track>(release.Lookup<Recording>(), postProcess)
-                .OrderBy(t => t.Posititon);
+            var queryResult = Query<Track>(release.Lookup<Recording>(), postProcess).ToList();
+            int discid = 0;
+            foreach (Track track in queryResult)
+            {
+                if (track.Posititon == 1)
+                    discid++;
+                track.DiscNumber = discid;
+            }
+            Trace.TraceInformation("Disc count of Release: " + discid);
+            return queryResult;
         }
 
         public void DownloadCoverArts(IEnumerable<Uri> uri, Action<CoverArt> callback, CancellationToken token)
@@ -124,27 +132,25 @@ namespace SongTagger.Core.Service
         #endregion
         internal static IEnumerable<TResult> DeserializeContent<TResult>(string content)
         {
-            ConcurrentBag<TResult> result = new ConcurrentBag<TResult>();
             using (StringReader input = new StringReader(content))
             {
                 XDocument doc = XDocument.Load(input);
                 XName xName = XName.Get(MusicBrainzExtension.GetMusicBrainzEntityName(typeof(TResult)),
                                         doc.Root.GetDefaultNamespace().NamespaceName);
 
-                IEnumerable<XElement> elements = doc.Descendants(xName);
                 XmlSerializer serializer = new XmlSerializer(typeof(TResult));
-
-                Action<XElement> deserialization = (element) =>
-                {
-                    using (XmlReader reader = element.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
-                    {
-                        result.Add((TResult)serializer.Deserialize(reader));
-                    }
-                };
-
-                Parallel.ForEach(elements.AsParallel(), deserialization);
+                var result = doc.Descendants(xName)
+                            .AsParallel().AsOrdered()
+                            .Select(element =>
+                            {
+                                using (XmlReader reader = element.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
+                                {
+                                    return (TResult)serializer.Deserialize(reader);
+                                }
+                            }).ToList();
+                return result;
             }
-            return result;
+
         }
 
         private static IEnumerable<TResult> Query<TResult>(Uri url, params Action<TResult>[] postProcessActions) where TResult : IEntity
@@ -196,7 +202,7 @@ namespace SongTagger.Core.Service
 
                     token.Register(client.CancelAsync);
 
-                    client.DownloadDataCompleted += (sender,args) =>
+                    client.DownloadDataCompleted += (sender, args) =>
                     {
                         if (args.Cancelled)
                             throw new OperationCanceledException();
@@ -214,7 +220,7 @@ namespace SongTagger.Core.Service
                     client.DownloadDataAsync(uri);
                     bool success = autoEvent.WaitOne(TimeSpan.FromMinutes(2));
                     if (!success)
-                        client.CancelAsync();                   
+                        client.CancelAsync();
                 }
             }
             catch (Exception)
@@ -231,8 +237,8 @@ namespace SongTagger.Core.Service
         private static EntityCache instance;
 
         internal static EntityCache Instance
-        { 
-            get{ return instance ?? (instance = new EntityCache());}
+        {
+            get { return instance ?? (instance = new EntityCache()); }
         }
 
         private EntityCache()
@@ -242,7 +248,7 @@ namespace SongTagger.Core.Service
         #endregion
         private ConcurrentBag<EntityCacheItem> repository;
 
-        internal bool TryGetEntity<TValue>(Uri uri, out IEnumerable<TValue> cachedCollection) 
+        internal bool TryGetEntity<TValue>(Uri uri, out IEnumerable<TValue> cachedCollection)
             where TValue : IEntity
         {
             try
