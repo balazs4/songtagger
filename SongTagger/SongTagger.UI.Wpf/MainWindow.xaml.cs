@@ -191,9 +191,9 @@ namespace SongTagger.UI.Wpf
         {
             return new[]
                 {
-                    new Track(AppealToReasonRelease) {Name = "Savior", Number = 11, Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
-                    new Track(AppealToReasonRelease) {Name = "Savior", Number = 11, Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
-                    new Track(AppealToReasonRelease) {Name = "Savior", Number = 11, Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
+                    new Track(AppealToReasonRelease) {Name = "Savior", Number = "11", Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
+                    new Track(AppealToReasonRelease) {Name = "Savior", Number = "11", Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
+                    new Track(AppealToReasonRelease) {Name = "Savior", Number = "11", Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
                 };
         }
 

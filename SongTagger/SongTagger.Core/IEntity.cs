@@ -165,6 +165,7 @@ namespace SongTagger.Core
         public Track()
         {
             Record = new Recording();
+            DiscNumber = 1;
         }
 
         [XmlAttribute("id")]
@@ -188,10 +189,13 @@ namespace SongTagger.Core
         public int Posititon { get; set; }
 
         [XmlElement("number")]
-        public int Number { get; set; }
+        public string Number { get; set; }
 
         [XmlIgnore]
         public Release Release { get; internal set; }
+
+        [XmlIgnore]
+        public int DiscNumber { get; internal set; } 
 
         public Track(Release release)
             : this()
