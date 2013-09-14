@@ -57,7 +57,6 @@ Global
 		$6.inheritsSet = VisualStudio
 		$6.inheritsScope = text/plain
 		$0.TextStylePolicy = $7
-		$7.EolMarker = Windows
 		$7.inheritsSet = VisualStudio
 		$7.inheritsScope = text/plain
 		$7.scope = text/x-csharp
@@ -71,12 +70,18 @@ Global
 		$8.EventAddBraceStyle = NextLine
 		$8.EventRemoveBraceStyle = NextLine
 		$8.StatementBraceStyle = NextLine
+		$8.ElseNewLinePlacement = NewLine
+		$8.CatchNewLinePlacement = NewLine
+		$8.FinallyNewLinePlacement = NewLine
+		$8.WhileNewLinePlacement = DoNotCare
+		$8.ArrayInitializerWrapping = DoNotChange
 		$8.ArrayInitializerBraceStyle = NextLine
 		$8.BeforeMethodDeclarationParentheses = False
 		$8.BeforeMethodCallParentheses = False
 		$8.BeforeConstructorDeclarationParentheses = False
 		$8.BeforeDelegateDeclarationParentheses = False
 		$8.NewParentheses = False
+		$8.SpacesBeforeBrackets = False
 		$8.inheritsSet = Mono
 		$8.inheritsScope = text/x-csharp
 		$8.scope = text/x-csharp
@@ -100,6 +105,11 @@ Global
 		$13.scope = application/xml
 		$0.VersionControlPolicy = $14
 		$14.inheritsSet = Mono
+		$0.ChangeLogPolicy = $15
+		$15.UpdateMode = None
+		$15.MessageStyle = $16
+		$16.LineAlign = 0
+		$15.inheritsSet = Mono
 		description = http://songtagger.codeplex.com/
 		outputpath = bin
 	EndGlobalSection

@@ -20,20 +20,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-
-using System;
-using NUnit.Framework;
-using System.Collections;
-
 namespace SongTagger.Core.Test.Unit.Service
 {
+    using NUnit.Framework;
+    using System.Collections;
 
     [TestFixture]
     public class CoverArtExtensionTests
     {
         internal static IEnumerable ReleaseSource
         {
-            get 
+            get
             {
                 yield return new TestCaseData(TestHelper.AppealToReasonRelease)
                     .Returns("http://coverartarchive.org/release/205f2019-fc18-477a-971c-ecc37aa216fc/front-500");

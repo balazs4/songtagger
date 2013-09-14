@@ -20,19 +20,19 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using System.ComponentModel;
+using System.Xml;
 
 namespace SongTagger.Core
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Drawing;
+    using System.IO;
+    using System.Linq;
+    using System.Xml.Serialization;
+    using System.ComponentModel;
+    using System.Collections.Concurrent;
+
     public interface IEntity
     {
         Guid Id { get; }
@@ -94,7 +94,7 @@ namespace SongTagger.Core
             {
                 FirstReleaseDate = string.IsNullOrEmpty(value)
                     ? DateTime.MinValue
-                    : System.Xml.XmlConvert.ToDateTime(value);
+                    : System.Xml.XmlConvert.ToDateTime(value, XmlDateTimeSerializationMode.Local);
             }
         }
 
@@ -256,6 +256,7 @@ namespace SongTagger.Core
         {
             Url = url;
             Data = content;
+            cache.AddOrUpdate(this, DateTime.Now, (k,v) => DateTime.Now);
         }
 
         public Uri Url { get; private set; }
@@ -281,7 +282,9 @@ namespace SongTagger.Core
             {
                 using (MemoryStream stream = new MemoryStream(data))
                 {
-                    using (Image.FromStream(stream)) { }
+                    using (Image.FromStream(stream))
+                    {
+                    }
                 }
                 return true;
             }
@@ -289,6 +292,23 @@ namespace SongTagger.Core
             {
                 return false;
             }
+        
         }
+        #region Cache
+        private static ConcurrentDictionary<CoverArt, DateTime> cache = new ConcurrentDictionary<CoverArt, DateTime>();
+
+        internal static void ClearRecentlyNotUsedItems(TimeSpan? diff = null)
+        {
+            if (diff == null)
+                diff = TimeSpan.FromMinutes(5);
+            var toBeDeleted = cache.Where(kv => DateTime.Now - kv.Value > diff);
+            cache = new ConcurrentDictionary<CoverArt, DateTime>(cache.Except(toBeDeleted));
+        }
+
+        internal static void ClearAll()
+        {
+            cache = new ConcurrentDictionary<CoverArt, DateTime>();
+        }
+        #endregion
     }
 }
