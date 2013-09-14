@@ -19,10 +19,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-//
-using System.Security.Policy;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
-
 namespace SongTagger.Core.Service
 {
     using System;
@@ -175,9 +171,9 @@ namespace SongTagger.Core.Service
                     }
                     tracer.WriteTrace("Postprocessing finished");
                 }
-
-                return result;
             }
+            EntityCache.Instance.Add(url, result.OfType<IEntity>());
+            return result;
         }
 
         private static void CheckArgument<TSource>(TSource entity) where TSource : IEntity
@@ -191,12 +187,33 @@ namespace SongTagger.Core.Service
 
         private static CoverArt DownloadCovertArtFromUri(Uri uri, CancellationToken token)
         {
-            byte[] data;
+            byte[] data = null;
             try
             {
                 using (WebClient client = ServiceClient.CreateWebClient())
                 {
-                    data = client.DownloadData(uri);
+                    AutoResetEvent autoEvent = new AutoResetEvent(false);
+
+                    token.Register(client.CancelAsync);
+
+                    client.DownloadDataCompleted += (sender,args) =>
+                    {
+                        if (args.Cancelled)
+                            throw new OperationCanceledException();
+
+                        if (args.Error != null)
+                            throw args.Error;
+
+                        if (args.Result == null)
+                            throw new InvalidOperationException();
+
+                        data = args.Result;
+                    };
+
+                    client.DownloadDataAsync(uri);
+                    bool success = autoEvent.WaitOne(TimeSpan.FromMinutes(2));
+                    if (!success)
+                        client.CancelAsync();                   
                 }
             }
             catch (Exception)
