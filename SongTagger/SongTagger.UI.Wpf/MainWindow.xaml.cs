@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using SongTagger.Core;
 
 namespace SongTagger.UI.Wpf
@@ -18,6 +19,33 @@ namespace SongTagger.UI.Wpf
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel(SongTagger.Core.Service.MusicData.Provider);
+        }
+    }
+
+
+    public class DynamicImage : Image
+    {
+        public static readonly RoutedEvent SourceChangedEvent = EventManager.RegisterRoutedEvent(
+            "SourceChanged", RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(DynamicImage));
+
+        static DynamicImage()
+        {
+            Image.SourceProperty.OverrideMetadata(typeof(DynamicImage), new FrameworkPropertyMetadata(SourcePropertyChanged));
+        }
+
+        public event RoutedEventHandler SourceChanged
+        {
+            add { AddHandler(SourceChangedEvent, value); }
+            remove { RemoveHandler(SourceChangedEvent, value); }
+        }
+
+        private static void SourcePropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        {
+            Image image = obj as Image;
+            if (image != null)
+            {
+                image.RaiseEvent(new RoutedEventArgs(SourceChangedEvent));
+            }
         }
     }
 
