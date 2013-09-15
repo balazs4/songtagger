@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -211,6 +212,17 @@ namespace SongTagger.UI.Wpf
             }
         }
 
+        private CoverArt selectedCover;
+        public CoverArt SelectedCover
+        {
+            get { return selectedCover; }
+            set
+            {
+                selectedCover = value;
+                RaisePropertyChangedEvent("SelectedCover");
+            }
+        }
+
         private ObservableCollection<Song> songs;
         public ObservableCollection<Song> Songs
         {
@@ -222,30 +234,82 @@ namespace SongTagger.UI.Wpf
             }
         }
 
+        private volatile bool IsCoversInitialized;
+
         public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action resetCallback, Action<IEnumerable<Uri>, Action<CoverArt>, CancellationToken> coverDownloaderService)
             : base(State.MapTracks)
         {
             CancellationTokenSource source = new CancellationTokenSource();
+            #region Init commands
             Reset = new DelegateCommand(p =>
                 {
                     source.Cancel(true);
                     resetCallback();
                 });
 
+            AddCoverArtLink = new DelegateCommand(p =>
+                {
+                    Uri uri;
+                    if (!Uri.TryCreate(Clipboard.GetText(TextDataFormat.Text), UriKind.Absolute, out uri))
+                        return;
+
+                    if (uri == null)
+                        return;
+
+                    if (!uri.IsWellFormedOriginalString())
+                        return;
+
+                    DownloadAndInitCovers(coverDownloaderService, source.Token, uri);
+                    Clipboard.Clear();
+                },
+                p =>
+                {
+                    if (!IsCoversInitialized)
+                        return false;
+
+                    string data = Clipboard.GetText(TextDataFormat.Text);
+
+                    Uri uri;
+                    return Uri.TryCreate(data, UriKind.Absolute, out uri);
+                });
+
+            CancelCustomCovertArt = new DelegateCommand(p => Clipboard.Clear());
+
+            #endregion
+
             ReleaseGroup = tracks.First().Release.ReleaseGroup;
             Artist = ReleaseGroup.Artist;
 
-            InitCovers(tracks, coverDownloaderService, source.Token);
+            #region Init cover arts
+            Covers = new ObservableCollection<CoverArt>();
+            Covers.CollectionChanged += (sender, args) =>
+                {
+                    if (args.Action != NotifyCollectionChangedAction.Add)
+                        return;
+                    SelectedCover = (CoverArt)args.NewItems[0];
+                };
 
-            var tracksByRelease = tracks.ToLookup(tr => tr.Release);
-            var longestRelease = tracksByRelease.OrderByDescending(r => r.Count()).First();
+            var coverUriList = tracks.ToLookup(t => t.Release)
+                                           .Where(group => group.Key.HasPreferredCoverArt)
+                                           .Select(group => group.Key.GetCoverArt())
+                                           .ToArray();
+            //TODO: DisCogs,Last.FM
+            DownloadAndInitCovers(coverDownloaderService, source.Token, coverUriList);
+            #endregion
 
             Songs = new ObservableCollection<Song>();
 
+            CollectAndInitSongs(tracks);
+        }
+
+        private void CollectAndInitSongs(IEnumerable<Track> tracks)
+        {
+            var tracksByRelease = tracks.ToLookup(tr => tr.Release);
+            var longestRelease = tracksByRelease.OrderByDescending(r => r.Count()).First();
 
             foreach (var track in longestRelease.OrderBy(t => t.DiscNumber).ThenBy(t => t.Posititon))
             {
-                Songs.Add(new Song{Track = track, Position = Songs.Count + 1 });
+                Songs.Add(new Song { Track = track, Position = Songs.Count + 1 });
             }
 
             foreach (var altenative in tracksByRelease.Except(new[] { longestRelease }))
@@ -258,34 +322,36 @@ namespace SongTagger.UI.Wpf
                     Songs.Add(new Song { Track = track, Position = Songs.Count + 1 });
                 }
             }
-
         }
 
         public ICommand Reset { get; private set; }
+        public ICommand AddCoverArtLink { get; private set; }
+        public ICommand CancelCustomCovertArt { get; private set; }
 
-        private void InitCovers(IEnumerable<Track> tracks, Action<IEnumerable<Uri>, Action<CoverArt>, CancellationToken> coverDownloaderService, CancellationToken token)
+        private void DownloadAndInitCovers(Action<IEnumerable<Uri>, Action<CoverArt>, CancellationToken> coverDownloaderService, CancellationToken token, params Uri[] coverUriList)
         {
-            List<Uri> coverUriList = tracks.ToLookup(t => t.Release)
-                                           .Where(group => group.Key.HasPreferredCoverArt)
-                                           .Select(group => group.Key.GetCoverArt())
-                                           .ToList();
-            //TODO: DisCogs,Last.FM
+            IsCoversInitialized = false;
+            if (Covers.Any(cover => cover.Data == null))
+            {
+                Covers.Clear();
+            }
+
             Task download = Task.Factory.StartNew(() => coverDownloaderService(coverUriList, AddToCoverArtCollectionThreadSafety, token), token);
 
             download.ContinueWith(task =>
                 {
                     Action addAction = () =>
                     {
-                        if (Covers == null)
-                            Covers = new ObservableCollection<CoverArt>();
-
                         if (Covers.Any())
                             return;
                         Covers.Add(CoverArt.CreateCoverArt(null, null));
                     };
                     Application.Current.Dispatcher.BeginInvoke(addAction, DispatcherPriority.Normal);
+                    IsCoversInitialized = true;
                 }, token);
         }
+
+
 
         private void AddToCoverArtCollectionThreadSafety(CoverArt item)
         {
@@ -301,18 +367,11 @@ namespace SongTagger.UI.Wpf
             if (!item.Data.Any())
                 return;
 
-            Action addAction = () =>
-                {
-                    if (Covers == null)
-                        Covers = new ObservableCollection<CoverArt>();
-                    Covers.Add(item);
-                };
+            Action addAction = () => Covers.Insert(0, item);
             Application.Current.Dispatcher.BeginInvoke(addAction, DispatcherPriority.Normal);
         }
 
     }
-
-
 
     public class Song : ViewModelBase
     {
@@ -338,4 +397,5 @@ namespace SongTagger.UI.Wpf
             }
         }
     }
+
 }

@@ -50,7 +50,7 @@
                                                         NonVisibleTemplate="{StaticResource nonVisibleTemplate}"
                                                         DefaultDataTemplate="{StaticResource defaultCartTemplate}"/>
                 </Grid.Resources>
-                <Image Grid.Row="0" Source="View/Images/logo.png" Width="64" />
+                <Image Grid.Row="0" Source="View/Images/logo.png" Width="64" Style="{StaticResource Shadow}"/>
                 <ContentControl Grid.Row="1" Margin="15,16,15,14"
                                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                 ContentTemplateSelector="{StaticResource cartTemplateSelector}"
@@ -87,9 +87,8 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-            <Canvas Height="200" VerticalAlignment="Top" Margin="25">
-                <Border Background="White" Opacity="0.98" 
-                        BorderThickness="2" BorderBrush="Gray"/>
+            <Border Background="White" Opacity="1" Height="180" VerticalAlignment="Top" Margin="25"
+                        BorderThickness="2" BorderBrush="Black">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"/>
@@ -111,9 +110,6 @@
                                Margin="0,10,0,0"/>
                     <StackPanel Grid.Row="1" Grid.Column="1">
                         <TextBlock Text="{Binding Error.Exception.Message}" FontSize="18" Margin="5,0,0,0"/>
-                        <Expander Header="Details" Opacity=".6" FontSize="9"
-                                  Content="{Binding Error.Exception.StackTrace}" 
-                                  IsExpanded="False"/>
                     </StackPanel>
                     <ItemsControl ItemsSource="{Binding Error.Actions}" Grid.Row="2" Grid.Column="1"
                                   HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10,10,50,10">
@@ -131,7 +127,7 @@
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
                 </Grid>
-            </Canvas>
+            </Border>
         </Grid>
     </Grid>
 </Window>
