@@ -15,6 +15,25 @@
     <viewModel:TimeSpanConverter x:Key="TimeSpanConvert"/>
     <viewModel:ByteArrayToBitmapConverter x:Key="ByteImageConverter"/>
 
+    <Style TargetType="Image" x:Key="Shadow">
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="Black" Direction="320" ShadowDepth="5" Opacity="0.5"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Button" x:Key="Back">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Image Source="Images/back.png" Width="50" Height="50" Style="{StaticResource Shadow}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <!-- #Region Entity -->
     <DataTemplate x:Key="artistEntityTemplate" DataType="{x:Type songtagger:Artist}">
@@ -124,15 +143,15 @@
 
     <DataTemplate x:Key="songDataTemplate" DataType="{x:Type viewModel:Song}">
         <Expander Header="{Binding}"  HorizontalContentAlignment="Stretch"
-                  Background="Transparent" IsExpanded="True" Margin="0,0,0,4">
+                  Background="Transparent" IsExpanded="False" Margin="0,0,0,4">
             <Expander.HeaderTemplate>
                 <DataTemplate>
                     <Border Background="LightGray" HorizontalAlignment="Center">
                         <Grid >
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50"/>
-                                <ColumnDefinition Width="300"/>
-                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="5*" MinWidth="300"/>
+                                <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
                             <Grid.Resources>
                                 <Style TargetType="TextBlock">
@@ -220,13 +239,7 @@
                 <RowDefinition Height="9*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" Name="header">
-                <Button HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Reset}">
-                    <Button.Template>
-                        <ControlTemplate>
-                            <Image Source="Images/back.png" Width="50" Height="50"/>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                <Button Command="{Binding Reset}" Style="{StaticResource Back}" />
                 <StackPanel Grid.Row="0" Margin="0,0,20,0" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <TextBlock Text="{Binding Header}" FontSize="48" />
                     <Grid Width="150" HorizontalAlignment="Right" Opacity=".5" Margin="0,5,0,0">
@@ -331,98 +344,155 @@
     <DataTemplate x:Key="virtualReleaseTemplate" DataType="{x:Type viewModel:VirtualReleaseViewModel}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="2*"/>
-                <RowDefinition Height="9*"/>
+                <RowDefinition Height="150"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" Name="header" Background="Transparent">
-                <StackPanel Orientation="Horizontal">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="110"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Command="{Binding Reset}" Margin="0,0,30,0" Grid.Column="0" Style="{StaticResource Back}"/>
 
-                    <Button HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding Reset}" Margin="0,0,30,0">
-                        <Button.Template>
-                            <ControlTemplate>
-                                <Image Source="Images/back.png" Width="50" Height="50"/>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
-
-                    <ListBox ItemsSource="{Binding Covers, IsAsync=True}" MaxWidth="105" 
-                             ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                    <Grid Grid.Column="1" VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="110"/>
+                            <RowDefinition Height="10"/>
+                        </Grid.RowDefinitions>
+                        <ListBox ItemsSource="{Binding Covers, IsAsync=True}" Name="CoverList" Grid.Row="1" HorizontalAlignment="Center"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                             BorderThickness="0">
-                        <ListBox.Resources>
-                            <Style TargetType="ListBox">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Items.Count}" Value="0">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate>
-                                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity=".8">
-                                                        <metroControls:MetroProgressBar EllipseDiameter="5" EllipseOffset="1" IsIndeterminate="True" Width="105" Foreground="Gray"/>
-                                                    </StackPanel>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ListBox.Resources>
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Image Stretch="UniformToFill" MaxWidth="90" MaxHeight="90" VerticalAlignment="Center" HorizontalAlignment="Left">
-                                    <Image.Resources>
-                                        <BitmapImage x:Key="NoCover" UriSource="Images/disc.png" />
-                                    </Image.Resources>
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Style.Triggers>
-                                                <EventTrigger RoutedEvent="Loaded">
-                                                    <EventTrigger.Actions>
-                                                        <BeginStoryboard>
-                                                            <Storyboard>
-                                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:1.0" From="0.0" To="1.0"  />
-                                                            </Storyboard>
-                                                        </BeginStoryboard>
-                                                    </EventTrigger.Actions>
-                                                </EventTrigger>
-                                                <Trigger Property="IsVisible" Value="True">
-                                                    <Setter Property="ToolTip">
+                             BorderThickness="0" SelectedIndex="0"
+                            SelectedItem="{Binding SelectedCover}"
+                                 SelectionMode="Single">
+                            <ListBox.Resources>
+                                <Style TargetType="ListBox">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Items.Count}" Value="0">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate>
+                                                        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Opacity=".8" Margin="0,-55,0,0">
+                                                            <metroControls:MetroProgressBar EllipseDiameter="5" EllipseOffset="1" IsIndeterminate="True" Width="105" Foreground="Gray"/>
+                                                        </StackPanel>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.Resources>
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Ellipse Width="4" Height="4" Fill="Black"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <Grid>
+                            <ContentControl Content="{Binding SelectedCover}" Grid.Row="0">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate DataType="{x:Type songtagger:CoverArt}">
+                                        <Image Stretch="UniformToFill" MaxWidth="110" MaxHeight="110" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                            <Image.Resources>
+                                                <BitmapImage x:Key="NoCover" UriSource="Images/disc.png" />
+                                            </Image.Resources>
+                                            <Image.Style>
+                                                <Style TargetType="Image">
+                                                    <Style.Triggers>
+                                                        <EventTrigger RoutedEvent="Loaded">
+                                                            <EventTrigger.Actions>
+                                                                <BeginStoryboard>
+                                                                    <Storyboard>
+                                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:1.0" From="0.0" To="1.0"  />
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </EventTrigger.Actions>
+                                                        </EventTrigger>
+                                                        <Trigger Property="IsVisible" Value="True">
+                                                            <Setter Property="ToolTip">
+                                                                <Setter.Value>
+                                                                    <Image Source="{Binding Data, Converter={StaticResource ByteImageConverter}}"/>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Image.Style>
+                                            <Image.Source>
+                                                <Binding Path="Data" Converter="{StaticResource ByteImageConverter}" TargetNullValue="{StaticResource NoCover}"/>
+                                            </Image.Source>
+                                        </Image>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+                            <Button ToolTip="Add custom covertart link from clipboard" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="customCover"
+                                    Command="{Binding AddCoverArtLink}" Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource Bool2Visibility}}"
+                                    >
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Grid>
+                                            <Grid.Resources>
+                                                <Style x:Key="AnimationImage" TargetType="{x:Type Image}" BasedOn="{StaticResource Shadow}">
+                                                    <Setter Property="RenderTransform">
                                                         <Setter.Value>
-                                                            <Image Source="{Binding Data, Converter={StaticResource ByteImageConverter}}"/>
+                                                            <RotateTransform Angle="0" CenterX="16" CenterY="16" />
                                                         </Setter.Value>
                                                     </Setter>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                    <Image.Source>
-                                        <Binding Path="Data" Converter="{StaticResource ByteImageConverter}"  
-                                                 TargetNullValue="{StaticResource NoCover}"/>
-                                    </Image.Source>
-                                </Image>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Style.Triggers>
-                                    <Trigger Property="IsSelected" Value="True" >
-                                        <Setter Property="FontWeight" Value="Bold" />
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="Foreground" Value="Black" />
-                                    </Trigger>
-                                </Style.Triggers>
-                                <Style.Resources>
-                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Orange" />
-                                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
-                                </Style.Resources>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                    </ListBox>
-                    <StackPanel Grid.Row="0" Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsVisible" Value="true">
+                                                            <Trigger.EnterActions>
+                                                                <BeginStoryboard>
+                                                                    <Storyboard>
+                                                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.Angle" 
+                                                                                         To="-180" Duration="0:0:0.5" AutoReverse="True" RepeatBehavior="2x" />
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </Trigger.EnterActions>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Resources>
+                                            <Border Background="Black" Opacity=".75" Padding="15"/>
+                                            <Ellipse Fill="WhiteSmoke" Height="64" Width="64" Margin="15" Opacity=".95"/>
+                                            <Image Source="Images/add.png" Width="32" Opacity="1.0" Style="{StaticResource AnimationImage}"/>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <Button ToolTip="No thanks, no custom coverart" Command="{Binding CancelCustomCovertArt}" 
+                                    HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5"
+                                    Visibility="{Binding ElementName=customCover, Path=Visibility}">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Canvas Name="canvas" Height="0" Width="10">
+                                            <Path Stroke="LightCoral" StrokeThickness="4">
+                                                <Path.Data>
+                                                    <PathGeometry>
+                                                        <PathGeometry.Figures>
+                                                            <PathFigure StartPoint="0,0">
+                                                                <LineSegment Point="10,10"/>
+                                                            </PathFigure>
+                                                            <PathFigure StartPoint="0,10">
+                                                                <LineSegment Point="10,0"/>
+                                                            </PathFigure>
+                                                        </PathGeometry.Figures>
+                                                    </PathGeometry>
+                                                </Path.Data>
+                                            </Path>
+                                        </Canvas>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                    <StackPanel Grid.Column="2" Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center">
                         <TextBlock Text="{Binding Artist.Name}" FontSize="20"/>
                         <TextBlock Text="{Binding ReleaseGroup.Name}" FontSize="24" FontWeight="Bold"/>
                         <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,5,0,0">
@@ -430,7 +500,7 @@
                             <TextBlock Text="{Binding ReleaseGroup.FirstReleaseDate.Year}"  HorizontalAlignment="Right"/>
                         </Grid>
                     </StackPanel>
-                </StackPanel>
+                </Grid>
             </Grid>
             <Grid Grid.Row="1" Name="content"  Background="Transparent" >
                 <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" 

@@ -4,6 +4,8 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace SongTagger.UI.Wpf
 {
@@ -12,5 +14,15 @@ namespace SongTagger.UI.Wpf
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            DispatcherTimer timer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMilliseconds(100)
+                };
+            timer.Start();
+            timer.Tick += (sender, args) => CommandManager.InvalidateRequerySuggested();
+        }
     }
 }
