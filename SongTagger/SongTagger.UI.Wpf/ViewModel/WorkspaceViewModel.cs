@@ -266,11 +266,16 @@ namespace SongTagger.UI.Wpf
                 {
                     if (!IsCoversInitialized)
                         return false;
-
-                    string data = Clipboard.GetText(TextDataFormat.Text);
-
-                    Uri uri;
-                    return Uri.TryCreate(data, UriKind.Absolute, out uri);
+                    try
+                    {
+                        string data = Clipboard.GetText(TextDataFormat.Text);
+                        Uri uri;
+                        return Uri.TryCreate(data, UriKind.Absolute, out uri);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
                 });
 
             CancelCustomCovertArt = new DelegateCommand(p => Clipboard.Clear());
