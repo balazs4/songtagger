@@ -256,7 +256,10 @@ namespace SongTagger.UI.Wpf
                     if (uri == null)
                         return;
 
-                    DownloadAndInitCovers(coverDownloaderService, source.Token, uri);
+                    if (Covers.All(cover => cover.Url == null || cover.Url.ToString() != uri.ToString()))
+                    {
+                        DownloadAndInitCovers(coverDownloaderService, source.Token, uri);
+                    }
                     Clipboard.Clear();
                 },
                 p =>
