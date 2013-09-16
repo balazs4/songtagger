@@ -193,9 +193,27 @@ namespace SongTagger.Core.Service
 
         private static CoverArt DownloadCovertArtFromUri(Uri uri, CancellationToken token)
         {
-            byte[] data = null;
+            CoverArt cover;
+
+            if (CoverArt.TryGetCoverArt(uri, out cover))
+            {
+                return cover;
+            }
+
             try
             {
+                byte[] data = null;
+                if (uri.Scheme == "file")
+                {
+                    using (FileStream fs =File.Open(uri.LocalPath, FileMode.Open))
+                    {
+                        data = new byte[fs.Length];
+                        fs.Read(data, 0, (int)fs.Length);
+                    }
+                    return CoverArt.CreateCoverArt(uri, data);
+                }
+
+
                 using (WebClient client = ServiceClient.CreateWebClient())
                 {
                     AutoResetEvent autoEvent = new AutoResetEvent(false);
@@ -218,16 +236,16 @@ namespace SongTagger.Core.Service
                     };
 
                     client.DownloadDataAsync(uri);
-                    bool success = autoEvent.WaitOne(TimeSpan.FromMinutes(2));
+                    bool success = autoEvent.WaitOne(TimeSpan.FromSeconds(30));
                     if (!success)
                         client.CancelAsync();
                 }
+                return CoverArt.CreateCoverArt(uri, data);
             }
             catch (Exception)
             {
-                data = null;
+                return CoverArt.Empty;
             }
-            return CoverArt.CreateCoverArt(uri, data);
         }
     }
 

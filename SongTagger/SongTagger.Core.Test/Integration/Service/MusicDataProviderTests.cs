@@ -28,6 +28,7 @@ using System.Linq;
 using SongTagger.Core.Service;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace SongTagger.Core.Test.Integration.Service
 {
@@ -140,6 +141,34 @@ namespace SongTagger.Core.Test.Integration.Service
             Assert.IsTrue(laps.All(time => time < referenceTime), "Time compare...");
 
             return artist.Id.ToString();
+        }
+
+        [Test]
+        public void F_CoverArtCacheTest()
+        {
+            string url = TestHelper.GetInputDataFilePath("DefLeppard-Erlangen.png");
+            Uri uri = new Uri(url);
+            CoverArt reference = null;
+            Stopwatch referenceWatcher = Stopwatch.StartNew();
+            MusicData.Provider.DownloadCoverArts(new Uri[] { uri }, ca => reference = ca, CancellationToken.None);
+            referenceWatcher.Stop();
+            Assert.IsNotNull(reference, "Reference coverart is null");
+            Assert.IsNotNull(reference.Data, "Reference.Data is null");
+            Assert.IsNotNull(reference.Url, "Reference.Url is null");
+            Console.WriteLine("REF ####:" + referenceWatcher.Elapsed);
+
+            for (int i = 0; i < 5; i++)
+            {
+                CoverArt current = null;
+                Stopwatch watcher = Stopwatch.StartNew();
+                MusicData.Provider.DownloadCoverArts(new Uri[] { uri }, ca => current = ca, CancellationToken.None);
+                watcher.Stop();
+                Assert.AreSame(reference, current, "Not the same objects");
+                Assert.AreSame(reference.Data, current.Data, "Not the same data");
+                Assert.AreSame(reference.Url, current.Url, "Not the same url");
+                Console.WriteLine("Cache #" + i + ": " + watcher.Elapsed);
+                Assert.LessOrEqual(watcher.ElapsedMilliseconds, referenceWatcher.ElapsedMilliseconds);
+            }
         }
     }
 }
