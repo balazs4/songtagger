@@ -18,7 +18,11 @@ namespace SongTagger.UI.Wpf
         public MainWindow()
         {
             InitializeComponent();
+#if OFFLINE
+            DataContext = new MainWindowViewModel(OfflineDataProvider.Instance);
+#else
             DataContext = new MainWindowViewModel(SongTagger.Core.Service.MusicData.Provider);
+#endif
         }
     }
 
@@ -53,7 +57,7 @@ namespace SongTagger.UI.Wpf
     public class MainWindowViewModelDesignData : MainWindowViewModel
     {
         public MainWindowViewModelDesignData()
-            : base(DesignDataProvider.Instance)
+            : base(OfflineDataProvider.Instance)
         {
             WindowTitle = "Design data";
             InitDesignData(CartInit, Tracks);
@@ -77,26 +81,26 @@ namespace SongTagger.UI.Wpf
 
         private void ReleaseGroupMarket()
         {
-            Cart.EntityItem = new EntityViewModel(DesignDataProvider.RiseAgainst);
+            Cart.EntityItem = new EntityViewModel(OfflineDataProvider.RiseAgainst);
             Workspace = new MarketViewModel(State.SelectReleaseGroup,
-               provider.BrowseReleaseGroups(DesignDataProvider.RiseAgainst).Select(e => new EntityViewModel(e)),
+               provider.BrowseReleaseGroups(OfflineDataProvider.RiseAgainst).Select(e => new EntityViewModel(e)),
                Reset
                );
         }
 
         private void ReleaseMarket()
         {
-            Cart.EntityItem = new EntityViewModel(DesignDataProvider.AppealToReason);
+            Cart.EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReason);
             Workspace = new MarketViewModel(State.SelectRelease,
-               provider.BrowseReleases(DesignDataProvider.AppealToReason).Select(e => new EntityViewModel(e)),
+               provider.BrowseReleases(OfflineDataProvider.AppealToReason).Select(e => new EntityViewModel(e)),
                Reset
                );
         }
 
         private void Tracks()
         {
-            Cart.EntityItem = new EntityViewModel(DesignDataProvider.AppealToReasonRelease);
-            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(DesignDataProvider.AppealToReasonRelease), Reset, provider.DownloadCoverArts);
+            Cart.EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReasonRelease);
+            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), Reset, provider.DownloadCoverArts);
         }
 
         private void CartInit()
@@ -114,7 +118,7 @@ namespace SongTagger.UI.Wpf
 
     }
 
-    public class DesignDataProvider : SongTagger.Core.Service.IProvider
+    public class OfflineDataProvider : SongTagger.Core.Service.IProvider
     {
         #region Singleton pattern
         private static SongTagger.Core.Service.IProvider instance;
@@ -123,12 +127,12 @@ namespace SongTagger.UI.Wpf
             get
             {
                 if (instance == null)
-                    instance = new DesignDataProvider();
+                    instance = new OfflineDataProvider();
                 return instance;
             }
         }
 
-        private DesignDataProvider()
+        private OfflineDataProvider()
         {
 
         }
@@ -227,18 +231,28 @@ namespace SongTagger.UI.Wpf
 
         public void DownloadCoverArts(IEnumerable<Uri> uri, Action<CoverArt> callback, CancellationToken token)
         {
-            Uri demo =
-                new Uri(
-                    "http://upload.wikimedia.org/wikipedia/en/thumb/4/40/Def_Leppard_-_Hysteria_(vinyl_version).jpg/220px-Def_Leppard_-_Hysteria_(vinyl_version).jpg");
-
-            byte[] data = new WebClient().DownloadData(demo.ToString());
-
-
-            System.Threading.Thread.Sleep(2000);
-            for (int i = 0; i < 4; i++)
+            var uriList = uri;
+            if (uri == null || !uri.Any())
             {
-                callback(CoverArt.CreateCoverArt(demo, data));
-                System.Threading.Thread.Sleep(1000);
+                uriList =
+                    Directory.EnumerateFileSystemEntries(
+                        Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "*.*")
+                             .Take(5)
+                             .Select(f => new Uri(f));
+            }
+            else
+            {
+                uriList = uri;
+            }
+            foreach (Uri pic in uriList)
+            {
+                using (FileStream fs = File.Open(pic.LocalPath, FileMode.Open))
+                {
+                    byte[] data = new byte[fs.Length];
+                    fs.Read(data, 0,(int)fs.Length);
+                    callback(CoverArt.CreateCoverArt(pic, data));
+                    System.Threading.Thread.Sleep(1000);
+                }
             }
         }
     }
