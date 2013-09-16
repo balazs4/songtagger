@@ -60,7 +60,7 @@ namespace SongTagger.Core.Test.Integration.Tag
             track = new Track();
             track.Release = TestHelper.AppealToReasonRelease;
             track.Record.Name = "Savior";
-            track.Number = 11;
+            track.Number = "11";
             track.Posititon = 11;
 
 
