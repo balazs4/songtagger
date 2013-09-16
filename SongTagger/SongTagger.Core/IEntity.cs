@@ -313,6 +313,22 @@ namespace SongTagger.Core
         {
             cache = new ConcurrentDictionary<CoverArt, DateTime>();
         }
+
+        internal static bool TryGetCoverArt(Uri uri, out CoverArt cover)
+        {
+            try
+            {
+                var cachedItem = cache.First(kv => kv.Key.Url.ToString() == uri.ToString() && kv.Key.Data != null);
+                cache.TryUpdate(cachedItem.Key, DateTime.Now, cachedItem.Value);
+                cover = cachedItem.Key;
+                return true;
+            }
+            catch
+            {
+                cover = default(CoverArt);
+                return false;
+            }
+        }
         #endregion
     }
 }
