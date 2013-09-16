@@ -260,6 +260,9 @@ namespace SongTagger.Core
         {
             Url = url;
             Data = content;
+            if (url == null || content == null)
+                return;
+
             cache.AddOrUpdate(this, DateTime.Now, (k,v) => DateTime.Now);
         }
 
