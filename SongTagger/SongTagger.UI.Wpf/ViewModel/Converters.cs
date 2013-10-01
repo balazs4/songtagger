@@ -125,4 +125,5 @@ namespace SongTagger.UI.Wpf
             throw new NotImplementedException();
         }
     }
+
 }
