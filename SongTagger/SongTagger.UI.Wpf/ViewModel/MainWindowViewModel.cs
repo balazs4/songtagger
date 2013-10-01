@@ -73,26 +73,16 @@ namespace SongTagger.UI.Wpf
             //TODO
         }
 
-        protected void Reset()
-        {
-            if (Cart == null || Cart.Collection.Count <= 1)
-            {
-                Workspace = new SearchViewmodel(SearchArtistAsync);
-                Cart = null;
-                return;
-            }
-            Cart.Collection.Remove(Cart.Collection.Last());
-            Cart.EntityItem = Cart.Collection.LastOrDefault();
-        }
+        
 
         private void StartMarketQueryTask<T>(Func<T> action, State nextWorkspaceState)
             where T : IEnumerable<IEntity>
         {
             Action<Task<T>> doneTask = task1 =>
                 {
-                    Workspace = new MarketViewModel(nextWorkspaceState, task1.Result.Select(a => new EntityViewModel(a)), Reset);
+                    Workspace = new MarketViewModel(nextWorkspaceState, task1.Result.Select(a => new EntityViewModel(a)));
                     if (Cart == null)
-                        Cart = new CartViewModel(LoadEntitiesAsync);
+                        Cart = new CartViewModel(LoadEntitiesAsync, ResetToSearchArtist);
                 };
 
             StartQueryTask(action, doneTask);
@@ -131,7 +121,7 @@ namespace SongTagger.UI.Wpf
             {
                 Func<IEnumerable<Track>> action = () =>
                     {
-                        IEnumerable<Release> releases = provider.BrowseReleases((ReleaseGroup) sourceEntity);
+                        IEnumerable<Release> releases = provider.BrowseReleases((ReleaseGroup)sourceEntity);
                         List<Track> tracks = new List<Track>();
                         foreach (Release release in releases)
                         {
@@ -142,15 +132,21 @@ namespace SongTagger.UI.Wpf
 
                 Action<Task<IEnumerable<Track>>> doneTask = task1 =>
                 {
-                    Workspace = new VirtualReleaseViewModel(task1.Result, Reset, provider.DownloadCoverArts);
+                    Workspace = new VirtualReleaseViewModel(task1.Result, provider.DownloadCoverArts);
                     if (Cart == null)
-                        Cart = new CartViewModel(LoadEntitiesAsync);
+                        Cart = new CartViewModel(LoadEntitiesAsync, ResetToSearchArtist);
                 };
 
                 StartQueryTask(action, doneTask);
 
                 return;
             }
+        }
+
+        protected void ResetToSearchArtist()
+        {
+            Workspace = new SearchViewmodel(SearchArtistAsync);
+            Cart = null;
         }
 
         private void SearchArtistAsync(string searchText)
@@ -219,22 +215,22 @@ namespace SongTagger.UI.Wpf
     public class EntityViewModel : ViewModelBase
     {
         #region Colors
-        private static Dictionary<Type, Color> colors = new Dictionary<Type, Color>
+        private static Dictionary<Type, Tuple<Color, string>> styles = new Dictionary<Type, Tuple<Color, string>>
             {
-                {typeof(Artist), Color.CornflowerBlue},
-                {typeof(ReleaseGroup), Color.Orange},
-                {typeof(Release), Color.Gray},
-                {typeof(Track), Color.MediumPurple}
+                {typeof(Artist), Tuple.Create(Color.CornflowerBlue, "artist.person.png")},
+                {typeof(ReleaseGroup), Tuple.Create(Color.Orange,"disc.png")},
+                {typeof(Release), Tuple.Create(Color.Gray,"")},
+                {typeof(Track), Tuple.Create(Color.MediumPurple,"")}
             };
 
-        private static Color fallBackColor = Color.Purple;
+        private static Tuple<Color, string> fallback = Tuple.Create(Color.Purple, "play.png");
 
-        private static Color GetColor(Type type)
+        private static Tuple<Color, string> GetStyle(Type type)
         {
-            if (colors.ContainsKey(type))
-                return colors[type];
+            if (styles.ContainsKey(type))
+                return styles[type];
             else
-                return fallBackColor;
+                return fallback;
         }
         #endregion
 
@@ -249,7 +245,9 @@ namespace SongTagger.UI.Wpf
             switch (eventArgs.PropertyName)
             {
                 case "Entity":
-                    EntityColor = GetColor(Entity.GetType());
+                    var entityStyle = GetStyle(Entity.GetType());
+                    EntityColor = entityStyle.Item1;
+                    EntityImage = Path.Combine("Images", entityStyle.Item2);
                     break;
 
                 case "EntityColor":
@@ -280,39 +278,16 @@ namespace SongTagger.UI.Wpf
                 RaisePropertyChangedEvent("Entity");
             }
         }
-    }
 
-    public class ReleaseEntityViewModel : EntityViewModel
-    {
-        public ReleaseEntityViewModel(IEntity entity)
-            : base(entity)
+        private string entityImage;
+        public string EntityImage
         {
-            PropertyChanged += OnPropertyChangedDispatcher;
-        }
-
-        private void OnPropertyChangedDispatcher(object sender, PropertyChangedEventArgs eventArgs)
-        {
-            if (eventArgs.PropertyName == "Entity")
+            get { return entityImage; }
+            set
             {
-                RaisePropertyChangedEvent("Release");
-                return;
+                entityImage = value;
+                RaisePropertyChangedEvent("EntityImage");
             }
-
-            if (eventArgs.PropertyName == "Release")
-            {
-
-                return;
-            }
-
         }
-
-        public Release Release
-        {
-            get { return (Release)Entity; }
-        }
-
-
-
-
     }
 }

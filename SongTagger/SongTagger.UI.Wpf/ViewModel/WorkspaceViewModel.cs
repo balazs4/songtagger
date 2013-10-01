@@ -87,11 +87,10 @@ namespace SongTagger.UI.Wpf
 
     public class MarketViewModel : WorkspaceViewModel
     {
-        public MarketViewModel(State state, IEnumerable<EntityViewModel> entities, Action resetCallback)
+        public MarketViewModel(State state, IEnumerable<EntityViewModel> entities)
             : base(state)
         {
             Entities = new ObservableCollection<EntityViewModel>(entities);
-            Reset = new DelegateCommand(param => resetCallback());
         }
 
         private string filterText;
@@ -173,8 +172,6 @@ namespace SongTagger.UI.Wpf
         {
             return properties.Any(s => s.ToLower().Contains(text));
         }
-
-        public ICommand Reset { get; private set; }
     }
 
     public class VirtualReleaseViewModel : WorkspaceViewModel
@@ -236,18 +233,17 @@ namespace SongTagger.UI.Wpf
 
         private volatile bool IsCoversInitialized;
 
-        public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action resetCallback, Action<IEnumerable<Uri>, Action<CoverArt>, CancellationToken> coverDownloaderService)
+        public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action<IEnumerable<Uri>, Action<CoverArt>, CancellationToken> coverDownloaderService)
             : base(State.MapTracks)
         {
             CancellationTokenSource source = new CancellationTokenSource();
             #region Init commands
-            Reset = new DelegateCommand(p =>
-                {
-                    source.Cancel(true);
-                    resetCallback();
-                });
 
-            AddCoverArtLink = new DelegateCommand(p =>
+            //TODO: Bind Reset.....
+            Reset = new DelegateCommand(p => source.Cancel(true));
+
+            AddCoverArtLink = new DelegateCommand(
+                p =>
                 {
                     Uri uri;
                     if (!Uri.TryCreate(Clipboard.GetText(TextDataFormat.Text), UriKind.Absolute, out uri))
@@ -280,6 +276,12 @@ namespace SongTagger.UI.Wpf
 
             CancelCustomCovertArt = new DelegateCommand(p => Clipboard.Clear());
 
+            Save = new DelegateCommand(
+                p =>
+                {
+                    throw new NotImplementedException("Not implemented feature");
+                },
+                p => Songs.Any(song => song.File != null && song.File.Exists));
             #endregion
 
             ReleaseGroup = tracks.First().Release.ReleaseGroup;
@@ -332,6 +334,7 @@ namespace SongTagger.UI.Wpf
         public ICommand Reset { get; private set; }
         public ICommand AddCoverArtLink { get; private set; }
         public ICommand CancelCustomCovertArt { get; private set; }
+        public ICommand Save { get; private set; }
 
         private void DownloadAndInitCovers(Action<IEnumerable<Uri>, Action<CoverArt>, CancellationToken> coverDownloaderService, CancellationToken token, params Uri[] coverUriList)
         {

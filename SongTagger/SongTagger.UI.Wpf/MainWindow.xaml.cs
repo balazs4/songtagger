@@ -60,7 +60,7 @@ namespace SongTagger.UI.Wpf
             : base(OfflineDataProvider.Instance)
         {
             WindowTitle = "Design data";
-            InitDesignData(CartInit, Tracks);
+            InitDesignData(CartInit, ReleaseMarket);
         }
 
         private void InitDesignData(params Action[] initActions)
@@ -74,8 +74,7 @@ namespace SongTagger.UI.Wpf
         private void ArtistMarket()
         {
             Workspace = new MarketViewModel(State.SelectArtist,
-                provider.SearchArtist("Rise Against").Select(e => new EntityViewModel(e)),
-                Reset
+                provider.SearchArtist("Rise Against").Select(e => new EntityViewModel(e))
                 );
         }
 
@@ -83,8 +82,7 @@ namespace SongTagger.UI.Wpf
         {
             Cart.EntityItem = new EntityViewModel(OfflineDataProvider.RiseAgainst);
             Workspace = new MarketViewModel(State.SelectReleaseGroup,
-               provider.BrowseReleaseGroups(OfflineDataProvider.RiseAgainst).Select(e => new EntityViewModel(e)),
-               Reset
+               provider.BrowseReleaseGroups(OfflineDataProvider.RiseAgainst).Select(e => new EntityViewModel(e))
                );
         }
 
@@ -92,20 +90,19 @@ namespace SongTagger.UI.Wpf
         {
             Cart.EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReason);
             Workspace = new MarketViewModel(State.SelectRelease,
-               provider.BrowseReleases(OfflineDataProvider.AppealToReason).Select(e => new EntityViewModel(e)),
-               Reset
+               provider.BrowseReleases(OfflineDataProvider.AppealToReason).Select(e => new EntityViewModel(e))
                );
         }
 
         private void Tracks()
         {
             Cart.EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReasonRelease);
-            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), Reset, provider.DownloadCoverArts);
+            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), provider.DownloadCoverArts);
         }
 
         private void CartInit()
         {
-            Cart = new CartViewModel(LoadEntitiesAsync);
+            Cart = new CartViewModel(LoadEntitiesAsync, ResetToSearchArtist);
         }
 
         private void ErrorMessage()

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using GongSolutions.Wpf.DragDrop;
 using SongTagger.Core;
+using SongTagger.UI.Wpf.ViewModel;
 
 namespace SongTagger.UI.Wpf
 {
@@ -19,7 +22,7 @@ namespace SongTagger.UI.Wpf
             else
             {
                 dropInfo.Effects = DragDropEffects.None;
-            }            
+            }
         }
 
         public void Drop(IDropInfo dropInfo)
@@ -29,11 +32,21 @@ namespace SongTagger.UI.Wpf
 
 
         private Action<EntityViewModel> loadSubEntities;
-        public CartViewModel(Action<EntityViewModel> entityChangedCallback)
+        public CartViewModel(Action<EntityViewModel> entityChangedCallback, Action reset)
         {
             loadSubEntities = entityChangedCallback;
             PropertyChanged += OnPropertyChangedDispatcher;
             Collection = new ObservableCollection<EntityViewModel>();
+            Remove = new DelegateCommand(
+                p =>
+                    {
+                        Collection.Remove(Collection.Last());
+                        EntityItem = Collection.LastOrDefault();
+
+                        if (Collection.Count == 0)
+                            reset();
+                    },
+                p => Collection.Any());
         }
 
         private void OnPropertyChangedDispatcher(object sender, PropertyChangedEventArgs eventArgs)
@@ -46,31 +59,35 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        private void FillCollection(ObservableCollection<EntityViewModel> list , EntityViewModel selectedViewModel)
+        private void FillCollection(ObservableCollection<EntityViewModel> list, EntityViewModel selectedViewModel)
         {
             list.Clear();
+
+            if (selectedViewModel == null)
+                return;
+
             IEntity currentEntity = selectedViewModel.Entity;
 
             if (currentEntity is Artist)
             {
-                Artist item = (Artist) currentEntity;
+                Artist item = (Artist)currentEntity;
                 list.Add(new EntityViewModel(item));
             }
 
             if (currentEntity is ReleaseGroup)
             {
-                ReleaseGroup item = (ReleaseGroup) currentEntity;
+                ReleaseGroup item = (ReleaseGroup)currentEntity;
                 list.Add(new EntityViewModel(item.Artist));
                 list.Add(new EntityViewModel(item));
             }
 
             if (currentEntity is Release)
             {
-                Release item = (Release) currentEntity;
+                Release item = (Release)currentEntity;
                 list.Add(new EntityViewModel(item.ReleaseGroup.Artist));
                 list.Add(new EntityViewModel(item.ReleaseGroup));
                 list.Add(new EntityViewModel(item));
-            
+
             }
         }
 
@@ -95,5 +112,7 @@ namespace SongTagger.UI.Wpf
                 RaisePropertyChangedEvent("EntityItem");
             }
         }
+
+        public ICommand Remove { get; private set; }
     }
 }
