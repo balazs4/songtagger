@@ -314,7 +314,7 @@ namespace SongTagger.UI.Wpf
 
             foreach (var track in longestRelease.OrderBy(t => t.DiscNumber).ThenBy(t => t.Posititon))
             {
-                Songs.Add(new Song { Track = track, Position = Songs.Count + 1});
+                Songs.Add(new Song { Track = track, Position = Songs.Count + 1 });
             }
 
             foreach (var altenative in tracksByRelease.Except(new[] { longestRelease }))
@@ -380,7 +380,7 @@ namespace SongTagger.UI.Wpf
     {
         public Song()
         {
-            EjectFile = new DelegateCommand(p => File = null);
+            EjectFile = new DelegateCommand(p => File = null, p => IsInitalized);
 
 #if DEBUG
             File = new FileInfo(Path.GetTempFileName());
@@ -420,8 +420,12 @@ namespace SongTagger.UI.Wpf
             {
                 file = value;
                 RaisePropertyChangedEvent("File");
+                RaisePropertyChangedEvent("IsInitalized");
             }
         }
+
+        public bool IsInitalized { get { return file != null; } }
+
         private static bool TryGetFileNameFromDropInfo(IDropInfo info, out FileInfo file)
         {
             try
