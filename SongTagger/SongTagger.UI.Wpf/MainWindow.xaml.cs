@@ -221,12 +221,15 @@ namespace SongTagger.UI.Wpf
 
         public IEnumerable<Track> LookupTracks(Release release)
         {
-            return new[]
+            Random random = new Random();
+            return Enumerable.Range(1, 18)
+                .Select(i => new Track(AppealToReasonRelease)
                 {
-                    new Track(AppealToReasonRelease) {Name = "Savior", Number = "11", Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
-                    new Track(AppealToReasonRelease) {Name = "Savior", Number = "11", Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
-                    new Track(AppealToReasonRelease) {Name = "Savior", Number = "11", Posititon = 11, Length = TimeSpan.FromMilliseconds(123456)}, 
-                };
+                    Name = "Track #" + i,
+                    Posititon = i,
+                    Length = TimeSpan.FromMilliseconds(random.Next(100000,300000))
+                }
+                );
         }
 
         public void DownloadCoverArts(IEnumerable<Uri> uri, Action<CoverArt> callback, CancellationToken token)
@@ -249,7 +252,7 @@ namespace SongTagger.UI.Wpf
                 using (FileStream fs = File.Open(pic.LocalPath, FileMode.Open))
                 {
                     byte[] data = new byte[fs.Length];
-                    fs.Read(data, 0,(int)fs.Length);
+                    fs.Read(data, 0, (int)fs.Length);
                     callback(CoverArt.CreateCoverArt(pic, data));
                     System.Threading.Thread.Sleep(1000);
                 }
