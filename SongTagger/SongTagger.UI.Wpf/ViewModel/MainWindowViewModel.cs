@@ -39,7 +39,7 @@ namespace SongTagger.UI.Wpf
         [Description("Select an artist")]
         SelectArtist,
 
-        [Description("Select a release group")]
+        [Description("Select an album")]
         SelectReleaseGroup,
 
         [Description("Select a release")]

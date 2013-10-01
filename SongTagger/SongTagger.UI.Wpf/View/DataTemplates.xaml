@@ -142,53 +142,35 @@
     </DataTemplate>
 
     <DataTemplate x:Key="songDataTemplate" DataType="{x:Type viewModel:Song}">
-        <Expander Header="{Binding}"  HorizontalContentAlignment="Stretch"
-                  Background="Transparent" IsExpanded="False" Margin="0,0,0,4">
-            <Expander.HeaderTemplate>
-                <DataTemplate>
-                    <Border Background="LightGray" HorizontalAlignment="Center">
-                        <Grid >
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="5*" MinWidth="300"/>
-                                <ColumnDefinition Width="2*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.Resources>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="18"/>
-                                </Style>
-                            </Grid.Resources>
-                            <TextBlock Text="{Binding Position}" Grid.Column="0" Margin="0,0,20,0"/>
-                            <TextBlock Text="{Binding Track.Name}" Grid.Column="1"/>
-                            <TextBlock Text="{Binding Track.Length, Converter={StaticResource TimeSpanConvert}}" 
-                                       Grid.Column="2" Margin="50,0,0,0"/>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </Expander.HeaderTemplate>
-            <Grid Background="WhiteSmoke"
-                  AllowDrop="True"
+        <Grid Margin="5" Background="LightGray"  AllowDrop="True"
                    gong:DragDrop.IsDropTarget="True"
                    gong:DragDrop.DropHandler="{Binding}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="5*"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding File.Name}" ToolTip="{Binding File}" 
-                           Grid.Column="0" Margin="50,0,0,0" FontSize="14"
-                           HorizontalAlignment="Left" VerticalAlignment="Center" />
-                <StackPanel Orientation="Horizontal" Grid.Column="1" 
-                            HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Button Command="{Binding EjectFile}">
-                        <Button.ContentTemplate>
-                            <DataTemplate>
-                                <Image Source="Images/eject.png" Width="18"/>
-                            </DataTemplate>
-                        </Button.ContentTemplate>
-                    </Button>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="25"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="25"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Position}" TextAlignment="Center" Grid.Column="0" FontSize="22"/>
+            <Rectangle Grid.Column="1" Fill="White"/>
+            <Grid Grid.Column="2" Background="Transparent">
+                <TextBlock Text="{Binding Track.Name}" FontSize="22"/>
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Label Content="{Binding File.Name}" ToolTip="{Binding File.FullName}" ContentStringFormat="{}{0} //  " FontSize="12"/>
+                    <Label Content="{Binding Track.Length, Converter={StaticResource TimeSpanConvert}}" FontSize="12"/>
                 </StackPanel>
             </Grid>
-        </Expander>
+            <Rectangle Fill="White" Grid.Column="3"/>
+            <Button Command="{Binding EjectFile}" Grid.Column="4"
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource Bool2Visibility}}">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <Image Source="Images/eject.png" Width="14"/>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+        </Grid>
     </DataTemplate>
 
     <!-- #EndRegion  -->
@@ -359,14 +341,14 @@
                     <Grid Grid.Column="1" VerticalAlignment="Center">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="110"/>
-                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="18"/>
                         </Grid.RowDefinitions>
+
                         <ListBox ItemsSource="{Binding Covers, IsAsync=True}" Name="CoverList" Grid.Row="1" HorizontalAlignment="Center"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
                              BorderThickness="0" SelectedIndex="0"
-                            SelectedItem="{Binding SelectedCover}"
-                                 SelectionMode="Single">
+                            SelectedItem="{Binding SelectedCover}" SelectionMode="Single">
                             <ListBox.Resources>
                                 <Style TargetType="ListBox">
                                     <Style.Triggers>
@@ -391,7 +373,7 @@
                             </ListBox.ItemsPanel>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Ellipse Width="4" Height="4" Fill="Black"/>
+                                    <Ellipse Width="6" Height="6" Fill="Gray" Margin="3"/>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
@@ -411,7 +393,7 @@
                                                         </Storyboard>
                                                     </BeginStoryboard>
                                                 </EventTrigger.Actions>
-                                            </EventTrigger>                                            
+                                            </EventTrigger>
                                             <Trigger Property="IsVisible" Value="True">
                                                 <Setter Property="ToolTip">
                                                     <Setter.Value>
@@ -496,16 +478,18 @@
                     </StackPanel>
                 </Grid>
             </Grid>
-            <Grid Grid.Row="1" Name="content"  Background="Transparent" >
-                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+            <Grid Grid.Row="1" Name="content"  Background="Transparent">
+                <ScrollViewer>
+                    <ItemsControl ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          ScrollViewer.VerticalScrollBarVisibility="Visible"
                          HorizontalContentAlignment="Stretch"
+                          HorizontalAlignment="Stretch"
                          Background="Transparent"
                          BorderThickness="0"
                          ItemsSource="{Binding Songs}"
-                         ItemTemplate="{StaticResource songDataTemplate}"
-                         gong:DragDrop.IsDragSource="True">
-                </ListBox>
+                         ItemTemplate="{StaticResource songDataTemplate}">
+                    </ItemsControl>
+                </ScrollViewer>
             </Grid>
         </Grid>
     </DataTemplate>

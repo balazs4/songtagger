@@ -314,7 +314,7 @@ namespace SongTagger.UI.Wpf
 
             foreach (var track in longestRelease.OrderBy(t => t.DiscNumber).ThenBy(t => t.Posititon))
             {
-                Songs.Add(new Song { Track = track, Position = Songs.Count + 1 });
+                Songs.Add(new Song { Track = track, Position = Songs.Count + 1});
             }
 
             foreach (var altenative in tracksByRelease.Except(new[] { longestRelease }))
@@ -356,8 +356,6 @@ namespace SongTagger.UI.Wpf
                 }, token);
         }
 
-
-
         private void AddToCoverArtCollectionThreadSafety(CoverArt item)
         {
             if (item == null)
@@ -378,8 +376,20 @@ namespace SongTagger.UI.Wpf
 
     }
 
-    public class Song : ViewModelBase
+    public class Song : ViewModelBase, IDropTarget
     {
+        public Song()
+        {
+            EjectFile = new DelegateCommand(p => File = null);
+
+#if DEBUG
+            File = new FileInfo(Path.GetTempFileName());
+#endif
+
+        }
+
+        public ICommand EjectFile { get; private set; }
+
         private int position;
         public int Position
         {
@@ -400,6 +410,57 @@ namespace SongTagger.UI.Wpf
                 track = value;
                 RaisePropertyChangedEvent("Track");
             }
+        }
+
+        private FileInfo file;
+        public FileInfo File
+        {
+            get { return file; }
+            set
+            {
+                file = value;
+                RaisePropertyChangedEvent("File");
+            }
+        }
+        private static bool TryGetFileNameFromDropInfo(IDropInfo info, out FileInfo file)
+        {
+            try
+            {
+                DataObject dataObject = info.Data as DataObject;
+                string filePath = ((string[])dataObject.GetData(DataFormats.FileDrop)).First();
+                file = new FileInfo(filePath);
+
+                if (!file.Extension.ToLower().Contains("mp3"))
+                    throw new NotSupportedException("Not supported extension");
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                file = null;
+                return false;
+            }
+        }
+
+        public void DragOver(IDropInfo dropInfo)
+        {
+            FileInfo file;
+            if (TryGetFileNameFromDropInfo(dropInfo, out file))
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+                dropInfo.Effects = DragDropEffects.Copy;
+            }
+            else
+            {
+                dropInfo.Effects = DragDropEffects.None;
+            }
+        }
+
+        public void Drop(IDropInfo dropInfo)
+        {
+            FileInfo file;
+            TryGetFileNameFromDropInfo(dropInfo, out file);
+            File = file;
         }
     }
 
