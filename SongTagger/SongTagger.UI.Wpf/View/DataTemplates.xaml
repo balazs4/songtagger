@@ -142,27 +142,37 @@
     </DataTemplate>
 
     <DataTemplate x:Key="songDataTemplate" DataType="{x:Type viewModel:Song}">
-        <Grid Margin="5" Background="LightGray"  AllowDrop="True"
+        <Grid Margin="5" AllowDrop="True"
                    gong:DragDrop.IsDropTarget="True"
                    gong:DragDrop.DropHandler="{Binding}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="25"/>
-                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="45"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="25"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Position}" TextAlignment="Center" Grid.Column="0" FontSize="22"/>
-            <Rectangle Grid.Column="1" Fill="White"/>
-            <Grid Grid.Column="2" Background="Transparent">
-                <TextBlock Text="{Binding Track.Name}" FontSize="22"/>
+            <Grid.Resources>
+                <Style TargetType="Grid">
+                    <Setter Property="Background" Value="LightGray"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsInitalized}" Value="true">
+                            <Setter Property="Background" Value="WhiteSmoke"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Resources>
+            <Label Content="{Binding Position}" HorizontalAlignment="Right" Grid.Column="0" FontSize="18"
+                   VerticalAlignment="Center" Foreground="Gray"
+                   ContentStringFormat="{}#{0,-2}|"/>
+            <Grid Grid.Column="1" Background="Transparent">
+                <Label Content="{Binding Track.Name}" FontSize="22"/>
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Center">
                     <Label Content="{Binding File.Name}" ToolTip="{Binding File.FullName}" ContentStringFormat="{}{0} //  " FontSize="12"/>
                     <Label Content="{Binding Track.Length, Converter={StaticResource TimeSpanConvert}}" FontSize="12"/>
                 </StackPanel>
             </Grid>
-            <Rectangle Fill="White" Grid.Column="3"/>
-            <Button Command="{Binding EjectFile}" Grid.Column="4"
+            <Rectangle Fill="White" Grid.Column="2"/>
+            <Button Command="{Binding EjectFile}" Grid.Column="3"
                     Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource Bool2Visibility}}">
                 <Button.ContentTemplate>
                     <DataTemplate>
