@@ -277,11 +277,8 @@ namespace SongTagger.UI.Wpf
             CancelCustomCovertArt = new DelegateCommand(p => Clipboard.Clear());
 
             Save = new DelegateCommand(
-                p =>
-                {
-                    throw new NotImplementedException("Not implemented feature");
-                },
-                p => Songs.Any(song => song.File != null && song.File.Exists));
+                p => TagSongs(),
+                p => Songs.Any(song => song.SourceFile != null && song.SourceFile.Exists));
             #endregion
 
             ReleaseGroup = tracks.First().Release.ReleaseGroup;
@@ -305,18 +302,54 @@ namespace SongTagger.UI.Wpf
             #endregion
 
             Songs = new ObservableCollection<Song>();
-
             CollectAndInitSongs(tracks);
+        }
+
+        private void TagSongs()
+        {
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
+
+            var initTask = new Task(() =>
+                {
+                    var song = Songs.First(s => s.SourceFile != null && s.SourceFile.Exists);
+                    if (!Directory.Exists(song.TargetFile.DirectoryName))
+                        Directory.CreateDirectory(song.TargetFile.DirectoryName);
+
+                }, tokenSource.Token);
+
+
+            var taggers = Songs.Where(s => s.SourceFile != null && s.SourceFile.Exists).Select(song =>
+                initTask
+                .ContinueWith(prevTask =>
+                    {
+                        File.Copy(song.SourceFile.FullName, song.TargetFile.FullName);
+                        song.SourceFile.Refresh();
+                        song.TargetFile.Refresh();
+                    },
+                tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current)
+                .ContinueWith(prevTask => Core.Mp3Tag.TagHandler.Save(song.Track, song.TargetFile, SelectedCover.Data),
+                tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current)
+                //.ContinueWith(prevTask => File.Delete(song.SourceFile.FullName), 
+                //tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current)
+                )
+                .ToArray();
+
+            initTask.Start(TaskScheduler.Current);
+            IsQueryRunning = true;
+            Task.WaitAll(taggers);
+            IsQueryRunning = false;
         }
 
         private void CollectAndInitSongs(IEnumerable<Track> tracks)
         {
+            DirectoryInfo targetDir = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic));
+
             var tracksByRelease = tracks.ToLookup(tr => tr.Release);
             var longestRelease = tracksByRelease.OrderByDescending(r => r.Count()).First();
 
             foreach (var track in longestRelease.OrderBy(t => t.DiscNumber).ThenBy(t => t.Posititon))
             {
-                Songs.Add(new Song { Track = track, Position = Songs.Count + 1 });
+                Songs.Add(new Song(track, Songs.Count + 1, targetDir));
             }
 
             foreach (var altenative in tracksByRelease.Except(new[] { longestRelease }))
@@ -326,7 +359,7 @@ namespace SongTagger.UI.Wpf
                     if (Songs.Any(song => song.Track.Name.ToLower() == track.Name.ToLower()))
                         continue;
 
-                    Songs.Add(new Song { Track = track, Position = Songs.Count + 1 });
+                    Songs.Add(new Song(track, Songs.Count + 1, targetDir));
                 }
             }
         }
@@ -381,17 +414,46 @@ namespace SongTagger.UI.Wpf
 
     public class Song : ViewModelBase, IDropTarget
     {
-        public Song()
+        public Song(Track track, int position, DirectoryInfo libraryRoot)
         {
-            EjectFile = new DelegateCommand(p => File = null, p => IsInitalized);
+            EjectSourceFile = new DelegateCommand(p => SourceFile = null, p => IsInitalized);
 
-#if DEBUG
-            File = new FileInfo(Path.GetTempFileName());
+#if OFFLINE
+            SourceFile = new FileInfo(Path.GetTempFileName());
 #endif
+            Track = track;
+            Position = position;
 
+            TargetFile = CreateTargetFile(libraryRoot);
         }
 
-        public ICommand EjectFile { get; private set; }
+        private FileInfo CreateTargetFile(DirectoryInfo libraryRoot = null)
+        {
+            string dirPath;
+            if (libraryRoot == null)
+                dirPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+            else
+                dirPath = libraryRoot.FullName;
+
+            string artistName = CreateValidName(name => name.ValidDirectoryName(), Track.Release.ReleaseGroup.Artist.Name);
+            string albumName = CreateValidName(name => name.ValidDirectoryName(),
+                Track.Release.ReleaseGroup.FirstReleaseDate.Year.ToString(),
+                Track.Release.ReleaseGroup.Name,
+                Track.Release.ReleaseGroup.PrimaryType == ReleaseGroupType.Album ? "" : Track.Release.ReleaseGroup.PrimaryType.ToString());
+            string fileName = CreateValidName(name => name.ValidFileName(), Position.ToString(), Track.Name, "mp3");
+
+            return new FileInfo(Path.Combine(dirPath, artistName, albumName, fileName));
+        }
+
+        private static string CreateValidName(Func<string, string> validator, params string[] parts)
+        {
+            char delimiter = '.';
+            return validator(String.Join(delimiter.ToString(), parts).Replace(' ', delimiter).TrimEnd(delimiter).Trim());
+        }
+
+        internal FileInfo TargetFile { get; private set; }
+
+        public ICommand EjectSourceFile { get; private set; }
 
         private int position;
         public int Position
@@ -415,19 +477,19 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        private FileInfo file;
-        public FileInfo File
+        private FileInfo sourceFile;
+        public FileInfo SourceFile
         {
-            get { return file; }
+            get { return sourceFile; }
             set
             {
-                file = value;
-                RaisePropertyChangedEvent("File");
+                sourceFile = value;
+                RaisePropertyChangedEvent("SourceFile");
                 RaisePropertyChangedEvent("IsInitalized");
             }
         }
 
-        public bool IsInitalized { get { return file != null; } }
+        public bool IsInitalized { get { return sourceFile != null; } }
 
         private static bool TryGetFileNameFromDropInfo(IDropInfo info, out FileInfo file)
         {
@@ -467,8 +529,31 @@ namespace SongTagger.UI.Wpf
         {
             FileInfo file;
             TryGetFileNameFromDropInfo(dropInfo, out file);
-            File = file;
+            SourceFile = file;
         }
     }
 
+
+
+    public static class StringExtension
+    {
+
+
+
+
+        private static string Validate(string text, Func<char[]> invalidChars)
+        {
+            return invalidChars().Aggregate(text, (current, invalidChar) => current.Replace(invalidChar, '_'));
+        }
+
+        public static string ValidFileName(this string text)
+        {
+            return Validate(text, Path.GetInvalidFileNameChars);
+        }
+
+        public static string ValidDirectoryName(this string text)
+        {
+            return Validate(text, Path.GetInvalidPathChars);
+        }
+    }
 }
