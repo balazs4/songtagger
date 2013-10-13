@@ -96,7 +96,7 @@ namespace SongTagger.Core.Test.Integration.Tag
         [TestCase(TagLib.TagTypes.Id3v2)]
         public void Assert_Title(TagLib.TagTypes tag)
         {
-            TagLib.Tag id3Tag = tags [tag];
+            TagLib.Tag id3Tag = tags[tag];
             Assert.AreEqual(track.Name, id3Tag.Title, tag.ToString());
         }
 
@@ -104,15 +104,15 @@ namespace SongTagger.Core.Test.Integration.Tag
         [TestCase(TagLib.TagTypes.Id3v2)]
         public void Assert_TrackNumber(TagLib.TagTypes tag)
         {
-            TagLib.Tag id3Tag = tags [tag];
-            Assert.AreEqual(track.Number, id3Tag.Track, tag.ToString());
+            TagLib.Tag id3Tag = tags[tag];
+            Assert.AreEqual(track.Number, id3Tag.Track.ToString(), tag.ToString());
         }
 
         [TestCase(TagLib.TagTypes.Id3v1)]
         [TestCase(TagLib.TagTypes.Id3v2)]
         public void Assert_AlbumName(TagLib.TagTypes tag)
         {
-            TagLib.Tag id3Tag = tags [tag];
+            TagLib.Tag id3Tag = tags[tag];
             Assert.AreEqual(track.Release.ReleaseGroup.Name, id3Tag.Album, tag.ToString());
         }
 
@@ -120,7 +120,7 @@ namespace SongTagger.Core.Test.Integration.Tag
         [TestCase(TagLib.TagTypes.Id3v2)]
         public void Assert_AlbumReleaseYear(TagLib.TagTypes tag)
         {
-            TagLib.Tag id3Tag = tags [tag];
+            TagLib.Tag id3Tag = tags[tag];
             Assert.AreEqual(track.Release.ReleaseGroup.FirstReleaseDate.Year.ToString(), id3Tag.Year.ToString(), tag.ToString());
         }
 
@@ -128,14 +128,14 @@ namespace SongTagger.Core.Test.Integration.Tag
         [TestCase(TagLib.TagTypes.Id3v2)]
         public void Assert_ArtistName(TagLib.TagTypes tag)
         {
-            TagLib.Tag id3Tag = tags [tag];
+            TagLib.Tag id3Tag = tags[tag];
             Assert.AreEqual(track.Release.ReleaseGroup.Artist.Name, id3Tag.FirstPerformer, tag.ToString());
         }
         //[TestCase(TagLib.TagTypes.Id3v1)]
         [TestCase(TagLib.TagTypes.Id3v2)]
         public void Assert_ArtistGenres(TagLib.TagTypes tag)
         {
-            TagLib.Tag id3Tag = tags [tag];
+            TagLib.Tag id3Tag = tags[tag];
             CollectionAssert.AreEquivalent(track.Release.ReleaseGroup.Artist.Tags.Select(t => t.Name), id3Tag.Genres, tag.ToString());
         }
         //[TestCase(TagLib.TagTypes.Id3v1)]
@@ -145,7 +145,7 @@ namespace SongTagger.Core.Test.Integration.Tag
             Assert.Ignore("Not implemented");
 
 
-            TagLib.Tag id3Tag = tags [tag];
+            TagLib.Tag id3Tag = tags[tag];
             CollectionAssert.IsNotEmpty(id3Tag.Pictures, tag.ToString());
         }
     }
