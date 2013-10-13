@@ -167,12 +167,12 @@
             <Grid Grid.Column="1" Background="Transparent">
                 <Label Content="{Binding Track.Name}" FontSize="22"/>
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Label Content="{Binding File.Name}" ToolTip="{Binding File.FullName}" ContentStringFormat="{}{0} //  " FontSize="12"/>
+                    <Label Content="{Binding SourceFile.Name}" ToolTip="{Binding SourceFile.FullName}" ContentStringFormat="{}{0} //  " FontSize="12"/>
                     <Label Content="{Binding Track.Length, Converter={StaticResource TimeSpanConvert}}" FontSize="12"/>
                 </StackPanel>
             </Grid>
             <Rectangle Fill="White" Grid.Column="2"/>
-            <Button Command="{Binding EjectFile}" Grid.Column="3"
+            <Button Command="{Binding EjectSourceFile}" Grid.Column="3"
                     Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource Bool2Visibility}}">
                 <Button.ContentTemplate>
                     <DataTemplate>
@@ -564,12 +564,14 @@
                     </Style>
                 </ItemsControl.Style>
             </ItemsControl>
-            <Button Grid.Row="2" Height="32" Width="32" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,0"
+            <Button Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,0"
                         Command="{Binding Remove}"
-                        ToolTip="Remove last item">
+                        ToolTip="Previous">
                 <Button.Template>
                     <ControlTemplate>
-                        <Image Source="Images/back.png" Height="32" Opacity=".7" Style="{StaticResource Shadow}"/>
+                        <StackPanel>
+                            <Image Source="Images/back.png" Height="32" Opacity=".7" Style="{StaticResource Shadow}"/>
+                        </StackPanel>
                     </ControlTemplate>
                 </Button.Template>
             </Button>

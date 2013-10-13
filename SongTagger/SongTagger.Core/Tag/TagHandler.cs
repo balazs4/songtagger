@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 
 namespace SongTagger.Core.Mp3Tag
 {
-    internal static class TagHandler
+    public static class TagHandler
     {
         public static void Save(Track songInfo, FileSystemInfo mp3File, byte[] cover = null)
         {
