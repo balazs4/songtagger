@@ -132,7 +132,7 @@ namespace SongTagger.UI.Wpf
 
                 Action<Task<IEnumerable<Track>>> doneTask = task1 =>
                 {
-                    Workspace = new VirtualReleaseViewModel(task1.Result, provider.DownloadCoverArts);
+                    Workspace = new VirtualReleaseViewModel(task1.Result, provider.DownloadCoverArts, exception => ShowErrorMessage(exception));
                     if (Cart == null)
                         Cart = new CartViewModel(LoadEntitiesAsync, ResetToSearchArtist);
                 };

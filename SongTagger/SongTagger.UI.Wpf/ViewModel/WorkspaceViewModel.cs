@@ -233,7 +233,9 @@ namespace SongTagger.UI.Wpf
 
         private volatile bool IsCoversInitialized;
 
-        public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action<IEnumerable<Uri>, Action<CoverArt>, CancellationToken> coverDownloaderService)
+        public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action<IEnumerable<Uri>, 
+            Action<CoverArt>, CancellationToken> coverDownloaderService,
+            Action<Exception> reportError)
             : base(State.MapTracks)
         {
             CancellationTokenSource source = new CancellationTokenSource();
@@ -277,8 +279,13 @@ namespace SongTagger.UI.Wpf
             CancelCustomCovertArt = new DelegateCommand(p => Clipboard.Clear());
 
             Save = new DelegateCommand(
-                p => TagSongs(),
-                p => Songs.Any(song => song.SourceFile != null && song.SourceFile.Exists));
+                p => TagSongs(reportError),
+                p =>
+                    {
+                        if (IsQueryRunning)
+                            return false;
+                        return Songs.Any(song => song.SourceFile != null && song.SourceFile.Exists);
+                    });
             #endregion
 
             ReleaseGroup = tracks.First().Release.ReleaseGroup;
@@ -305,7 +312,7 @@ namespace SongTagger.UI.Wpf
             CollectAndInitSongs(tracks);
         }
 
-        private void TagSongs()
+        private void TagSongs(Action<Exception> reportError)
         {
             CancellationTokenSource tokenSource = new CancellationTokenSource();
 
@@ -318,26 +325,38 @@ namespace SongTagger.UI.Wpf
                 }, tokenSource.Token);
 
 
-            var taggers = Songs.Where(s => s.SourceFile != null && s.SourceFile.Exists).Select(song =>
-                initTask
-                .ContinueWith(prevTask =>
+
+            List<Task> taggers = new List<Task>();
+
+            foreach (Song song in Songs.Where(s => s.SourceFile != null && s.SourceFile.Exists))
+            {
+                 var tagger = initTask.ContinueWith(prevTask =>
                     {
                         File.Copy(song.SourceFile.FullName, song.TargetFile.FullName);
                         song.SourceFile.Refresh();
                         song.TargetFile.Refresh();
-                    },
-                tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current)
-                .ContinueWith(prevTask => Core.Mp3Tag.TagHandler.Save(song.Track, song.TargetFile, SelectedCover.Data),
-                tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current)
-                //.ContinueWith(prevTask => File.Delete(song.SourceFile.FullName), 
-                //tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current)
-                )
-                .ToArray();
+                        Core.Mp3Tag.TagHandler.Save(song.Track, song.TargetFile, SelectedCover.Data);
+                        song.EjectSourceFile.Execute(null);
+                    }, tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
+
+                taggers.Add(tagger);
+                tagger.ContinueWith(prevTask =>
+                    {
+                        if (File.Exists(song.TargetFile.FullName))
+                            File.Delete(song.TargetFile.FullName);
+                    }, TaskContinuationOptions.NotOnRanToCompletion);
+                tagger.ContinueWith(prevTask => song.State = prevTask.Status);
+            }
 
             initTask.Start(TaskScheduler.Current);
             IsQueryRunning = true;
-            Task.WaitAll(taggers);
-            IsQueryRunning = false;
+            Task.Factory.StartNew(() => Task.WaitAll(taggers.ToArray()))
+                .ContinueWith(prevTask =>
+                    {
+                        IsQueryRunning = false;
+                        if (prevTask.IsFaulted)
+                            reportError(prevTask.Exception.InnerException);
+                    });
         }
 
         private void CollectAndInitSongs(IEnumerable<Track> tracks)
@@ -486,6 +505,17 @@ namespace SongTagger.UI.Wpf
                 sourceFile = value;
                 RaisePropertyChangedEvent("SourceFile");
                 RaisePropertyChangedEvent("IsInitalized");
+            }
+        }
+
+        private TaskStatus state;
+        public TaskStatus State
+        {
+            get { return state; }
+            set
+            {
+                state = value;
+                RaisePropertyChangedEvent("State");
             }
         }
 

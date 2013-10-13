@@ -482,14 +482,18 @@
                             <TextBlock Text="{Binding ReleaseGroup.FirstReleaseDate.Year}"  HorizontalAlignment="Right"/>
                         </Grid>
                     </StackPanel>
-                    <Button Grid.Column="2" Margin="0,0,50,0" ToolTip="Save" Command="{Binding Save}"
+                    <Grid Grid.Column="2" Margin="0,0,50,0">
+                        <metroControls:ProgressRing IsActive="{Binding IsQueryRunning}" Visibility="{Binding IsQueryRunning, Converter={StaticResource Bool2Visibility}}" 
+                                                    Foreground="Gray"/>
+                        <Button ToolTip="Save" Command="{Binding Save}"
                             Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource Bool2Visibility}}">
-                        <Button.Template>
-                            <ControlTemplate>
-                                <Image Source="Images/save.png" Opacity=".9"/>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
+                            <Button.Template>
+                                <ControlTemplate>
+                                    <Image Source="Images/save.png" Opacity=".9"/>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid Grid.Row="1" Name="content"  Background="Transparent">
