@@ -39,14 +39,15 @@ namespace SongTagger.UI.Wpf
             Collection = new ObservableCollection<EntityViewModel>();
             Remove = new DelegateCommand(
                 p =>
+                {
+                    if (Collection.Any())
                     {
                         Collection.Remove(Collection.Last());
                         EntityItem = Collection.LastOrDefault();
-
-                        if (Collection.Count == 0)
-                            reset();
-                    },
-                p => Collection.Any());
+                    }
+                    if (EntityItem == null)
+                        reset();
+                });
         }
 
         private void OnPropertyChangedDispatcher(object sender, PropertyChangedEventArgs eventArgs)
