@@ -142,12 +142,12 @@ namespace SongTagger.Core.Service
                 var result = doc.Descendants(xName)
                             .AsParallel().AsOrdered()
                             .Select(element =>
-                            {
-                                using (XmlReader reader = element.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
-                                {
-                                    return (TResult)serializer.Deserialize(reader);
-                                }
-                            }).ToList();
+                {
+                    using (XmlReader reader = element.CreateReader(ReaderOptions.OmitDuplicateNamespaces))
+                    {
+                        return (TResult)serializer.Deserialize(reader);
+                    }
+                }).ToList();
                 return result;
             }
 
@@ -249,7 +249,7 @@ namespace SongTagger.Core.Service
         }
     }
 
-    internal class EntityCache
+    class EntityCache
     {
         #region Singleton pattern
         private static EntityCache instance;
@@ -313,7 +313,7 @@ namespace SongTagger.Core.Service
         }
     }
 
-    internal class EntityCacheItem
+    class EntityCacheItem
     {
         public EntityCacheItem(Uri uri, IEnumerable<IEntity> entities)
         {

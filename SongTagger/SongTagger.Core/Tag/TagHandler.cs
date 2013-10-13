@@ -26,12 +26,14 @@ using System.Linq;
 using TagLib;
 using System.Collections.Generic;
 using System.Net;
+using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace SongTagger.Core.Mp3Tag
 {
     internal static class TagHandler
     {
-        public static void Save(Track songInfo, FileInfo mp3File)
+        public static void Save(Track songInfo, FileSystemInfo mp3File, byte[] cover = null)
         {
             if (mp3File == null)
                 throw new ArgumentNullException("mp3File", "Mp3 file cannot be null");
@@ -68,15 +70,13 @@ namespace SongTagger.Core.Mp3Tag
 
                 tag.Genres = songInfo.Release.ReleaseGroup.Artist.Tags.Select(t => t.Name).ToArray();
 
-                //tag.Pictures = DownloadCoverArt(songInfo, mp3File.Directory);
+                if (cover == null)
+                    continue;
+
+                tag.Pictures = new IPicture[] { new Picture(new ByteVector(cover)) };
             }
 
             mp3.Save();
-        }
-
-        private static IPicture[] DownloadCoverArt(Track songInfo, DirectoryInfo targetDir)
-        {
-            throw new NotImplementedException();
         }
     }
 }
