@@ -52,6 +52,12 @@ namespace SongTagger.Core.Test.Integration.Tag
             return tmp;
         }
 
+        private static byte[] GetCoverArt()
+        {
+            string fileName = TestHelper.GetInputDataFilePath("DefLeppard-Erlangen.png");
+            return System.IO.File.ReadAllBytes(fileName);
+        }
+
         [TestFixtureSetUp]
         public void TestFixtureSetup()
         {
@@ -64,7 +70,7 @@ namespace SongTagger.Core.Test.Integration.Tag
             track.Posititon = 11;
 
 
-            TagHandler.Save(track, new FileInfo(tempFileName));
+            TagHandler.Save(track, new FileInfo(tempFileName), GetCoverArt());
 
             mp3File = new TagLib.Mpeg.AudioFile(tempFileName);
 
@@ -142,9 +148,6 @@ namespace SongTagger.Core.Test.Integration.Tag
         [TestCase(TagLib.TagTypes.Id3v2)]
         public void Assert_CoverArt(TagLib.TagTypes tag)
         {
-            Assert.Ignore("Not implemented");
-
-
             TagLib.Tag id3Tag = tags[tag];
             CollectionAssert.IsNotEmpty(id3Tag.Pictures, tag.ToString());
         }
