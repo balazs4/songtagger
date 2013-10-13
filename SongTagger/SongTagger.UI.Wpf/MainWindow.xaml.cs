@@ -97,7 +97,7 @@ namespace SongTagger.UI.Wpf
         private void Tracks()
         {
             Cart.EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReasonRelease);
-            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), provider.DownloadCoverArts);
+            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), provider.DownloadCoverArts, (error) => ShowErrorMessage(error));
         }
 
         private void CartInit()
