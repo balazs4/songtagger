@@ -65,8 +65,24 @@
                                                              VirtualReleaseDataTemplate="{StaticResource virtualReleaseTemplate}"
                                                              />
             </Grid.Resources>
-            <ContentControl Content="{Binding Workspace}"
-                                ContentTemplateSelector="{StaticResource workspaceSelector}"/>
+            <ContentControl Content="{Binding Workspace}" ContentTemplateSelector="{StaticResource workspaceSelector}"/>
+            <Border Background="Transparent" Height="64" Width="384" VerticalAlignment="Bottom" 
+                    Visibility="{Binding IsNotificationVisible, Converter={StaticResource Bool2Visibility}}">
+                <Grid>
+                    <Image Source="View/Images/done.png" Height="64" HorizontalAlignment="Left"/>
+                    <Rectangle Fill="Black" Opacity="0.7"/>
+                    <StackPanel Margin="64,0,0,0" VerticalAlignment="Center">
+                        <StackPanel.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <TextBlock Text="{Binding LastTaggedAlbum.Name}"/>
+                        <TextBlock Text="{Binding LastTaggedAlbum.Artist.Name}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </Window>

@@ -144,9 +144,6 @@
     <Resource Include="View\Images\noresult.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="View\Images\error.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="View\Images\cart.png" />
   </ItemGroup>
   <ItemGroup>
@@ -166,6 +163,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="View\Images\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Images\done.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

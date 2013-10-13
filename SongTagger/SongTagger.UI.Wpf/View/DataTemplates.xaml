@@ -379,7 +379,7 @@
                             </ListBox.ItemsPanel>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Ellipse Width="6" Height="6" Fill="Gray" Margin="3"/>
+                                    <Ellipse Width="4" Height="4" Fill="Gray" Margin="2"/>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
