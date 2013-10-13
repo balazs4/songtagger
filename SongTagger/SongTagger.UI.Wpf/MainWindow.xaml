@@ -19,36 +19,35 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid>
-        <Grid ShowGridLines="False" Name="songtagger">
-            <Grid.Style>
-                <Style TargetType="Grid">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Error, Converter={StaticResource NullChecker}}" Value="False">
-                            <Setter Property="Opacity" Value="0.7"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Error, Converter={StaticResource NullChecker}}" Value="True">
-                            <Setter Property="Opacity" Value="1.0"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="9*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Name="controller" KeyboardNavigation.IsTabStop="True">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="100"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid.Resources>
-                    <viewModel:CartDataTemplateSelector x:Key="cartTemplateSelector"
+    <Grid ShowGridLines="False" Name="songtagger">
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Error, Converter={StaticResource NullChecker}}" Value="False">
+                        <Setter Property="Opacity" Value="0.7"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Error, Converter={StaticResource NullChecker}}" Value="True">
+                        <Setter Property="Opacity" Value="1.0"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="9*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" Name="controller" KeyboardNavigation.IsTabStop="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.Resources>
+                <viewModel:CartDataTemplateSelector x:Key="cartTemplateSelector"
                                                         NonVisibleTemplate="{StaticResource nonVisibleTemplate}"
                                                         DefaultDataTemplate="{StaticResource defaultCartTemplate}"/>
-                </Grid.Resources>
-                <Image Grid.Row="0" Source="View/Images/logo.png" Width="86" Style="{StaticResource Shadow}"/>
-                <ContentControl Grid.Row="1" Margin="10,50"
+            </Grid.Resources>
+            <Image Grid.Row="0" Source="View/Images/logo.png" Width="86" Style="{StaticResource Shadow}"/>
+            <ContentControl Grid.Row="1" Margin="10,50"
                                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                 ContentTemplateSelector="{StaticResource cartTemplateSelector}"
                                 Content="{Binding Cart}"
@@ -56,75 +55,18 @@
                                 gong:DragDrop.IsDropTarget="True"
                                 gong:DragDrop.DropHandler="{Binding Cart}"
                                 gong:DragDrop.DragAdornerTemplate="{StaticResource entityTemplate}"/>
-                
-            </Grid>
-            <Grid Grid.Column="1" Name="workspace" KeyboardNavigation.IsTabStop="False" FocusManager.IsFocusScope="False">
-                <Grid.Resources>
-                    <viewModel:WorkspaceDataTemplateSelector x:Key="workspaceSelector"
+
+        </Grid>
+        <Grid Grid.Column="1" Name="workspace" KeyboardNavigation.IsTabStop="False" FocusManager.IsFocusScope="False">
+            <Grid.Resources>
+                <viewModel:WorkspaceDataTemplateSelector x:Key="workspaceSelector"
                                                              SearchArtistDataTemplate="{StaticResource searchDataTemplate}"
                                                              MarketDataTemplate="{StaticResource marketDataTemplate}"
                                                              VirtualReleaseDataTemplate="{StaticResource virtualReleaseTemplate}"
                                                              />
-                </Grid.Resources>
-                <ContentControl Content="{Binding Workspace}"
+            </Grid.Resources>
+            <ContentControl Content="{Binding Workspace}"
                                 ContentTemplateSelector="{StaticResource workspaceSelector}"/>
-            </Grid>
-        </Grid>
-        <Grid Grid.ColumnSpan="2" Name="error">
-            <Grid.Style>
-                <Style TargetType="Grid">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Error, Converter={StaticResource NullChecker}}" Value="False">
-                            <Setter Property="Opacity" Value="1.0"/>
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Error, Converter={StaticResource NullChecker}}" Value="True">
-                            <Setter Property="Visibility" Value="Hidden"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-            <Border Background="White" Opacity="1" Height="180" VerticalAlignment="Top" Margin="25"
-                        BorderThickness="2" BorderBrush="Black">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*"/>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="1*"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="180"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="Black"/>
-                        </Style>
-                    </Grid.Resources>
-                    <Image Source="View/Images/error.png" Grid.RowSpan="3" Width="90"/>
-                    <TextBlock Text="{Binding Error.Title}" Grid.Row="0" Grid.Column="1"
-                               FontSize="24" FontWeight="Bold"
-                               Margin="0,10,0,0"/>
-                    <StackPanel Grid.Row="1" Grid.Column="1">
-                        <TextBlock Text="{Binding Error.Exception.Message}" FontSize="18" Margin="5,0,0,0"/>
-                    </StackPanel>
-                    <ItemsControl ItemsSource="{Binding Error.Actions}" Grid.Row="2" Grid.Column="1"
-                                  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10,10,50,10">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="viewModel:ErrorActionViewModel">
-                                <Button Content="{Binding Caption}" Command="{Binding HandlerCommand}" 
-                                        Margin="5,0,0,0"
-                                        Width="80"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                </Grid>
-            </Border>
         </Grid>
     </Grid>
 </Window>

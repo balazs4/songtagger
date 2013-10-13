@@ -54,23 +54,24 @@ namespace SongTagger.UI.Wpf
         private static object lockObject = new object();
         protected readonly IProvider provider;
 
-        public MainWindowViewModel(IProvider dataProvider)
+        private Action<Exception> errorHandler;
+
+        public MainWindowViewModel(IProvider dataProvider, Action<Exception> errorHandlerCallback)
         {
             if (dataProvider == null)
                 throw new ArgumentNullException("No data provider");
+         
+  
+            if (errorHandlerCallback == null)
+                throw new ArgumentNullException("No error handling");
 
-            PropertyChanged += OnPropertyChangedDispatcher;
             provider = dataProvider;
+            errorHandler = errorHandlerCallback;
 
             Workspace = new SearchViewmodel(SearchArtistAsync);
             Cart = null;
 
             WindowTitle = GetType().Namespace.Split('.').FirstOrDefault();
-        }
-
-        private void OnPropertyChangedDispatcher(object sender, PropertyChangedEventArgs eventArgs)
-        {
-            //TODO
         }
 
         
@@ -95,7 +96,7 @@ namespace SongTagger.UI.Wpf
             Action<Task<T>> errorTask = task1 =>
             {
                 Workspace.IsQueryRunning = false;
-                ShowErrorMessage(task1.Exception.InnerException);
+                errorHandler(task1.Exception);
             };
 
             Workspace.IsQueryRunning = true;
@@ -132,7 +133,7 @@ namespace SongTagger.UI.Wpf
 
                 Action<Task<IEnumerable<Track>>> doneTask = task1 =>
                 {
-                    Workspace = new VirtualReleaseViewModel(task1.Result, provider.DownloadCoverArts, exception => ShowErrorMessage(exception));
+                    Workspace = new VirtualReleaseViewModel(task1.Result, provider.DownloadCoverArts, errorHandler);
                     if (Cart == null)
                         Cart = new CartViewModel(LoadEntitiesAsync, ResetToSearchArtist);
                 };
@@ -185,30 +186,6 @@ namespace SongTagger.UI.Wpf
                 cart = value;
                 RaisePropertyChangedEvent("Cart");
             }
-        }
-
-        private ErrorViewModel error;
-        public ErrorViewModel Error
-        {
-            get { return error; }
-            set
-            {
-                error = value;
-                RaisePropertyChangedEvent("Error");
-            }
-        }
-
-        private void CloseErrorMessage()
-        {
-            Error = null;
-        }
-
-        protected void ShowErrorMessage(Exception exception, params ErrorActionViewModel[] actions)
-        {
-            if (actions == null || !actions.Any())
-                Error = new ErrorViewModel(exception, new ErrorActionViewModel("Ok", CloseErrorMessage));
-            else
-                Error = new ErrorViewModel(exception, actions);
         }
     }
 

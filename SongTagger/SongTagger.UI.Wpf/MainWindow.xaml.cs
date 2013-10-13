@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using SongTagger.Core;
 
 namespace SongTagger.UI.Wpf
@@ -19,10 +20,27 @@ namespace SongTagger.UI.Wpf
         {
             InitializeComponent();
 #if OFFLINE
-            DataContext = new MainWindowViewModel(OfflineDataProvider.Instance);
+            DataContext = new MainWindowViewModel(OfflineDataProvider.Instance, ShowErrorMessageBox);
 #else
-            DataContext = new MainWindowViewModel(SongTagger.Core.Service.MusicData.Provider);
+            DataContext = new MainWindowViewModel(SongTagger.Core.Service.MusicData.Provider, ShowErrorMessageBox);
 #endif
+        }
+
+        private void ShowErrorMessageBox(Exception exception)
+        {
+            if (exception == null)
+                return;
+
+            string messageText = exception.Message;
+            if (exception is AggregateException)
+            {
+                var errors = ((AggregateException)exception).InnerExceptions.Take(3).Select(ex => ex.Message).ToList();
+                errors.Add("...and more errors.");
+                messageText = string.Join(Environment.NewLine, errors);
+            }
+
+            Action showError = () => MessageBox.Show(this, messageText, "Oops something went wrong...", MessageBoxButton.OK, MessageBoxImage.Error);
+            Dispatcher.Invoke(showError, DispatcherPriority.Normal);
         }
     }
 
@@ -57,7 +75,7 @@ namespace SongTagger.UI.Wpf
     public class MainWindowViewModelDesignData : MainWindowViewModel
     {
         public MainWindowViewModelDesignData()
-            : base(OfflineDataProvider.Instance)
+            : base(OfflineDataProvider.Instance, exception => { })
         {
             WindowTitle = "Design data";
             InitDesignData(CartInit, ReleaseMarket);
@@ -97,7 +115,7 @@ namespace SongTagger.UI.Wpf
         private void Tracks()
         {
             Cart.EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReasonRelease);
-            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), provider.DownloadCoverArts, (error) => ShowErrorMessage(error));
+            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), provider.DownloadCoverArts, (error) => { });
         }
 
         private void CartInit()
@@ -107,10 +125,7 @@ namespace SongTagger.UI.Wpf
 
         private void ErrorMessage()
         {
-            ShowErrorMessage(new NotImplementedException("Design data exception bla bla bla bla bla bla"),
-                new ErrorActionViewModel("Ok", () => { }),
-                new ErrorActionViewModel("Cancel", () => { })
-            );
+
         }
 
     }
@@ -224,7 +239,7 @@ namespace SongTagger.UI.Wpf
                 {
                     Name = "Track #" + i,
                     Posititon = i,
-                    Length = TimeSpan.FromMilliseconds(random.Next(100000,300000))
+                    Length = TimeSpan.FromMilliseconds(random.Next(100000, 300000))
                 }
                 );
         }
