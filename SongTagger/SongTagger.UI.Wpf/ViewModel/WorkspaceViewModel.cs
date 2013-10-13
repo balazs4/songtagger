@@ -563,14 +563,8 @@ namespace SongTagger.UI.Wpf
         }
     }
 
-
-
     public static class StringExtension
     {
-
-
-
-
         private static string Validate(string text, Func<char[]> invalidChars)
         {
             return invalidChars().Aggregate(text, (current, invalidChar) => current.Replace(invalidChar, '_'));
