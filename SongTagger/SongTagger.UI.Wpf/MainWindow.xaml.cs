@@ -34,8 +34,12 @@ namespace SongTagger.UI.Wpf
             string messageText = exception.Message;
             if (exception is AggregateException)
             {
-                var errors = ((AggregateException)exception).InnerExceptions.Take(3).Select(ex => ex.Message).ToList();
-                errors.Add("...and more errors.");
+                var aggregateException = ((AggregateException) exception);
+                var errors = aggregateException.InnerExceptions.Take(3).Select(ex => ex.Message).ToList();
+                if (aggregateException.InnerExceptions.Count > 3)
+                {
+                    errors.Add("...and more errors.");    
+                }
                 messageText = string.Join(Environment.NewLine, errors);
             }
 
@@ -78,7 +82,12 @@ namespace SongTagger.UI.Wpf
             : base(OfflineDataProvider.Instance, exception => { })
         {
             WindowTitle = "Design data";
-            InitDesignData(CartInit, ReleaseMarket);
+            InitDesignData(CartInit, ReleaseGroupMarket, ShowNotification);
+        }
+
+        private void ShowNotification()
+        {
+            LastTaggedAlbum = OfflineDataProvider.AppealToReason;
         }
 
         private void InitDesignData(params Action[] initActions)
@@ -115,7 +124,7 @@ namespace SongTagger.UI.Wpf
         private void Tracks()
         {
             Cart.EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReasonRelease);
-            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), provider.DownloadCoverArts, (error) => { });
+            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), provider.DownloadCoverArts, (error) => { }, rgroup => {} );
         }
 
         private void CartInit()

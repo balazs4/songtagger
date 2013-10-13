@@ -72,6 +72,7 @@ namespace SongTagger.UI.Wpf
         }
 
         private string searchText;
+
         public string SearchText
         {
             get { return searchText; }
@@ -233,16 +234,14 @@ namespace SongTagger.UI.Wpf
 
         private volatile bool IsCoversInitialized;
 
-        public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action<IEnumerable<Uri>, 
+        public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action<IEnumerable<Uri>,
             Action<CoverArt>, CancellationToken> coverDownloaderService,
-            Action<Exception> reportError)
+            Action<Exception> reportError,
+            Action<ReleaseGroup> reportDone)
             : base(State.MapTracks)
         {
             CancellationTokenSource source = new CancellationTokenSource();
             #region Init commands
-
-            //TODO: Bind Reset.....
-            Reset = new DelegateCommand(p => source.Cancel(true));
 
             AddCoverArtLink = new DelegateCommand(
                 p =>
@@ -279,13 +278,13 @@ namespace SongTagger.UI.Wpf
             CancelCustomCovertArt = new DelegateCommand(p => Clipboard.Clear());
 
             Save = new DelegateCommand(
-                p => TagSongs(reportError),
+                p => TagSongs(reportError, reportDone),
                 p =>
-                    {
-                        if (IsQueryRunning)
-                            return false;
-                        return Songs.Any(song => song.SourceFile != null && song.SourceFile.Exists);
-                    });
+                {
+                    if (IsQueryRunning)
+                        return false;
+                    return Songs.Any(song => song.SourceFile != null && song.SourceFile.Exists);
+                });
             #endregion
 
             ReleaseGroup = tracks.First().Release.ReleaseGroup;
@@ -312,7 +311,7 @@ namespace SongTagger.UI.Wpf
             CollectAndInitSongs(tracks);
         }
 
-        private void TagSongs(Action<Exception> reportError)
+        private void TagSongs(Action<Exception> reportError, Action<ReleaseGroup> reportDone)
         {
             CancellationTokenSource tokenSource = new CancellationTokenSource();
 
@@ -330,22 +329,22 @@ namespace SongTagger.UI.Wpf
 
             foreach (Song song in Songs.Where(s => s.SourceFile != null && s.SourceFile.Exists))
             {
-                 var tagger = initTask.ContinueWith(prevTask =>
-                    {
-                        File.Copy(song.SourceFile.FullName, song.TargetFile.FullName);
-                        song.SourceFile.Refresh();
-                        song.TargetFile.Refresh();
-                        Core.Mp3Tag.TagHandler.Save(song.Track, song.TargetFile, SelectedCover.Data);
-                        song.EjectSourceFile.Execute(null);
-                    }, tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
+                var tagger = initTask.ContinueWith(prevTask =>
+                   {
+                       File.Copy(song.SourceFile.FullName, song.TargetFile.FullName, true);
+                       song.SourceFile.Refresh();
+                       song.TargetFile.Refresh();
+                       Core.Mp3Tag.TagHandler.Save(song.Track, song.TargetFile, SelectedCover.Data);
+                       song.EjectSourceFile.Execute(null);
+                   }, tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
 
                 taggers.Add(tagger);
+
                 tagger.ContinueWith(prevTask =>
                     {
                         if (File.Exists(song.TargetFile.FullName))
                             File.Delete(song.TargetFile.FullName);
                     }, TaskContinuationOptions.NotOnRanToCompletion);
-                tagger.ContinueWith(prevTask => song.State = prevTask.Status);
             }
 
             initTask.Start(TaskScheduler.Current);
@@ -355,7 +354,13 @@ namespace SongTagger.UI.Wpf
                     {
                         IsQueryRunning = false;
                         if (prevTask.IsFaulted)
-                            reportError(prevTask.Exception.InnerException);
+                        {
+                            reportError(prevTask.Exception);
+                        }
+                        else
+                        {
+                            reportDone(Songs.First().Track.Release.ReleaseGroup);
+                        }
                     });
         }
 
@@ -383,7 +388,6 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        public ICommand Reset { get; private set; }
         public ICommand AddCoverArtLink { get; private set; }
         public ICommand CancelCustomCovertArt { get; private set; }
         public ICommand Save { get; private set; }
@@ -508,16 +512,6 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        private TaskStatus state;
-        public TaskStatus State
-        {
-            get { return state; }
-            set
-            {
-                state = value;
-                RaisePropertyChangedEvent("State");
-            }
-        }
 
         public bool IsInitalized { get { return sourceFile != null; } }
 
@@ -567,7 +561,8 @@ namespace SongTagger.UI.Wpf
     {
         private static string Validate(string text, Func<char[]> invalidChars)
         {
-            return invalidChars().Aggregate(text, (current, invalidChar) => current.Replace(invalidChar, '_'));
+            return invalidChars().Select(c => c.ToString()).Concat(new[] {":"})
+                .Aggregate(text, (current, c) => current.Replace(c, ""));
         }
 
         public static string ValidFileName(this string text)

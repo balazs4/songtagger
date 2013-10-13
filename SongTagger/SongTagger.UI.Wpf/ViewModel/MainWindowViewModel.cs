@@ -60,8 +60,8 @@ namespace SongTagger.UI.Wpf
         {
             if (dataProvider == null)
                 throw new ArgumentNullException("No data provider");
-         
-  
+
+
             if (errorHandlerCallback == null)
                 throw new ArgumentNullException("No error handling");
 
@@ -74,7 +74,7 @@ namespace SongTagger.UI.Wpf
             WindowTitle = GetType().Namespace.Split('.').FirstOrDefault();
         }
 
-        
+
 
         private void StartMarketQueryTask<T>(Func<T> action, State nextWorkspaceState)
             where T : IEnumerable<IEntity>
@@ -133,7 +133,12 @@ namespace SongTagger.UI.Wpf
 
                 Action<Task<IEnumerable<Track>>> doneTask = task1 =>
                 {
-                    Workspace = new VirtualReleaseViewModel(task1.Result, provider.DownloadCoverArts, errorHandler);
+                    Workspace = new VirtualReleaseViewModel(task1.Result, provider.DownloadCoverArts, errorHandler,
+                        releaseGroup =>
+                        {
+                            LastTaggedAlbum = releaseGroup;
+                        });
+
                     if (Cart == null)
                         Cart = new CartViewModel(LoadEntitiesAsync, ResetToSearchArtist);
                 };
@@ -143,6 +148,26 @@ namespace SongTagger.UI.Wpf
                 return;
             }
         }
+
+        private ReleaseGroup lastTaggedAlbum;
+        public ReleaseGroup LastTaggedAlbum
+        {
+            get { return lastTaggedAlbum; }
+            set
+            {
+                lastTaggedAlbum = value;
+                RaisePropertyChangedEvent("LastTaggedAlbum");
+                RaisePropertyChangedEvent("IsNotificationVisible");
+                Task.Factory.StartNew(() =>
+                    {
+                        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(4));
+                        lastTaggedAlbum = null;
+                        RaisePropertyChangedEvent("IsNotificationVisible");
+                    });
+            }
+        }
+
+        public bool IsNotificationVisible { get { return LastTaggedAlbum != null; } }
 
         protected void ResetToSearchArtist()
         {
