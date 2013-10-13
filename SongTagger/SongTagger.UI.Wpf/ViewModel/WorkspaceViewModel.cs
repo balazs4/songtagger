@@ -458,12 +458,17 @@ namespace SongTagger.UI.Wpf
             else
                 dirPath = libraryRoot.FullName;
 
+            var albumSuffix = new[]
+                {
+                    ReleaseGroupType.EP, ReleaseGroupType.Live, ReleaseGroupType.Single, 
+                };
+
             string artistName = CreateValidName(name => name.ValidDirectoryName(), Track.Release.ReleaseGroup.Artist.Name);
             string albumName = CreateValidName(name => name.ValidDirectoryName(),
                 Track.Release.ReleaseGroup.FirstReleaseDate.Year.ToString(),
                 Track.Release.ReleaseGroup.Name,
-                Track.Release.ReleaseGroup.PrimaryType == ReleaseGroupType.Album ? "" : Track.Release.ReleaseGroup.PrimaryType.ToString());
-            string fileName = CreateValidName(name => name.ValidFileName(), Position.ToString(), Track.Name, "mp3");
+                albumSuffix.Contains(Track.Release.ReleaseGroup.PrimaryType) ? Track.Release.ReleaseGroup.PrimaryType.ToString() : "");
+            string fileName = CreateValidName(name => name.ValidFileName(), Position.ToString().PadLeft(2,'0'), Track.Name, "mp3");
 
             return new FileInfo(Path.Combine(dirPath, artistName, albumName, fileName));
         }
@@ -561,7 +566,7 @@ namespace SongTagger.UI.Wpf
     {
         private static string Validate(string text, Func<char[]> invalidChars)
         {
-            return invalidChars().Select(c => c.ToString()).Concat(new[] {":"})
+            return invalidChars().Select(c => c.ToString()).Concat(new[] { ":" })
                 .Aggregate(text, (current, c) => current.Replace(c, ""));
         }
 
