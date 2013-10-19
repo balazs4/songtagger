@@ -10,7 +10,13 @@ using SongTagger.UI.Wpf.ViewModel;
 
 namespace SongTagger.UI.Wpf
 {
-    public class CartViewModel : ViewModelBase, IDropTarget
+    public abstract class AbstractCartViewModel : ViewModelBase
+    {
+        
+    }
+
+
+    public class CartViewModel : AbstractCartViewModel, IDropTarget
     {
         public void DragOver(IDropInfo dropInfo)
         {
@@ -30,7 +36,6 @@ namespace SongTagger.UI.Wpf
             EntityItem = (EntityViewModel)dropInfo.Data;
         }
 
-
         private Action<EntityViewModel> loadSubEntities;
         public CartViewModel(Action<EntityViewModel> entityChangedCallback, Action reset)
         {
@@ -48,6 +53,7 @@ namespace SongTagger.UI.Wpf
                     if (EntityItem == null)
                         reset();
                 });
+
         }
 
         private void OnPropertyChangedDispatcher(object sender, PropertyChangedEventArgs eventArgs)
@@ -115,5 +121,16 @@ namespace SongTagger.UI.Wpf
         }
 
         public ICommand Remove { get; private set; }
+    }
+
+
+    public class DummyCartViewModel : AbstractCartViewModel
+    {
+        public DummyCartViewModel(Action openSettingsCallback)
+        {
+            OpenSettings = new DelegateCommand(p => openSettingsCallback());
+        }
+
+        public ICommand OpenSettings { get; private set; }
     }
 }

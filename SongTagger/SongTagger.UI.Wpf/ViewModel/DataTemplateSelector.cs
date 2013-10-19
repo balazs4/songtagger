@@ -61,4 +61,21 @@ namespace SongTagger.UI.Wpf
             return DefaultDataTemplate;
         }
     }
+
+    public class SettingDataTempalteSelector : DataTemplateSelector
+    {
+        public DataTemplate PathTemplate { get; set; }
+        public DataTemplate SwitchTemplate { get; set; }
+
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            if (item is PathSettingViewModel)
+                return PathTemplate;
+
+            if (item is SwitchSettingViewModel)
+                return SwitchTemplate;
+
+            return base.SelectTemplate(item, container);
+        }
+    }
 }
