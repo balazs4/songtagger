@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -34,19 +35,40 @@ namespace SongTagger.UI.Wpf
             string messageText = exception.Message;
             if (exception is AggregateException)
             {
-                var aggregateException = ((AggregateException) exception);
-                var errors = aggregateException.InnerExceptions.Take(3).Select(ex => ex.Message).ToList();
-                if (aggregateException.InnerExceptions.Count > 3)
-                {
-                    errors.Add("...and more errors.");    
-                }
-                messageText = string.Join(Environment.NewLine, errors);
+                var messages = GetErrorMessages((AggregateException) exception);
+                int maxErrorCount = 5;
+                messageText = messages.Count() < maxErrorCount
+                                  ? string.Join(Environment.NewLine, messages)
+                                  : string.Join(Environment.NewLine,
+                                                messages.Take(maxErrorCount).Concat(new[] {"...and other errors"}));
+                Trace.TraceError(string.Join(Environment.NewLine, messages));
+            }
+            else
+            {
+                Trace.TraceError(string.Join(Environment.NewLine, messageText));
             }
 
             Action showError = () => MessageBox.Show(this, messageText, "Oops something went wrong...", MessageBoxButton.OK, MessageBoxImage.Error);
             Dispatcher.Invoke(showError, DispatcherPriority.Normal);
         }
+
+
+        private static IEnumerable<string> GetErrorMessages(AggregateException aggregate)
+        {
+            if (aggregate == null)
+                return new[] { string.Empty };
+
+            var furtherAggregateExceptions = aggregate.InnerExceptions.Where(ex => ex is AggregateException);
+            var simpleExceptions = aggregate.InnerExceptions.Except(furtherAggregateExceptions);
+
+            var nestedMessages = furtherAggregateExceptions.Cast<AggregateException>().SelectMany(GetErrorMessages);
+
+            return simpleExceptions.Select(ex => ex.Message).Concat(nestedMessages).Where(m => !String.IsNullOrWhiteSpace(m)).ToList();
+        }
     }
+
+
+
 
 
     public class DynamicImage : Image
@@ -124,7 +146,7 @@ namespace SongTagger.UI.Wpf
         private void Tracks()
         {
             Cart.EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReasonRelease);
-            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), provider.DownloadCoverArts, (error) => { }, rgroup => {} );
+            Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), provider.DownloadCoverArts, (error) => { }, rgroup => { });
         }
 
         private void CartInit()

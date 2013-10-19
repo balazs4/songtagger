@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -23,6 +24,8 @@ namespace SongTagger.UI.Wpf
                 };
             timer.Start();
             timer.Tick += (sender, args) => CommandManager.InvalidateRequerySuggested();
+
+            Trace.Listeners.Add(new ConsoleTraceListener(true));
         }
     }
 }
