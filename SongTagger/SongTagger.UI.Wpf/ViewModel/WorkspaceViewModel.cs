@@ -189,7 +189,7 @@ namespace SongTagger.UI.Wpf
         }
     }
 
-    public class VirtualReleaseViewModel : WorkspaceViewModel
+    public class VirtualReleaseViewModel : WorkspaceViewModel, IDropTarget
     {
         private Artist artist;
         public Artist Artist
@@ -243,6 +243,17 @@ namespace SongTagger.UI.Wpf
             {
                 songs = value;
                 RaisePropertyChangedEvent("Songs");
+            }
+        }
+
+        private bool isFolderDragNDropActive;
+        public bool IsFolderDragNDropActive
+        {
+            get { return isFolderDragNDropActive; }
+            set
+            {
+                isFolderDragNDropActive = value;
+                RaisePropertyChangedEvent("IsFolderDragNDropActive");
             }
         }
 
@@ -457,6 +468,69 @@ namespace SongTagger.UI.Wpf
             Application.Current.Dispatcher.BeginInvoke(addAction, DispatcherPriority.Normal);
         }
 
+        private static bool TryGetDirNameFromDropInfo(IDropInfo info, out DirectoryInfo dir)
+        {
+            try
+            {
+                DataObject dataObject = info.Data as DataObject;
+                string filePath = ((string[])dataObject.GetData(DataFormats.FileDrop)).First();
+                dir = new DirectoryInfo(filePath);
+
+                if (!dir.GetFiles().Any(f => f.Extension.ToLower().EndsWith("mp3")))
+                      throw new NotSupportedException("Not supported extension");
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                dir = null;
+                return false;
+            }
+        }
+
+        public void DragOver(IDropInfo dropInfo)
+        {
+            DirectoryInfo dir;
+            if (TryGetDirNameFromDropInfo(dropInfo, out dir))
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+                dropInfo.Effects = DragDropEffects.Copy;
+                IsFolderDragNDropActive = true;
+                Task.Factory.StartNew(() =>
+                    {
+                        Thread.Sleep(3000);
+                        if (IsFolderDragNDropActive)
+                            IsFolderDragNDropActive = false;
+                    });
+            }
+            else
+            {
+                dropInfo.Effects = DragDropEffects.None;
+            }
+        }
+
+        public void Drop(IDropInfo dropInfo)
+        {
+            DirectoryInfo dir;
+            IsFolderDragNDropActive = false;
+            TryGetDirNameFromDropInfo(dropInfo, out dir);
+            DetectTracks(dir);
+        }
+
+        private void DetectTracks(DirectoryInfo dir)
+        {
+            var mp3FileList = dir.EnumerateFiles("*.mp3", SearchOption.AllDirectories);
+
+            Parallel.ForEach(mp3FileList, file =>
+                {
+                    var song = Songs.FirstOrDefault(s => s.SourceFile == null);
+                    song.SourceFile = file;
+
+                    //TODO
+                    
+                });
+
+        }
     }
 
     public class Song : ViewModelBase, IDropTarget
