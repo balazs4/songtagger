@@ -86,14 +86,60 @@
             </Border>
 
         </Grid>
-        <Grid ColumnSpan="2"  IsEnabled="{Binding IsWorkspaceBusy}"
-                                        Visibility="{Binding IsWorkspaceBusy, Converter={StaticResource Bool2Visibility}}">
+        <Grid ColumnSpan="2" IsEnabled="{Binding IsWorkspaceBusy}"
+                             Visibility="{Binding IsWorkspaceBusy, Converter={StaticResource Bool2Visibility}}">
             <Border Background="Black" Opacity=".75" Height="256">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <metroControls:ProgressRing IsActive="True" Foreground="White"/>
                     <TextBlock Text="Please wait..." FontSize="32"  Margin="25,0,0,0" Foreground="White"/>
                 </StackPanel>
             </Border>
+        </Grid>
+        <Grid ColumnSpan="2" IsEnabled="{Binding IsSettingsActive}"
+                             Visibility="{Binding IsSettingsActive, Converter={StaticResource Bool2Visibility}}">
+            <Grid.Resources>
+                <viewModel:SettingDataTempalteSelector x:Key="settingDataTemplateSelector"
+                                                       PathTemplate="{StaticResource pathSettingTempalte}"
+                                                       SwitchTemplate="{StaticResource switchSettingTempalte}"
+                                                       />
+            </Grid.Resources>
+            <Grid Background="White" Opacity=".90"/>
+            <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="50,25">
+                <Rectangle Fill="WhiteSmoke" Opacity=".9" Margin="0"/>
+                <Rectangle Fill="LightGray" Opacity=".9" Margin="2"/>
+                <Rectangle Fill="Gray" Opacity=".9" Margin="3"/>
+                <Rectangle Fill="DarkGray" Opacity=".7" Margin="1"/>
+                <StackPanel Background="White" Margin="4">
+                    <Label Content="Settings" HorizontalAlignment="Center" FontSize="32"/>
+                    <ItemsControl ItemsSource="{Binding Settings.Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type viewModel:AbstractSettingViewModel}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="{Binding Title}" Grid.Column="0" HorizontalAlignment="Right" Margin="5"
+                                           ContentStringFormat="{}{0}:" FontWeight="Bold"
+                                           ToolTip="{Binding Hint}"/>
+                                    <ContentControl Content="{Binding}" VerticalAlignment="Center"
+                                                    ContentTemplateSelector="{StaticResource settingDataTemplateSelector}"
+                                                    Grid.Column="1"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <StackPanel Orientation="Horizontal" Margin="0,15" HorizontalAlignment="Center">
+                        <StackPanel.Resources>
+                            <Style TargetType="Button">
+                                <Setter Property="Margin" Value="8,0"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <Button Content="Reset" Width="60" Command="{Binding Settings.ResetToDefault}"/>
+                        <Button Content="Apply" Width="60" Command="{Binding Settings.CloseRequest}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

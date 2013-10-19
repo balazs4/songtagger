@@ -6,6 +6,7 @@
                     xmlns:metroControls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="ScrollViewer.xaml"/>
+        <ResourceDictionary Source="SwitchBox.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
     <BooleanToVisibilityConverter x:Key="Bool2Visibility"/>
@@ -506,9 +507,9 @@
     <!-- #EndRegion -->
 
     <!-- #Region Cart  -->
-    <DataTemplate x:Key="nonVisibleTemplate">
+    <DataTemplate x:Key="nonVisibleTemplate"  DataType="{x:Type viewModel:DummyCartViewModel}">
         <Button Grid.Row="2" Height="32" Width="32" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,0"
-                        ToolTip="Settings...">
+                Command="{Binding OpenSettings}" ToolTip="Settings...">
             <Button.Template>
                 <ControlTemplate>
                     <Image Source="Images/settings.png" Height="32" Opacity=".7" Style="{StaticResource Shadow}"/>
@@ -574,5 +575,35 @@
 
     </DataTemplate>
     <!-- #EndRegion  -->
+
+    <!-- #Region Settings  -->
+    <DataTemplate x:Key="pathSettingTempalte" DataType="{x:Type viewModel:PathSettingViewModel}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="48"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Text="{Binding FullPath, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}">
+                <TextBox.Style>
+                    <Style TargetType="{x:Type TextBox}">
+                        <Style.Triggers>
+                            <Trigger Property="Validation.HasError" Value="true">
+                                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+            <Button Content="..." Grid.Column="1" Margin="8,0"  Command="{Binding Browse}"/>
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="switchSettingTempalte" DataType="{x:Type viewModel:SwitchSettingViewModel}">
+        <Grid HorizontalAlignment="Left">
+            <CheckBox IsChecked="{Binding Enabled}" Style="{StaticResource SwitchBox}" />
+        </Grid>
+    </DataTemplate>
+    <!-- #EndRegion  -->
+
+
 
 </ResourceDictionary>

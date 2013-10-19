@@ -345,6 +345,15 @@ namespace SongTagger.UI.Wpf
                         if (File.Exists(song.TargetFile.FullName))
                             File.Delete(song.TargetFile.FullName);
                     }, TaskContinuationOptions.NotOnRanToCompletion);
+
+                tagger.ContinueWith(prevTask =>
+                {
+                    if (SongTaggerSettings.Current.KeepOriginalFileAfterTagging)
+                        return;
+
+                    File.Delete(song.SourceFile.FullName);
+                }, TaskContinuationOptions.OnlyOnRanToCompletion);
+
             }
 
             initTask.Start(TaskScheduler.Current);
@@ -366,7 +375,7 @@ namespace SongTagger.UI.Wpf
 
         private void CollectAndInitSongs(IEnumerable<Track> tracks)
         {
-            DirectoryInfo targetDir = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic));
+            DirectoryInfo targetDir = new DirectoryInfo(SongTaggerSettings.Current.OutputFolderPath);
 
             var tracksByRelease = tracks.ToLookup(tr => tr.Release);
             var longestRelease = tracksByRelease.OrderByDescending(r => r.Count()).First();
@@ -468,7 +477,7 @@ namespace SongTagger.UI.Wpf
                 Track.Release.ReleaseGroup.FirstReleaseDate.Year.ToString(),
                 Track.Release.ReleaseGroup.Name,
                 albumSuffix.Contains(Track.Release.ReleaseGroup.PrimaryType) ? Track.Release.ReleaseGroup.PrimaryType.ToString() : "");
-            string fileName = CreateValidName(name => name.ValidFileName(), Position.ToString().PadLeft(2,'0'), Track.Name, "mp3");
+            string fileName = CreateValidName(name => name.ValidFileName(), Position.ToString().PadLeft(2, '0'), Track.Name, "mp3");
 
             return new FileInfo(Path.Combine(dirPath, artistName, albumName, fileName));
         }

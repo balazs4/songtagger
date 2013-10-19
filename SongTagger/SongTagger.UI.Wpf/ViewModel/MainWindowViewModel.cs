@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Globalization;
@@ -55,8 +56,9 @@ namespace SongTagger.UI.Wpf
         protected readonly IProvider provider;
 
         private Action<Exception> errorHandler;
+        private Func<string, DirectoryInfo> dirSelector;
 
-        public MainWindowViewModel(IProvider dataProvider, Action<Exception> errorHandlerCallback)
+        public MainWindowViewModel(IProvider dataProvider, Action<Exception> errorHandlerCallback, Func<string, DirectoryInfo> dirSelectorCallback)
         {
             if (dataProvider == null)
                 throw new ArgumentNullException("No data provider");
@@ -66,24 +68,27 @@ namespace SongTagger.UI.Wpf
 
             provider = dataProvider;
             errorHandler = errorHandlerCallback;
+            dirSelector = dirSelectorCallback;
 
             PropertyChanged += OnPropertyChanged;
 
             Workspace = new SearchViewmodel(SearchArtistAsync);
-            Cart = null;
+            Cart = new DummyCartViewModel(ShowSettings);
 
             WindowTitle = GetType().Namespace.Split('.').FirstOrDefault();
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (args.PropertyName != "Workspace")
-                return;
+            if (args.PropertyName == "Workspace")
+            {
+                if (Workspace is SearchViewmodel)
+                    return;
 
-            if (Workspace is SearchViewmodel)
+                Workspace.PropertyChanged += WorkspaceQueryRunningEventHandler;
                 return;
+            }
 
-            Workspace.PropertyChanged += WorkspaceQueryRunningEventHandler;
         }
 
         private void WorkspaceQueryRunningEventHandler(object sender, PropertyChangedEventArgs args)
@@ -103,7 +108,7 @@ namespace SongTagger.UI.Wpf
             Action<Task<T>> doneTask = task1 =>
                 {
                     Workspace = new MarketViewModel(nextWorkspaceState, task1.Result.Select(a => new EntityViewModel(a)));
-                    if (Cart == null)
+                    if (Cart == null || Cart is DummyCartViewModel)
                         Cart = new CartViewModel(LoadEntitiesAsync, ResetToSearchArtist);
                 };
 
@@ -160,7 +165,7 @@ namespace SongTagger.UI.Wpf
                             LastTaggedAlbum = releaseGroup;
                         });
 
-                    if (Cart == null)
+                    if (Cart == null || Cart is DummyCartViewModel)
                         Cart = new CartViewModel(LoadEntitiesAsync, ResetToSearchArtist);
                 };
 
@@ -193,7 +198,7 @@ namespace SongTagger.UI.Wpf
         protected void ResetToSearchArtist()
         {
             Workspace = new SearchViewmodel(SearchArtistAsync);
-            Cart = null;
+            Cart = new DummyCartViewModel(ShowSettings);
         }
 
         private void SearchArtistAsync(string searchText)
@@ -235,8 +240,8 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        private CartViewModel cart;
-        public CartViewModel Cart
+        private AbstractCartViewModel cart;
+        public AbstractCartViewModel Cart
         {
             get { return cart; }
             set
@@ -244,6 +249,33 @@ namespace SongTagger.UI.Wpf
                 cart = value;
                 RaisePropertyChangedEvent("Cart");
             }
+        }
+
+        private SettingsViewModel settings;
+        public SettingsViewModel Settings
+        {
+            get { return settings; }
+            set
+            {
+                settings = value;
+                RaisePropertyChangedEvent("Settings");
+                RaisePropertyChangedEvent("IsSettingsActive");
+            }
+        }
+
+        public bool IsSettingsActive
+        {
+            get { return Settings != null; }
+        }
+
+        private void ShowSettings()
+        {
+            Settings = new SettingsViewModel(CloseSettings, dirSelector);
+        }
+
+        private void CloseSettings()
+        {
+            Settings = null;
         }
     }
 
@@ -323,6 +355,154 @@ namespace SongTagger.UI.Wpf
                 entityImage = value;
                 RaisePropertyChangedEvent("EntityImage");
             }
+        }
+    }
+
+    public class SettingsViewModel : ViewModelBase
+    {
+        public SettingsViewModel(Action closeCallback, Func<string, DirectoryInfo> dirSelectorCallback)
+        {
+            CloseRequest = new DelegateCommand(p => closeCallback(), p => SongTaggerSettings.Current.IsValid());
+            ResetToDefault = new DelegateCommand(p =>
+                {
+                    SongTaggerSettings.Reset();
+                    Items.Clear();
+                    InitSettings(dirSelectorCallback);
+                });
+            Items = new ObservableCollection<AbstractSettingViewModel>();
+            InitSettings(dirSelectorCallback);
+        }
+
+        private void InitSettings(Func<string, DirectoryInfo> dirSelectorCallback)
+        {
+            var outputPath = new PathSettingViewModel("Output path", SongTaggerSettings.Current.OutputFolderPath,
+                                                      dirSelectorCallback)
+                {
+                    Hint = "Target path to place the recently tagged mp3's"
+                };
+            outputPath.PropertyChanged += (sender, args) => SongTaggerSettings.Current.OutputFolderPath = ((PathSettingViewModel)sender).FullPath;
+            Items.Add(outputPath);
+
+            var keepFile = new SwitchSettingViewModel("Keep original files",
+                                                      SongTaggerSettings.Current.KeepOriginalFileAfterTagging)
+                {
+                    Hint = "If enabled then the application won't delete the tagged file at the original place"
+                };
+            keepFile.PropertyChanged += (sender, args) => SongTaggerSettings.Current.KeepOriginalFileAfterTagging = ((SwitchSettingViewModel)sender).Enabled;
+            Items.Add(keepFile);
+
+        }
+
+        private ObservableCollection<AbstractSettingViewModel> items;
+        public ObservableCollection<AbstractSettingViewModel> Items
+        {
+            get { return items; }
+            set
+            {
+                items = value;
+                RaisePropertyChangedEvent("Settings");
+            }
+        }
+
+        public ICommand CloseRequest { get; private set; }
+        public ICommand ResetToDefault { get; private set; }
+    }
+
+    public abstract class AbstractSettingViewModel : ViewModelBase, IDataErrorInfo
+    {
+        private string title;
+        public string Title
+        {
+            get { return title; }
+            set
+            {
+                title = value;
+                RaisePropertyChangedEvent("Title");
+            }
+        }
+
+        private string hint;
+        public string Hint
+        {
+            get { return hint; }
+            set
+            {
+                hint = value;
+                RaisePropertyChangedEvent("Hint");
+            }
+        }
+
+        protected AbstractSettingViewModel(string name)
+        {
+            title = name;
+        }
+
+        public abstract string this[string columnName] { get; }
+        public string Error { get; private set; }
+    }
+
+    public class PathSettingViewModel : AbstractSettingViewModel
+    {
+        public PathSettingViewModel(string name, string path, Func<string, DirectoryInfo> dirSelectorCallback)
+            : base(name)
+        {
+            FullPath = path;
+            Browse = new DelegateCommand(p =>
+                {
+                    FullPath = dirSelectorCallback(FullPath).FullName;
+                });
+        }
+
+        public ICommand Browse { get; private set; }
+
+        private string fullPath;
+        public string FullPath
+        {
+            get { return fullPath; }
+            set
+            {
+                fullPath = value;
+                RaisePropertyChangedEvent("FullPath");
+            }
+        }
+
+        public override string this[string columnName]
+        {
+            get
+            {
+                if (String.IsNullOrWhiteSpace(FullPath))
+                    return "Invalid path";
+
+                if (!Directory.Exists(FullPath))
+                    return "Path does not exist";
+
+                return null;
+            }
+        }
+    }
+
+    public class SwitchSettingViewModel : AbstractSettingViewModel
+    {
+        public SwitchSettingViewModel(string name, bool initState)
+            : base(name)
+        {
+            Enabled = initState;
+        }
+
+        private bool enabled;
+        public bool Enabled
+        {
+            get { return enabled; }
+            set
+            {
+                enabled = value;
+                RaisePropertyChangedEvent("Enabled");
+            }
+        }
+
+        public override string this[string columnName]
+        {
+            get { return null; }
         }
     }
 }

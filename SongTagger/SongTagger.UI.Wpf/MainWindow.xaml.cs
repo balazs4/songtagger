@@ -7,8 +7,10 @@ using System.Net;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Threading;
 using SongTagger.Core;
+using MessageBox = System.Windows.MessageBox;
 
 namespace SongTagger.UI.Wpf
 {
@@ -23,9 +25,24 @@ namespace SongTagger.UI.Wpf
 #if OFFLINE
             DataContext = new MainWindowViewModel(OfflineDataProvider.Instance, ShowErrorMessageBox);
 #else
-            DataContext = new MainWindowViewModel(SongTagger.Core.Service.MusicData.Provider, ShowErrorMessageBox);
+            DataContext = new MainWindowViewModel(SongTagger.Core.Service.MusicData.Provider, ShowErrorMessageBox, SelectDirectory);
 #endif
         }
+
+        private DirectoryInfo SelectDirectory(string initPath)
+        {
+            using (var dialog = new FolderBrowserDialog())
+            {
+                dialog.ShowNewFolderButton = true;
+                dialog.SelectedPath = initPath;
+                DialogResult result = dialog.ShowDialog();
+                return result == System.Windows.Forms.DialogResult.OK 
+                    ? new DirectoryInfo(dialog.SelectedPath) 
+                    : new DirectoryInfo(initPath);
+            }
+            
+        }
+
 
         private void ShowErrorMessageBox(Exception exception)
         {
@@ -35,12 +52,12 @@ namespace SongTagger.UI.Wpf
             string messageText = exception.Message;
             if (exception is AggregateException)
             {
-                var messages = GetErrorMessages((AggregateException) exception);
+                var messages = GetErrorMessages((AggregateException)exception);
                 int maxErrorCount = 5;
                 messageText = messages.Count() < maxErrorCount
                                   ? string.Join(Environment.NewLine, messages)
                                   : string.Join(Environment.NewLine,
-                                                messages.Take(maxErrorCount).Concat(new[] {"...and other errors"}));
+                                                messages.Take(maxErrorCount).Concat(new[] { "...and other errors" }));
                 Trace.TraceError(string.Join(Environment.NewLine, messages));
             }
             else
@@ -51,7 +68,6 @@ namespace SongTagger.UI.Wpf
             Action showError = () => MessageBox.Show(this, messageText, "Oops something went wrong...", MessageBoxButton.OK, MessageBoxImage.Error);
             Dispatcher.Invoke(showError, DispatcherPriority.Normal);
         }
-
 
         private static IEnumerable<string> GetErrorMessages(AggregateException aggregate)
         {
@@ -101,10 +117,10 @@ namespace SongTagger.UI.Wpf
     public class MainWindowViewModelDesignData : MainWindowViewModel
     {
         public MainWindowViewModelDesignData()
-            : base(OfflineDataProvider.Instance, exception => { })
+            : base(OfflineDataProvider.Instance, exception => { }, s => new DirectoryInfo(s))
         {
             WindowTitle = "Design data";
-            InitDesignData(CartInit, ArtistMarket);
+            InitDesignData(ShowSettings);
         }
 
         private void ShowNotification()
@@ -130,16 +146,16 @@ namespace SongTagger.UI.Wpf
 
         private void ReleaseGroupMarket()
         {
-            Cart.EntityItem = new EntityViewModel(OfflineDataProvider.RiseAgainst);
+            ((CartViewModel)Cart).EntityItem = new EntityViewModel(OfflineDataProvider.RiseAgainst);
             Workspace = new MarketViewModel(State.SelectReleaseGroup,
                provider.BrowseReleaseGroups(OfflineDataProvider.RiseAgainst).Select(e => new EntityViewModel(e))
                );
-           
+
         }
 
         private void ReleaseMarket()
         {
-            Cart.EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReason);
+            ((CartViewModel)Cart).EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReason);
             Workspace = new MarketViewModel(State.SelectRelease,
                provider.BrowseReleases(OfflineDataProvider.AppealToReason).Select(e => new EntityViewModel(e))
                );
@@ -147,7 +163,7 @@ namespace SongTagger.UI.Wpf
 
         private void Tracks()
         {
-            Cart.EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReasonRelease);
+            ((CartViewModel)Cart).EntityItem = new EntityViewModel(OfflineDataProvider.AppealToReasonRelease);
             Workspace = new VirtualReleaseViewModel(provider.LookupTracks(OfflineDataProvider.AppealToReasonRelease), provider.DownloadCoverArts, (error) => { }, rgroup => { });
         }
 
@@ -159,6 +175,11 @@ namespace SongTagger.UI.Wpf
         private void ErrorMessage()
         {
 
+        }
+
+        private void ShowSettings()
+        {
+            Settings = new SettingsViewModel(() =>  {}, s => new DirectoryInfo(s));
         }
 
     }
