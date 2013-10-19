@@ -68,10 +68,16 @@
             </Grid.Resources>
             <ContentControl Content="{Binding Workspace}" ContentTemplateSelector="{StaticResource workspaceSelector}"/>
             <Border Background="Transparent" Height="64" Width="384" VerticalAlignment="Bottom" 
+                    BorderBrush="Gray" BorderThickness="2"
                     Visibility="{Binding IsNotificationVisible, Converter={StaticResource Bool2Visibility}}">
-                <Grid>
-                    <Image Source="View/Images/done.png" Height="64" HorizontalAlignment="Left"/>
-                    <Rectangle Fill="Black" Opacity="0.7"/>
+                <Grid Margin="1">
+                    <Rectangle Fill="Black" Opacity="0.85"/>
+                    <Grid HorizontalAlignment="Left" Width="64">
+                        <Border Background="Transparent" Opacity=".75"/>
+                        <Ellipse Fill="LimeGreen" Height="32" Width="32" Opacity=".65"/>
+                        <Image Source="View/Images/done.png" Width="32" Opacity="1.0"/>
+                    </Grid>
+
                     <StackPanel Margin="64,0,0,0" VerticalAlignment="Center">
                         <StackPanel.Resources>
                             <Style TargetType="TextBlock">

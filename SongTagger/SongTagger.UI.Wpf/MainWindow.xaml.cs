@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using SongTagger.Core;
+using SongTagger.UI.Wpf.View;
 using MessageBox = System.Windows.MessageBox;
 
 namespace SongTagger.UI.Wpf
@@ -23,7 +24,7 @@ namespace SongTagger.UI.Wpf
         {
             InitializeComponent();
 #if OFFLINE
-            DataContext = new MainWindowViewModel(OfflineDataProvider.Instance, ShowErrorMessageBox);
+            DataContext = new MainWindowViewModel(OfflineDataProvider.Instance, ShowErrorMessageBox, SelectDirectory);
 #else
             DataContext = new MainWindowViewModel(SongTagger.Core.Service.MusicData.Provider, ShowErrorMessageBox, SelectDirectory);
 #endif
@@ -36,11 +37,11 @@ namespace SongTagger.UI.Wpf
                 dialog.ShowNewFolderButton = true;
                 dialog.SelectedPath = initPath;
                 DialogResult result = dialog.ShowDialog();
-                return result == System.Windows.Forms.DialogResult.OK 
-                    ? new DirectoryInfo(dialog.SelectedPath) 
+                return result == System.Windows.Forms.DialogResult.OK
+                    ? new DirectoryInfo(dialog.SelectedPath)
                     : new DirectoryInfo(initPath);
             }
-            
+
         }
 
 
@@ -65,7 +66,16 @@ namespace SongTagger.UI.Wpf
                 Trace.TraceError(string.Join(Environment.NewLine, messageText));
             }
 
-            Action showError = () => MessageBox.Show(this, messageText, "Oops something went wrong...", MessageBoxButton.OK, MessageBoxImage.Error);
+            Action showError = () =>
+                {
+                    View.ErrorDialog dialog = new ErrorDialog(messageText)
+                        {
+                            Owner = this
+                        };
+                    dialog.ShowDialog();
+                };
+
+            //Action showError = () => MessageBox.Show(this, messageText, "Oops something went wrong...", MessageBoxButton.OK, MessageBoxImage.Error);
             Dispatcher.Invoke(showError, DispatcherPriority.Normal);
         }
 
@@ -120,7 +130,7 @@ namespace SongTagger.UI.Wpf
             : base(OfflineDataProvider.Instance, exception => { }, s => new DirectoryInfo(s))
         {
             WindowTitle = "Design data";
-            InitDesignData(ShowSettings);
+            InitDesignData(CartInit, Tracks, ShowNotification);
         }
 
         private void ShowNotification()
@@ -179,7 +189,7 @@ namespace SongTagger.UI.Wpf
 
         private void ShowSettings()
         {
-            Settings = new SettingsViewModel(() =>  {}, s => new DirectoryInfo(s));
+            Settings = new SettingsViewModel(() => { }, s => new DirectoryInfo(s));
         }
 
     }

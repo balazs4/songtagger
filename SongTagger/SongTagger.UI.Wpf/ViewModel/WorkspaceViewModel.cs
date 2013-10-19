@@ -335,7 +335,7 @@ namespace SongTagger.UI.Wpf
                        song.SourceFile.Refresh();
                        song.TargetFile.Refresh();
                        Core.Mp3Tag.TagHandler.Save(song.Track, song.TargetFile, SelectedCover.Data);
-                       song.EjectSourceFile.Execute(null);
+                       
                    }, tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
 
                 taggers.Add(tagger);
@@ -348,10 +348,11 @@ namespace SongTagger.UI.Wpf
 
                 tagger.ContinueWith(prevTask =>
                 {
-                    if (SongTaggerSettings.Current.KeepOriginalFileAfterTagging)
-                        return;
-
-                    File.Delete(song.SourceFile.FullName);
+                    if (!SongTaggerSettings.Current.KeepOriginalFileAfterTagging)
+                    {
+                        File.Delete(song.SourceFile.FullName);    
+                    }
+                    song.EjectSourceFile.Execute(null);
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
             }
