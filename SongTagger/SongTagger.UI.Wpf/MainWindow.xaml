@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:viewModel="clr-namespace:SongTagger.UI.Wpf"
         xmlns:gong="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+        xmlns:metroControls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=viewModel:MainWindowViewModelDesignData}"
         Title="{Binding WindowTitle}" Height="650" Width="850" 
@@ -82,6 +83,16 @@
                         <TextBlock Text="{Binding LastTaggedAlbum.Artist.Name}"/>
                     </StackPanel>
                 </Grid>
+            </Border>
+
+        </Grid>
+        <Grid ColumnSpan="2"  IsEnabled="{Binding IsWorkspaceBusy}"
+                                        Visibility="{Binding IsWorkspaceBusy, Converter={StaticResource Bool2Visibility}}">
+            <Border Background="Black" Opacity=".75" Height="256">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <metroControls:ProgressRing IsActive="True" Foreground="White"/>
+                    <TextBlock Text="Please wait..." FontSize="32"  Margin="25,0,0,0" Foreground="White"/>
+                </StackPanel>
             </Border>
         </Grid>
     </Grid>

@@ -104,7 +104,7 @@ namespace SongTagger.UI.Wpf
             : base(OfflineDataProvider.Instance, exception => { })
         {
             WindowTitle = "Design data";
-            InitDesignData(CartInit, ReleaseGroupMarket, ShowNotification);
+            InitDesignData(CartInit, ArtistMarket);
         }
 
         private void ShowNotification()
@@ -125,6 +125,7 @@ namespace SongTagger.UI.Wpf
             Workspace = new MarketViewModel(State.SelectArtist,
                 provider.SearchArtist("Rise Against").Select(e => new EntityViewModel(e))
                 );
+            Workspace.IsQueryRunning = true;
         }
 
         private void ReleaseGroupMarket()
@@ -133,6 +134,7 @@ namespace SongTagger.UI.Wpf
             Workspace = new MarketViewModel(State.SelectReleaseGroup,
                provider.BrowseReleaseGroups(OfflineDataProvider.RiseAgainst).Select(e => new EntityViewModel(e))
                );
+           
         }
 
         private void ReleaseMarket()
