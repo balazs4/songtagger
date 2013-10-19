@@ -130,7 +130,7 @@ namespace SongTagger.UI.Wpf
             : base(OfflineDataProvider.Instance, exception => { }, s => new DirectoryInfo(s))
         {
             WindowTitle = "Design data";
-            InitDesignData(CartInit, Tracks, ShowNotification);
+            InitDesignData(ShowNotification);
         }
 
         private void ShowNotification()

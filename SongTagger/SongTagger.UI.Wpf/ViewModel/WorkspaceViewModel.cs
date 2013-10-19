@@ -69,6 +69,18 @@ namespace SongTagger.UI.Wpf
                     param => searchCallback(SearchText),
                     param => !String.IsNullOrWhiteSpace(SearchText)
                 );
+
+            OpenLink = new DelegateCommand(p =>
+                {
+                    if (p == null)
+                        return;
+
+                    Uri url;
+                    if (!Uri.TryCreate(p.ToString(), UriKind.Absolute, out url))
+                        return;
+
+                    System.Diagnostics.Process.Start(url.ToString());
+                });
         }
 
         private string searchText;
@@ -84,6 +96,8 @@ namespace SongTagger.UI.Wpf
         }
 
         public ICommand Search { get; private set; }
+
+        public ICommand OpenLink { get; private set; }
     }
 
     public class MarketViewModel : WorkspaceViewModel

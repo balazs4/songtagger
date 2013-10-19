@@ -9,6 +9,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Xml.Serialization;
 
 namespace SongTagger.UI.Wpf
 {
@@ -34,7 +35,43 @@ namespace SongTagger.UI.Wpf
     public class SongTaggerSettings : INotifyPropertyChanged
     {
         private static SongTaggerSettings instance;
-        public static SongTaggerSettings Current { get { return instance ?? (instance = new SongTaggerSettings()); } }
+        public static SongTaggerSettings Current { get { return instance ?? (instance = LoadOrDefault()); } }
+
+        private static readonly string userConfig =
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"SongTagger.xml");
+
+
+        private static SongTaggerSettings LoadOrDefault()
+        {
+            try
+            {
+                using (var fileStream = File.Open(userConfig, FileMode.Open))
+                {
+                    return (SongTaggerSettings) new XmlSerializer(typeof(SongTaggerSettings)).Deserialize(fileStream);
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.TraceWarning("Could not load settings. Details: " + e.ToString());
+                return new SongTaggerSettings();
+            }
+        }
+
+
+        public void Save()
+        {
+            try
+            {
+                using (var fileStream = File.Open(userConfig, FileMode.OpenOrCreate))
+                {
+                    new XmlSerializer(typeof(SongTaggerSettings)).Serialize(fileStream, this);
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.TraceWarning("Could not save settings. Details: " + e.ToString());
+            }
+        }
 
         private SongTaggerSettings()
         {
@@ -43,6 +80,8 @@ namespace SongTagger.UI.Wpf
         }
 
         private string outputFolderPath;
+        
+        [XmlElement]
         public string OutputFolderPath
         {
             get { return outputFolderPath; }
@@ -54,6 +93,8 @@ namespace SongTagger.UI.Wpf
         }
 
         private bool keepOriginalFileAfterTagging;
+
+        [XmlElement]
         public bool KeepOriginalFileAfterTagging
         {
             get { return keepOriginalFileAfterTagging; }
@@ -86,7 +127,7 @@ namespace SongTagger.UI.Wpf
 
         public static void Reset()
         {
-            instance = null;
+            instance = new SongTaggerSettings();
         }
     }
 }
