@@ -142,7 +142,7 @@
                             </Style>
                         </StackPanel.Resources>
                         <Button Content="Reset" Width="60" Command="{Binding Settings.ResetToDefault}"/>
-                        <Button Content="Apply" Width="60" Command="{Binding Settings.CloseRequest}"/>
+                        <Button Content="Apply" Width="60" Command="{Binding Settings.Apply}"/>
                     </StackPanel>
                 </StackPanel>
             </Grid>

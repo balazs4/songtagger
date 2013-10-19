@@ -14,7 +14,7 @@
             </Grid.ColumnDefinitions>
             <Image Source="Images/error.png" Width="64" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Details" TextAlignment="Left" FontSize="16" FontWeight="Bold"/>
+                <TextBlock Text="Oops something went wrong..." TextAlignment="Left" FontSize="16" FontWeight="Bold"/>
                 <TextBlock Text="{Binding}" FontSize="14" Margin="24,8,4,4"/>
             </StackPanel>
         </Grid>

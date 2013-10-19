@@ -362,7 +362,12 @@ namespace SongTagger.UI.Wpf
     {
         public SettingsViewModel(Action closeCallback, Func<string, DirectoryInfo> dirSelectorCallback)
         {
-            CloseRequest = new DelegateCommand(p => closeCallback(), p => SongTaggerSettings.Current.IsValid());
+            Apply = new DelegateCommand(p =>
+                {
+                    SongTaggerSettings.Current.Save();
+                    closeCallback();
+                }, 
+                p => SongTaggerSettings.Current.IsValid());
             ResetToDefault = new DelegateCommand(p =>
                 {
                     SongTaggerSettings.Reset();
@@ -404,7 +409,7 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        public ICommand CloseRequest { get; private set; }
+        public ICommand Apply { get; private set; }
         public ICommand ResetToDefault { get; private set; }
     }
 

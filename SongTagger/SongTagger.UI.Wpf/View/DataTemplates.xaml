@@ -188,41 +188,62 @@
 
     <!-- #Region Workspace -->
     <DataTemplate x:Key="searchDataTemplate" DataType="{x:Type viewModel:SearchViewmodel}">
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,150,0">
-            <StackPanel.Resources>
-                <Style TargetType="StackPanel">
-                    <Style.Triggers>
-                        <EventTrigger RoutedEvent="Loaded">
-                            <EventTrigger.Actions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:0.8" From="0.0" To="1.0"  />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger.Actions>
-                        </EventTrigger>
-                    </Style.Triggers>
-                </Style>
-            </StackPanel.Resources>
-            <TextBlock Text="{Binding Header}" FontSize="48"/>
-            <Grid>
-                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" BorderBrush="DarkGray" BorderThickness="1"
+        <Grid>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,150,0">
+                <StackPanel.Resources>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <EventTrigger.Actions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:0.8" From="0.0" To="1.0"  />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger.Actions>
+                            </EventTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Resources>
+                <TextBlock Text="{Binding Header}" FontSize="48"/>
+                <Grid>
+                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" BorderBrush="DarkGray" BorderThickness="1"
                                          IsEnabled="{Binding IsQueryRunning, Converter={StaticResource BoolInverter}}"
                                          FontSize="22" TextAlignment="Center" TextWrapping="Wrap" Padding="0,0,32,0">
-                    <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding Search}"/>
-                    </TextBox.InputBindings>
-                </TextBox>
-                <Button HorizontalAlignment="Right"
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding Search}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button HorizontalAlignment="Right"
                                     Command="{Binding Search}"
                                     IsEnabled="{Binding IsQueryRunning, Converter={StaticResource BoolInverter}}">
-                    <Button.Content>
-                        <Image Source="Images/search.png" Width="32" Height="32"/>
-                    </Button.Content>
-                </Button>
-            </Grid>
-            <metroControls:ProgressRing IsActive="{Binding IsQueryRunning}" Foreground="Gray"/>
-        </StackPanel>
+                        <Button.Content>
+                            <Image Source="Images/search.png" Width="32" Height="32"/>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+                <metroControls:ProgressRing IsActive="{Binding IsQueryRunning}" Foreground="Gray"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <StackPanel.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Foreground" Value="Gray"/>
+                        <Setter Property="Margin" Value="0,0,2,0"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Label Content="developed by balazs4"/>
+                <Label>
+                    <Label.Content>
+                        <Hyperlink Command="{Binding OpenLink}"
+                                   CommandParameter="http://songtagger.codeplex.com/">
+                            SongTagger
+                        </Hyperlink>
+                    </Label.Content>
+                </Label>
+                <Label Content="GPLv2"/>
+            </StackPanel>
+        </Grid>
     </DataTemplate>
 
     <DataTemplate x:Key="marketDataTemplate" DataType="{x:Type viewModel:MarketViewModel}">
