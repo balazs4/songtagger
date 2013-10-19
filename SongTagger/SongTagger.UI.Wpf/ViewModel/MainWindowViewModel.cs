@@ -61,12 +61,13 @@ namespace SongTagger.UI.Wpf
             if (dataProvider == null)
                 throw new ArgumentNullException("No data provider");
 
-
             if (errorHandlerCallback == null)
                 throw new ArgumentNullException("No error handling");
 
             provider = dataProvider;
             errorHandler = errorHandlerCallback;
+
+            PropertyChanged += OnPropertyChanged;
 
             Workspace = new SearchViewmodel(SearchArtistAsync);
             Cart = null;
@@ -74,7 +75,27 @@ namespace SongTagger.UI.Wpf
             WindowTitle = GetType().Namespace.Split('.').FirstOrDefault();
         }
 
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName != "Workspace")
+                return;
 
+            if (Workspace is SearchViewmodel)
+                return;
+
+            Workspace.PropertyChanged += WorkspaceQueryRunningEventHandler;
+        }
+
+        private void WorkspaceQueryRunningEventHandler(object sender, PropertyChangedEventArgs args)
+        {
+            if (sender != Workspace)
+                return;
+
+            if (args.PropertyName != "IsQueryRunning")
+                return;
+
+            RaisePropertyChangedEvent("IsWorkspaceBusy");
+        }
 
         private void StartMarketQueryTask<T>(Func<T> action, State nextWorkspaceState)
             where T : IEnumerable<IEntity>
@@ -199,6 +220,18 @@ namespace SongTagger.UI.Wpf
             {
                 workspace = value;
                 RaisePropertyChangedEvent("Workspace");
+                RaisePropertyChangedEvent("IsWorkspaceBusy");
+            }
+        }
+
+        public bool IsWorkspaceBusy
+        {
+            get
+            {
+                if (Workspace == null)
+                    return false;
+
+                return Workspace.IsQueryRunning;
             }
         }
 

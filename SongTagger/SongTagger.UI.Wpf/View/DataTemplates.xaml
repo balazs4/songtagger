@@ -319,15 +319,6 @@
                         </Style>
                     </ListBox.Resources>
                 </ListBox>
-                <Border Background="Black" Opacity=".55" Margin="-150,-140,0,0" 
-                                        Height="256"
-                                        IsEnabled="{Binding IsQueryRunning}"
-                                        Visibility="{Binding IsQueryRunning, Converter={StaticResource Bool2Visibility}}">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <metroControls:ProgressRing IsActive="{Binding IsQueryRunning}" Foreground="White"/>
-                        <TextBlock Text="Please wait..." FontSize="32"  Margin="25,0,0,0" Foreground="White"/>
-                    </StackPanel>
-                </Border>
             </Grid>
         </Grid>
     </DataTemplate>

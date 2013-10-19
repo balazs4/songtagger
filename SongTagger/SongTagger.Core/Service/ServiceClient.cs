@@ -22,8 +22,10 @@
 //
 
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace SongTagger.Core.Service
 {
@@ -32,33 +34,54 @@ namespace SongTagger.Core.Service
         private static object lockObject = new object();
         private static DateTime lastFinishedDownload = DateTime.MinValue;
 
-        private static Func<Uri,String> download;
-        internal static Func<Uri,String> Download
-        { 
+        private static Func<Uri, String> download;
+        internal static Func<Uri, String> Download
+        {
             get
             {
                 return download ?? (download = DefaultContentDownloader);
             }
-            set {download = value;}
+            set { download = value; }
         }
 
 
         internal static WebClient CreateWebClient()
         {
             WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
-            return new WebClient {Proxy = WebRequest.DefaultWebProxy, Encoding = new UTF8Encoding()};
+            return new WebClient { Proxy = WebRequest.DefaultWebProxy, Encoding = new UTF8Encoding() };
         }
 
         private static string DefaultContentDownloader(Uri url)
         {
-            string content;
+            string content = string.Empty;
             using (WebClient client = CreateWebClient())
             {
-                content = client.DownloadString(url);
+                AutoResetEvent autoEvent = new AutoResetEvent(false);
+
+                client.DownloadStringCompleted += (sender, args) =>
+                    {
+                        if (args.Error != null)
+                            Trace.TraceError(args.Error.ToString());
+                        else
+                            content = args.Result;
+
+                        autoEvent.Set();
+                    };
+                client.DownloadStringAsync(url);
+
+                TimeSpan waitTime = TimeSpan.FromSeconds(30);
+                if (!autoEvent.WaitOne(waitTime))
+                {
+                    client.CancelAsync();
+                    string message =
+                        string.Format(
+                            "No respond from server in {0}. \nPlease try it later again or check your internet connection.",
+                            waitTime);
+                    throw new SongTaggerException(message);
+                }
+                //content = client.DownloadString(url);
             }
-            return String.IsNullOrWhiteSpace(content)
-                    ? String.Empty
-                    : content;
+            return content;
         }
 
         public static string DownloadContent(Uri url, Action<DateTime> prepareAction)
