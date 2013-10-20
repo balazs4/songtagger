@@ -496,8 +496,6 @@
                         </Grid>
                     </StackPanel>
                     <Grid Grid.Column="2" Margin="0,0,50,0">
-                        <metroControls:ProgressRing IsActive="{Binding IsQueryRunning}" Visibility="{Binding IsQueryRunning, Converter={StaticResource Bool2Visibility}}" 
-                                                    Foreground="Gray"/>
                         <Button ToolTip="Save" Command="{Binding Save}"
                             Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource Bool2Visibility}}">
                             <Button.Template>

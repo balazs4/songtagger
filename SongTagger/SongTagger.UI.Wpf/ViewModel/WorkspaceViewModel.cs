@@ -360,7 +360,7 @@ namespace SongTagger.UI.Wpf
                        song.SourceFile.Refresh();
                        song.TargetFile.Refresh();
                        Core.Mp3Tag.TagHandler.Save(song.Track, song.TargetFile, SelectedCover.Data);
-                       
+
                    }, tokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
 
                 taggers.Add(tagger);
@@ -375,7 +375,7 @@ namespace SongTagger.UI.Wpf
                 {
                     if (!SongTaggerSettings.Current.KeepOriginalFileAfterTagging)
                     {
-                        File.Delete(song.SourceFile.FullName);    
+                        File.Delete(song.SourceFile.FullName);
                     }
                     song.EjectSourceFile.Execute(null);
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -477,7 +477,7 @@ namespace SongTagger.UI.Wpf
                 dir = new DirectoryInfo(filePath);
 
                 if (!dir.GetFiles().Any(f => f.Extension.ToLower().EndsWith("mp3")))
-                      throw new NotSupportedException("Not supported extension");
+                    throw new NotSupportedException("Not supported extension");
 
                 return true;
             }
@@ -514,22 +514,37 @@ namespace SongTagger.UI.Wpf
             DirectoryInfo dir;
             IsFolderDragNDropActive = false;
             TryGetDirNameFromDropInfo(dropInfo, out dir);
+
+            IsQueryRunning = true;
             DetectTracks(dir);
+            IsQueryRunning = false;
         }
 
         private void DetectTracks(DirectoryInfo dir)
         {
-            var mp3FileList = dir.EnumerateFiles("*.mp3", SearchOption.AllDirectories);
+            var availableInfo = dir.EnumerateFiles("*.mp3", SearchOption.AllDirectories).AsParallel().ToDictionary(info => info,
+                                                                                               SongTagger.Core.Mp3Tag.TagHandler.GetSongTags);
 
-            Parallel.ForEach(mp3FileList, file =>
+
+            foreach (Song song in Songs)
+            {
+                if (song.SourceFile != null && availableInfo.Keys.Select(info => info.FullName).Contains(song.SourceFile.FullName))
+                    continue;
+
+                var found = availableInfo.FirstOrDefault(kv => kv.Value.Contains(song.Track.Name.ToLower()) || kv.Value.Contains(song.Track.Posititon.ToString())).Key;
+                if (found != null)
                 {
-                    var song = Songs.FirstOrDefault(s => s.SourceFile == null);
-                    song.SourceFile = file;
+                    song.SourceFile = found;
+                    continue;
+                }
 
-                    //TODO
-                    
-                });
-
+                var fileNameFound = availableInfo.Keys.FirstOrDefault(info => info.Name.Contains(song.Track.Posititon.ToString()));
+                if (fileNameFound != null)
+                {
+                    song.SourceFile = fileNameFound;
+                    continue;
+                }
+            }
         }
     }
 
@@ -539,9 +554,6 @@ namespace SongTagger.UI.Wpf
         {
             EjectSourceFile = new DelegateCommand(p => SourceFile = null, p => IsInitalized);
 
-#if OFFLINE
-            SourceFile = new FileInfo(Path.GetTempFileName());
-#endif
             Track = track;
             Position = position;
 
