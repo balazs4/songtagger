@@ -57,7 +57,6 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-
         public void Save()
         {
             try
@@ -73,10 +72,13 @@ namespace SongTagger.UI.Wpf
             }
         }
 
+        private static readonly string songtaggeLastFmApiKey = "f935072042e3375d19bebcb0ea0cd972";
+
         private SongTaggerSettings()
         {
             OutputFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
             KeepOriginalFileAfterTagging = true;
+            LastFmApiKey = songtaggeLastFmApiKey;
         }
 
         private string outputFolderPath;
@@ -105,6 +107,19 @@ namespace SongTagger.UI.Wpf
             }
         }
 
+        private string lastFmApiKey;
+
+        [XmlElement]
+        public string LastFmApiKey
+        {
+            get { return lastFmApiKey; }
+            set
+            {
+                lastFmApiKey = value;
+                RaisePropertyChangedEvent("LastFmApiKey");
+            }
+        }
+
         public bool IsValid()
         {
             if (string.IsNullOrWhiteSpace(OutputFolderPath))
@@ -128,6 +143,11 @@ namespace SongTagger.UI.Wpf
         public static void Reset()
         {
             instance = new SongTaggerSettings();
+        }
+
+        public void SetLastFmApiKey(bool set)
+        {
+            LastFmApiKey = set ? songtaggeLastFmApiKey : string.Empty;
         }
     }
 }

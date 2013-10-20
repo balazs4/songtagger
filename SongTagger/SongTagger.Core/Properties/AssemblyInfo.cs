@@ -49,3 +49,4 @@ using System.Runtime.CompilerServices;
 
 
 [assembly: InternalsVisibleTo("SongTagger.Core.Test")]
+[assembly: InternalsVisibleTo("SongTagger.UI.Wpf")]

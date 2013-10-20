@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +14,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Xml.Linq;
 using GongSolutions.Wpf.DragDrop;
 using SongTagger.Core;
 using SongTagger.UI.Wpf.ViewModel;
@@ -327,13 +329,39 @@ namespace SongTagger.UI.Wpf
             var coverUriList = tracks.ToLookup(t => t.Release)
                                            .Where(group => group.Key.HasPreferredCoverArt)
                                            .Select(group => group.Key.GetCoverArt())
-                                           .ToArray();
-            //TODO: DisCogs,Last.FM
-            DownloadAndInitCovers(coverDownloaderService, source.Token, coverUriList);
+                                           .ToList();
+
+            var lastFmCover = GetLastFmCoverArt(ReleaseGroup);
+            if (lastFmCover != null)
+                coverUriList.Add(lastFmCover);
+
+            DownloadAndInitCovers(coverDownloaderService, source.Token, coverUriList.ToArray());
             #endregion
 
             Songs = new ObservableCollection<Song>();
             CollectAndInitSongs(tracks);
+        }
+
+        private Uri GetLastFmCoverArt(ReleaseGroup releaseGroup)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(SongTaggerSettings.Current.LastFmApiKey))
+                    return null;
+
+                Uri uri = new Uri(string.Format("http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key={0}&artist={1}&album={2}", 
+                    SongTaggerSettings.Current.LastFmApiKey, 
+                    releaseGroup.Artist.Name, 
+                    releaseGroup.Name));
+
+                string content = Core.Service.ServiceClient.DownloadContent(uri, time => { });
+                string imageUri = XDocument.Parse(content).Descendants("image").Single(element => element.Attribute("size").Value == "extralarge").Value;
+                return new Uri(imageUri);
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
 
         private void TagSongs(Action<Exception> reportError, Action<ReleaseGroup> reportDone)
@@ -523,7 +551,7 @@ namespace SongTagger.UI.Wpf
         private void DetectTracks(DirectoryInfo dir)
         {
             var availableInfo = dir.EnumerateFiles("*.mp3", SearchOption.AllDirectories).AsParallel().ToDictionary(info => info,
-                                                                                               SongTagger.Core.Mp3Tag.TagHandler.GetSongTags);
+                                                                                               info => string.Join(" ", SongTagger.Core.Mp3Tag.TagHandler.GetSongTags(info)));
 
 
             foreach (Song song in Songs)
