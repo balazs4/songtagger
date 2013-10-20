@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 namespace SongTagger.Core.Mp3Tag
 {
@@ -77,6 +78,44 @@ namespace SongTagger.Core.Mp3Tag
             }
 
             mp3.Save();
+        }
+
+        public static IEnumerable<string> GetSongTags(FileSystemInfo mp3File)
+        {
+            if (mp3File == null)
+                throw new ArgumentNullException("mp3File", "Mp3 file cannot be null");
+
+            if (!mp3File.Exists)
+                throw new FileNotFoundException("File does not exist", mp3File.FullName);
+
+
+            TagLib.Mpeg.AudioFile mp3 = new TagLib.Mpeg.AudioFile(mp3File.FullName);
+
+
+            List<Func<TagLib.Tag,string>> supportedTags = new List<Func<TagLib.Tag, string>>
+            {
+                tag => tag.Track.ToString(),
+                tag => tag.Title
+            };
+
+            List<string> infos = new List<string>();
+
+            foreach (var tag in new List<TagTypes>{TagTypes.Id3v1,TagTypes.Id3v2}.Select(mp3.GetTag))
+            {
+                foreach (var read in supportedTags)
+                {
+                    try
+                    {
+                        infos.Add(read(tag).ToLower());
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            return infos.Distinct();
         }
     }
 }

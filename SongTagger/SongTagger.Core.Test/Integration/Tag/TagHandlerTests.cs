@@ -30,7 +30,7 @@ using System.Collections.Generic;
 namespace SongTagger.Core.Test.Integration.Tag
 {
     [TestFixture()]
-    public class TagHandlerTests
+    public class TagHandlerSaveTests
     {
         private string tempFileName;
         private Track track;
@@ -150,6 +150,21 @@ namespace SongTagger.Core.Test.Integration.Tag
         {
             TagLib.Tag id3Tag = tags[tag];
             CollectionAssert.IsNotEmpty(id3Tag.Pictures, tag.ToString());
+        }
+    }
+
+    [TestFixture()]
+    public class TagHandlerGetInfoTests
+    {
+        [Test]
+        public void GetInfo()
+        {
+            FileInfo mp3 = new FileInfo(TestHelper.GetInputDataFilePath("office.mp3"));
+
+            var actualTags = TagHandler.GetSongTags(mp3);
+            var expectedTags = new [] { "4", "the office theme song" };
+
+            CollectionAssert.AreEquivalent(expectedTags, actualTags);
         }
     }
 }
