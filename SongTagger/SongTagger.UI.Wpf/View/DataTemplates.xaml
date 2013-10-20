@@ -237,7 +237,7 @@
                     <Label.Content>
                         <Hyperlink Command="{Binding OpenLink}"
                                    CommandParameter="http://songtagger.codeplex.com/">
-                            SongTagger
+                            songtagger
                         </Hyperlink>
                     </Label.Content>
                 </Label>
