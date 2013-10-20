@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Deployment.Application;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -75,7 +76,11 @@ namespace SongTagger.UI.Wpf
             Workspace = new SearchViewmodel(SearchArtistAsync);
             Cart = new DummyCartViewModel(ShowSettings);
 
-            WindowTitle = GetType().Namespace.ToLower().Split('.').FirstOrDefault() + " v1.0";
+            Version version = new Version(0,0,0,999);
+            if (ApplicationDeployment.IsNetworkDeployed)
+                version = ApplicationDeployment.CurrentDeployment.CurrentVersion;
+
+            WindowTitle = GetType().Namespace.ToLower().Split('.').FirstOrDefault() + " v" + version.ToString(4);
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
