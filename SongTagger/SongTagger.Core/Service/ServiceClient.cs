@@ -69,7 +69,7 @@ namespace SongTagger.Core.Service
                     };
                 client.DownloadStringAsync(url);
 
-                TimeSpan waitTime = TimeSpan.FromMinutes(2);
+                TimeSpan waitTime = TimeSpan.FromSeconds(30);
                 if (!autoEvent.WaitOne(waitTime))
                 {
                     client.CancelAsync();

@@ -396,6 +396,14 @@ namespace SongTagger.UI.Wpf
             keepFile.PropertyChanged += (sender, args) => SongTaggerSettings.Current.KeepOriginalFileAfterTagging = ((SwitchSettingViewModel)sender).Enabled;
             Items.Add(keepFile);
 
+
+            var lastFm = new SwitchSettingViewModel("CoverArt from Last.Fm too",
+                                                    !string.IsNullOrWhiteSpace(SongTaggerSettings.Current.LastFmApiKey))
+                {
+                    Hint = "Extend covertart search with Last.FM support"
+                };
+            lastFm.PropertyChanged += (sender, args) => SongTaggerSettings.Current.SetLastFmApiKey(((SwitchSettingViewModel) sender).Enabled);
+            Items.Add(lastFm);
         }
 
         private ObservableCollection<AbstractSettingViewModel> items;
