@@ -75,7 +75,7 @@ namespace SongTagger.UI.Wpf
             Workspace = new SearchViewmodel(SearchArtistAsync);
             Cart = new DummyCartViewModel(ShowSettings);
 
-            WindowTitle = GetType().Namespace.Split('.').FirstOrDefault();
+            WindowTitle = GetType().Namespace.ToLower().Split('.').FirstOrDefault() + " v1.0";
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
