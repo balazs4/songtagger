@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shell;
 
 namespace SongTagger.UI.Wpf
 {
@@ -126,4 +127,24 @@ namespace SongTagger.UI.Wpf
         }
     }
 
+
+    public class TaskbarItemInfoConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return TaskbarItemProgressState.None;
+
+            bool isBusy;
+            if (!bool.TryParse(value.ToString(), out isBusy))
+                return TaskbarItemProgressState.None;
+
+            return isBusy ? TaskbarItemProgressState.Indeterminate : TaskbarItemProgressState.None;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

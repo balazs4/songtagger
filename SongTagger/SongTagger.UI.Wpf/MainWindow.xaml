@@ -16,10 +16,13 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="View/DataTemplates.xaml" />
-
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+        
     </Window.Resources>
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo ProgressState="{Binding IsWorkspaceBusy, Converter={StaticResource TaskBarStatusConverter}}"/>
+    </Window.TaskbarItemInfo>
     <Grid ShowGridLines="False" Name="songtagger">
         <Grid.Style>
             <Style TargetType="Grid">

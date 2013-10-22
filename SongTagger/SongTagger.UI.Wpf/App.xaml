@@ -15,5 +15,7 @@
         <Style TargetType="DockPanel">
             <Setter Property="LastChildFill" Value="True"/>
         </Style>
+
+        
     </Application.Resources>
 </Application>

@@ -15,6 +15,7 @@
     <viewModel:IsNullConverter x:Key="NullChecker"/>
     <viewModel:TimeSpanConverter x:Key="TimeSpanConvert"/>
     <viewModel:ByteArrayToBitmapConverter x:Key="ByteImageConverter"/>
+    <viewModel:TaskbarItemInfoConverter x:Key="TaskBarStatusConverter"/>
 
     <Style TargetType="Image" x:Key="Shadow">
         <Setter Property="Effect">
