@@ -186,7 +186,7 @@ namespace SongTagger.Core
         }
 
         [XmlElement("position")]
-        public int Posititon { get; set; }
+        public int Position { get; set; }
 
         [XmlElement("number")]
         public string Number { get; set; }

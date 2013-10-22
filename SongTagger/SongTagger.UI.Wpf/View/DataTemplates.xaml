@@ -162,7 +162,7 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Resources>
-            <Label Content="{Binding Position}" HorizontalAlignment="Right" Grid.Column="0" FontSize="18"
+            <Label Content="{Binding Track.Position}" HorizontalAlignment="Right" Grid.Column="0" FontSize="18"
                    VerticalAlignment="Center" Foreground="Gray"
                    ContentStringFormat="{}#{0,-2}|"/>
             <Grid Grid.Column="1" Background="Transparent">
@@ -361,7 +361,7 @@
                     <Grid Grid.Column="0" VerticalAlignment="Center">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="110"/>
-                            <RowDefinition Height="18"/>
+                            <RowDefinition MaxHeight="48" Height="18"/>
                         </Grid.RowDefinitions>
                         <ListBox ItemsSource="{Binding Covers, IsAsync=True}" Name="CoverList" Grid.Row="1" HorizontalAlignment="Center"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -396,7 +396,7 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                        <Grid>
+                        <Grid Margin="0" VerticalAlignment="Bottom">
                             <viewModel:DynamicImage Stretch="UniformToFill" MaxWidth="110" MaxHeight="110" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0">
                                 <viewModel:DynamicImage.Resources>
                                     <BitmapImage x:Key="NoCover" UriSource="Images/disc.png" />
@@ -492,7 +492,17 @@
                         <TextBlock Text="{Binding ReleaseGroup.Name}" FontSize="24" FontWeight="Bold"/>
                         <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,5,0,0">
                             <TextBlock Text="{Binding ReleaseGroup.PrimaryType}" Foreground="DarkGray"/>
-                            <TextBlock Text="{Binding ReleaseGroup.FirstReleaseDate.Year}"  HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding ReleaseGroup.FirstReleaseDate.Year}"  HorizontalAlignment="Right">
+                                <TextBlock.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ReleaseGroup.FirstReleaseDate.Year}" Value="1">
+                                                <Setter Property="Opacity" Value="0"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Resources>
+                            </TextBlock>
                         </Grid>
                     </StackPanel>
                     <Grid Grid.Column="2" Margin="0,0,50,0">

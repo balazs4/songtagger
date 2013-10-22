@@ -1,4 +1,4 @@
-//
+﻿//
 //  MusicDataProviderTests.cs
 //
 //  Author:
@@ -108,7 +108,7 @@ namespace SongTagger.Core.Test.Integration.Service
             foreach (Track item in resultList)
             {
                 int actualPosition = resultList.IndexOf(item) + 1;
-                int expectedPosition = item.Posititon;
+                int expectedPosition = item.Position;
                 Assert.AreEqual(expectedPosition, actualPosition, "Wrong position");
             }
 

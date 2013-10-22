@@ -67,7 +67,7 @@ namespace SongTagger.Core.Test.Integration.Tag
             track.Release = TestHelper.AppealToReasonRelease;
             track.Record.Name = "Savior";
             track.Number = "11";
-            track.Posititon = 11;
+            track.Position = 11;
 
 
             TagHandler.Save(track, new FileInfo(tempFileName), GetCoverArt());

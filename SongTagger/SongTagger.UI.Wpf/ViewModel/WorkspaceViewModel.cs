@@ -264,7 +264,7 @@ namespace SongTagger.UI.Wpf
         public VirtualReleaseViewModel(IEnumerable<Track> tracks, Action<IEnumerable<Uri>,
             Action<CoverArt>, CancellationToken> coverDownloaderService,
             Action<Exception> reportError,
-            Action<ReleaseGroup> reportDone)
+            Action<Tuple<ReleaseGroup, DirectoryInfo, byte[]>> reportDone)
             : base(State.MapTracks)
         {
             CancellationTokenSource source = new CancellationTokenSource();
@@ -349,9 +349,9 @@ namespace SongTagger.UI.Wpf
                 if (string.IsNullOrWhiteSpace(SongTaggerSettings.Current.LastFmApiKey))
                     return null;
 
-                Uri uri = new Uri(string.Format("http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key={0}&artist={1}&album={2}", 
-                    SongTaggerSettings.Current.LastFmApiKey, 
-                    releaseGroup.Artist.Name, 
+                Uri uri = new Uri(string.Format("http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key={0}&artist={1}&album={2}",
+                    SongTaggerSettings.Current.LastFmApiKey,
+                    releaseGroup.Artist.Name,
                     releaseGroup.Name));
 
                 string content = Core.Service.ServiceClient.DownloadContent(uri, time => { });
@@ -364,7 +364,7 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        private void TagSongs(Action<Exception> reportError, Action<ReleaseGroup> reportDone)
+        private void TagSongs(Action<Exception> reportError, Action<Tuple<ReleaseGroup, DirectoryInfo, byte[]>> reportDone)
         {
             CancellationTokenSource tokenSource = new CancellationTokenSource();
 
@@ -422,7 +422,15 @@ namespace SongTagger.UI.Wpf
                         }
                         else
                         {
-                            reportDone(Songs.First().Track.Release.ReleaseGroup);
+                            var song = Songs.First();
+
+                            var tuple = Tuple.Create(
+                                song.Track.Release.ReleaseGroup,
+                                song.TargetFile.Directory,
+                                SelectedCover.Data
+                                );
+
+                            reportDone(tuple);
                         }
                     });
         }
@@ -434,14 +442,19 @@ namespace SongTagger.UI.Wpf
             var tracksByRelease = tracks.ToLookup(tr => tr.Release);
             var longestRelease = tracksByRelease.OrderByDescending(r => r.Count()).First();
 
-            foreach (var track in longestRelease.OrderBy(t => t.DiscNumber).ThenBy(t => t.Posititon))
+
+            foreach (var track in longestRelease.OrderBy(t => t.DiscNumber).ThenBy(t => t.Position))
             {
+                //Pyromania workaround...
+                if (Songs.Any(s => s.Track.Name == track.Name))
+                    continue;
+
                 Songs.Add(new Song(track, Songs.Count + 1, targetDir));
             }
 
             foreach (var altenative in tracksByRelease.Except(new[] { longestRelease }))
             {
-                foreach (var track in altenative.OrderBy(t => t.DiscNumber).ThenBy(t => t.Posititon))
+                foreach (var track in altenative.OrderBy(t => t.DiscNumber).ThenBy(t => t.Position))
                 {
                     if (Songs.Any(song => song.Track.Name.ToLower() == track.Name.ToLower()))
                         continue;
@@ -543,37 +556,65 @@ namespace SongTagger.UI.Wpf
             IsFolderDragNDropActive = false;
             TryGetDirNameFromDropInfo(dropInfo, out dir);
 
-            IsQueryRunning = true;
             DetectTracks(dir);
-            IsQueryRunning = false;
         }
 
         private void DetectTracks(DirectoryInfo dir)
         {
-            var availableInfo = dir.EnumerateFiles("*.mp3", SearchOption.AllDirectories).AsParallel().ToDictionary(info => info,
-                                                                                               info => string.Join(" ", SongTagger.Core.Mp3Tag.TagHandler.GetSongTags(info)));
-
-
-            foreach (Song song in Songs)
-            {
-                if (song.SourceFile != null && availableInfo.Keys.Select(info => info.FullName).Contains(song.SourceFile.FullName))
-                    continue;
-
-                var found = availableInfo.FirstOrDefault(kv => kv.Value.Contains(song.Track.Name.ToLower()) || kv.Value.Contains(song.Track.Posititon.ToString())).Key;
-                if (found != null)
+            IsQueryRunning = true;           
+            Task.Factory.StartNew(() =>
                 {
-                    song.SourceFile = found;
-                    continue;
-                }
+                    var availableInfo = dir.EnumerateFiles("*.mp3", SearchOption.AllDirectories).AsParallel().ToDictionary(info => info,
+                                                                                              info => string.Join(" ", SongTagger.Core.Mp3Tag.TagHandler.GetSongTags(info)));
 
-                var fileNameFound = availableInfo.Keys.FirstOrDefault(info => info.Name.Contains(song.Track.Posititon.ToString()));
-                if (fileNameFound != null)
-                {
-                    song.SourceFile = fileNameFound;
-                    continue;
-                }
-            }
+                    foreach (Song song in Songs)
+                    {
+                        if (song.SourceFile != null && availableInfo.Keys.Select(info => info.FullName).Contains(song.SourceFile.FullName))
+                            continue;
+
+
+                        foreach (var detect in detectionStrategies)
+                        {
+                            detect(song, availableInfo);
+
+                            if (song.SourceFile != null)
+                                break;
+                        }
+                    }
+
+                }).ContinueWith(prevTask => IsQueryRunning = false);           
         }
+
+
+        private static Action<Song, IDictionary<FileInfo, string>>[] detectionStrategies = new Action<Song, IDictionary<FileInfo, string>>[]
+            {
+                DetectByTrackNameInTag,
+                DetectByTrackPositionInTag,
+                DetectByTrackNameInFileName,
+                DetectByTrackPositionInFileName,
+            };
+
+        private static void DetectByTrackNameInFileName(Song song, IDictionary<FileInfo, string> availableInfo)
+        {
+            song.SourceFile = availableInfo.Keys.FirstOrDefault(info => info.Name.ToLower().Contains(song.Track.Name.ToLower()));
+        }
+
+        private static void DetectByTrackPositionInFileName(Song song, IDictionary<FileInfo, string> availableInfo)
+        {
+            song.SourceFile = availableInfo.Keys.FirstOrDefault(info => info.Name.Contains(song.Track.Position.ToString()));
+        }
+
+        private static void DetectByTrackPositionInTag(Song song, IDictionary<FileInfo, string> availableInfo)
+        {
+            song.SourceFile = availableInfo.FirstOrDefault(kv => kv.Value.Contains(song.Track.Position.ToString())).Key;
+        }
+
+        private static void DetectByTrackNameInTag(Song song, IDictionary<FileInfo, string> availableInfo)
+        {
+            song.SourceFile = availableInfo.FirstOrDefault(kv => kv.Value.ToLower().Contains(song.Track.Name.ToLower())).Key;
+        }
+
+
     }
 
     public class Song : ViewModelBase, IDropTarget
@@ -583,7 +624,7 @@ namespace SongTagger.UI.Wpf
             EjectSourceFile = new DelegateCommand(p => SourceFile = null, p => IsInitalized);
 
             Track = track;
-            Position = position;
+            Track.Position = position;
 
             TargetFile = CreateTargetFile(libraryRoot);
         }
@@ -603,10 +644,10 @@ namespace SongTagger.UI.Wpf
 
             string artistName = CreateValidName(name => name.ValidDirectoryName(), Track.Release.ReleaseGroup.Artist.Name);
             string albumName = CreateValidName(name => name.ValidDirectoryName(),
-                Track.Release.ReleaseGroup.FirstReleaseDate.Year.ToString(),
+                Track.Release.ReleaseGroup.FirstReleaseDate.Year == DateTime.MinValue.Year ? "" : Track.Release.ReleaseGroup.FirstReleaseDate.Year.ToString(),
                 Track.Release.ReleaseGroup.Name,
                 albumSuffix.Contains(Track.Release.ReleaseGroup.PrimaryType) ? Track.Release.ReleaseGroup.PrimaryType.ToString() : "");
-            string fileName = CreateValidName(name => name.ValidFileName(), Position.ToString().PadLeft(2, '0'), Track.Name, "mp3");
+            string fileName = CreateValidName(name => name.ValidFileName(), Track.Position.ToString().PadLeft(2, '0'), Track.Name, "mp3");
 
             return new FileInfo(Path.Combine(dirPath, artistName, albumName, fileName));
         }
@@ -614,23 +655,14 @@ namespace SongTagger.UI.Wpf
         private static string CreateValidName(Func<string, string> validator, params string[] parts)
         {
             char delimiter = '.';
-            return validator(String.Join(delimiter.ToString(), parts).Replace(' ', delimiter).TrimEnd(delimiter).Trim());
+            return validator(String.Join(delimiter.ToString(), parts).Replace(' ', delimiter).TrimEnd(delimiter).Trim()).Trim(delimiter);
         }
 
         internal FileInfo TargetFile { get; private set; }
 
         public ICommand EjectSourceFile { get; private set; }
 
-        private int position;
-        public int Position
-        {
-            get { return position; }
-            set
-            {
-                position = value;
-                RaisePropertyChangedEvent("Position");
-            }
-        }
+       
 
         private Track track;
         public Track Track

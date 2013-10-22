@@ -68,15 +68,21 @@
             </Grid.Resources>
             <ContentControl Content="{Binding Workspace}" ContentTemplateSelector="{StaticResource workspaceSelector}"/>
             <Border Background="Transparent" Height="64" Width="384" VerticalAlignment="Bottom" 
-                    BorderBrush="Gray" BorderThickness="2"
+                    BorderBrush="LimeGreen" BorderThickness="1"
                     Visibility="{Binding IsNotificationVisible, Converter={StaticResource Bool2Visibility}}">
                 <Grid Margin="1">
                     <Rectangle Fill="Black" Opacity="0.85"/>
-                    <Grid HorizontalAlignment="Left" Width="64">
-                        <Border Background="Transparent" Opacity=".75"/>
-                        <Ellipse Fill="LimeGreen" Height="32" Width="32" Opacity=".65"/>
-                        <Image Source="View/Images/done.png" Width="32" Opacity="1.0"/>
-                    </Grid>
+                    <Button HorizontalAlignment="Left" Width="64" Command="{Binding OpenFolder}">
+                        <Button.Template>
+                            <ControlTemplate>
+                               <Image Width="64" Opacity="1.0">
+                                    <Image.Source>
+                                        <Binding Path="LastTaggedAlbum.Item3" IsAsync="True" Converter="{StaticResource ByteImageConverter}" TargetNullValue="View/Images/done.png"/>
+                                    </Image.Source>
+                                </Image>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
 
                     <StackPanel Margin="64,0,0,0" VerticalAlignment="Center">
                         <StackPanel.Resources>
@@ -85,8 +91,8 @@
                                 <Setter Property="Foreground" Value="White"/>
                             </Style>
                         </StackPanel.Resources>
-                        <TextBlock Text="{Binding LastTaggedAlbum.Name}"/>
-                        <TextBlock Text="{Binding LastTaggedAlbum.Artist.Name}"/>
+                        <TextBlock Text="{Binding LastTaggedAlbum.Item1.Name}"/>
+                        <TextBlock Text="{Binding LastTaggedAlbum.Item1.Artist.Name}"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -94,6 +100,7 @@
         </Grid>
         <Grid ColumnSpan="2" IsEnabled="{Binding IsWorkspaceBusy}"
                              Visibility="{Binding IsWorkspaceBusy, Converter={StaticResource Bool2Visibility}}">
+            <Border Background="White" Opacity=".25"/>
             <Border Background="Black" Opacity=".75" Height="256">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <metroControls:ProgressRing IsActive="True" Foreground="White"/>
