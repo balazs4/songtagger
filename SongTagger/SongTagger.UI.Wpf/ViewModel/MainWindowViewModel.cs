@@ -418,13 +418,21 @@ namespace SongTagger.UI.Wpf
             Items.Add(keepFile);
 
 
-            var lastFm = new SwitchSettingViewModel("CoverArt from Last.Fm too",
+            var lastFm = new SwitchSettingViewModel("Try to get CoverArt from Last.Fm",
                                                     !string.IsNullOrWhiteSpace(SongTaggerSettings.Current.LastFmApiKey))
                 {
-                    Hint = "Extend covertart search with Last.FM support"
+                    Hint = "Extend covertart fetching with Last.FM support"
                 };
             lastFm.PropertyChanged += (sender, args) => SongTaggerSettings.Current.SetLastFmApiKey(((SwitchSettingViewModel)sender).Enabled);
             Items.Add(lastFm);
+
+            var coverJpg = new SwitchSettingViewModel("Save cover as jpg in album folder",
+                                                      SongTaggerSettings.Current.CreateSeperateCoverFile)
+                {
+                    Hint = "Add cover to mp3 and save the cover art as jpg"
+                };
+            coverJpg.PropertyChanged += (sender, args) => SongTaggerSettings.Current.CreateSeperateCoverFile = ((SwitchSettingViewModel)sender).Enabled;
+            Items.Add(coverJpg);
         }
 
         private ObservableCollection<AbstractSettingViewModel> items;

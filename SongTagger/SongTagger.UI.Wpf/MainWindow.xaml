@@ -132,7 +132,7 @@
                             <DataTemplate DataType="{x:Type viewModel:AbstractSettingViewModel}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="256"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Label Content="{Binding Title}" Grid.Column="0" HorizontalAlignment="Right" Margin="5"

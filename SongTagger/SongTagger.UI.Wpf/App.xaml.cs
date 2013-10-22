@@ -78,6 +78,7 @@ namespace SongTagger.UI.Wpf
         {
             OutputFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
             KeepOriginalFileAfterTagging = true;
+            CreateSeperateCoverFile = false;
             LastFmApiKey = songtaggeLastFmApiKey;
         }
 
@@ -119,6 +120,20 @@ namespace SongTagger.UI.Wpf
                 RaisePropertyChangedEvent("LastFmApiKey");
             }
         }
+
+        private bool createSeperateCoverFile;
+
+        [XmlElement]
+        public bool CreateSeperateCoverFile
+        {
+            get { return createSeperateCoverFile; }
+            set
+            {
+                createSeperateCoverFile = value;
+                RaisePropertyChangedEvent("CreateSeperateCoverFile");
+            }
+        }
+
 
         public bool IsValid()
         {

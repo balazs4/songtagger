@@ -397,6 +397,7 @@ namespace SongTagger.UI.Wpf
                     {
                         if (File.Exists(song.TargetFile.FullName))
                             File.Delete(song.TargetFile.FullName);
+
                     }, TaskContinuationOptions.NotOnRanToCompletion);
 
                 tagger.ContinueWith(prevTask =>
@@ -405,6 +406,8 @@ namespace SongTagger.UI.Wpf
                     {
                         File.Delete(song.SourceFile.FullName);
                     }
+
+              
                     song.EjectSourceFile.Execute(null);
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
@@ -423,6 +426,12 @@ namespace SongTagger.UI.Wpf
                         else
                         {
                             var song = Songs.First();
+
+                            if (SongTaggerSettings.Current.CreateSeperateCoverFile)
+                            {
+                                var path = Path.Combine(song.TargetFile.Directory.FullName, "cover.jpg");
+                                File.WriteAllBytes(path, SelectedCover.Data);
+                            }
 
                             var tuple = Tuple.Create(
                                 song.Track.Release.ReleaseGroup,
@@ -561,7 +570,7 @@ namespace SongTagger.UI.Wpf
 
         private void DetectTracks(DirectoryInfo dir)
         {
-            IsQueryRunning = true;           
+            IsQueryRunning = true;
             Task.Factory.StartNew(() =>
                 {
                     var availableInfo = dir.EnumerateFiles("*.mp3", SearchOption.AllDirectories).AsParallel().ToDictionary(info => info,
@@ -582,7 +591,7 @@ namespace SongTagger.UI.Wpf
                         }
                     }
 
-                }).ContinueWith(prevTask => IsQueryRunning = false);           
+                }).ContinueWith(prevTask => IsQueryRunning = false);
         }
 
 
@@ -662,7 +671,7 @@ namespace SongTagger.UI.Wpf
 
         public ICommand EjectSourceFile { get; private set; }
 
-       
+
 
         private Track track;
         public Track Track
