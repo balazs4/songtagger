@@ -135,7 +135,7 @@ namespace SongTagger.UI.Wpf
 
         private void ShowNotification()
         {
-            LastTaggedAlbum = OfflineDataProvider.AppealToReason;
+            LastTaggedAlbum = Tuple.Create(OfflineDataProvider.AppealToReason, new DirectoryInfo(@"C:\temp"), (byte[])null);
         }
 
         private void InitDesignData(params Action[] initActions)
@@ -302,7 +302,7 @@ namespace SongTagger.UI.Wpf
                 .Select(i => new Track(AppealToReasonRelease)
                 {
                     Name = "Track #" + i,
-                    Posititon = i,
+                    Position = i,
                     Length = TimeSpan.FromMilliseconds(random.Next(100000, 300000))
                 }
                 );
@@ -310,19 +310,12 @@ namespace SongTagger.UI.Wpf
 
         public void DownloadCoverArts(IEnumerable<Uri> uri, Action<CoverArt> callback, CancellationToken token)
         {
-            var uriList = uri;
-            if (uri == null || !uri.Any())
-            {
-                uriList =
+            var uriList =
                     Directory.EnumerateFileSystemEntries(
                         Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "*.*")
-                             .Take(5)
-                             .Select(f => new Uri(f));
-            }
-            else
-            {
-                uriList = uri;
-            }
+                             .Take(12)
+                             .Select(f => new Uri(f)); ;
+          
             foreach (Uri pic in uriList)
             {
                 using (FileStream fs = File.Open(pic.LocalPath, FileMode.Open))

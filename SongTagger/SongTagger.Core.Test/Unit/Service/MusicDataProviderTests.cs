@@ -144,7 +144,7 @@ namespace SongTagger.Core.Test.Unit.Service
             Track track = result.First(a => a.Id.ToString() == "e5265bc0-c138-34c4-ba9c-a8c366acad6c");
             Assert.AreEqual("The Dirt Whispered", track.Name, "wrong title");
             Assert.AreEqual("4", track.Number, "wrong number");
-            Assert.AreEqual(4, track.Posititon, "wrong position");
+            Assert.AreEqual(4, track.Position, "wrong position");
             Assert.AreEqual(TimeSpan.FromMilliseconds(189126), track.Length, "wrong length");
         }
     }

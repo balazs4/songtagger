@@ -76,11 +76,25 @@ namespace SongTagger.UI.Wpf
             Workspace = new SearchViewmodel(SearchArtistAsync);
             Cart = new DummyCartViewModel(ShowSettings);
 
-            Version version = new Version(0,0,0,999);
+            Version version = new Version(0, 0, 0, 999);
             if (ApplicationDeployment.IsNetworkDeployed)
                 version = ApplicationDeployment.CurrentDeployment.CurrentVersion;
 
             WindowTitle = GetType().Namespace.ToLower().Split('.').FirstOrDefault() + " v" + version.ToString(4);
+             OpenFolder = new DelegateCommand(p => System.Diagnostics.Process.Start(LastTaggedAlbum.Item2.FullName),
+                 p =>
+                     {
+                         if (LastTaggedAlbum == null)
+                             return false;
+
+                         if (LastTaggedAlbum.Item2 == null)
+                             return false;
+
+                         if (!LastTaggedAlbum.Item2.Exists)
+                             return false;
+
+                         return true;
+                     });
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -165,9 +179,9 @@ namespace SongTagger.UI.Wpf
                 Action<Task<IEnumerable<Track>>> doneTask = task1 =>
                 {
                     Workspace = new VirtualReleaseViewModel(task1.Result, provider.DownloadCoverArts, errorHandler,
-                        releaseGroup =>
+                        tuple =>
                         {
-                            LastTaggedAlbum = releaseGroup;
+                            LastTaggedAlbum = tuple;
                         });
 
                     if (Cart == null || Cart is DummyCartViewModel)
@@ -180,8 +194,8 @@ namespace SongTagger.UI.Wpf
             }
         }
 
-        private ReleaseGroup lastTaggedAlbum;
-        public ReleaseGroup LastTaggedAlbum
+        private Tuple<ReleaseGroup, DirectoryInfo, byte[]> lastTaggedAlbum;
+        public Tuple<ReleaseGroup, DirectoryInfo, byte[]> LastTaggedAlbum
         {
             get { return lastTaggedAlbum; }
             set
@@ -191,7 +205,7 @@ namespace SongTagger.UI.Wpf
                 RaisePropertyChangedEvent("IsNotificationVisible");
                 Task.Factory.StartNew(() =>
                     {
-                        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(4));
+                        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(7));
                         lastTaggedAlbum = null;
                         RaisePropertyChangedEvent("IsNotificationVisible");
                     });
@@ -199,6 +213,8 @@ namespace SongTagger.UI.Wpf
         }
 
         public bool IsNotificationVisible { get { return LastTaggedAlbum != null; } }
+
+        public ICommand OpenFolder { get; private set; }
 
         protected void ResetToSearchArtist()
         {
@@ -371,7 +387,7 @@ namespace SongTagger.UI.Wpf
                 {
                     SongTaggerSettings.Current.Save();
                     closeCallback();
-                }, 
+                },
                 p => SongTaggerSettings.Current.IsValid());
             ResetToDefault = new DelegateCommand(p =>
                 {
@@ -407,7 +423,7 @@ namespace SongTagger.UI.Wpf
                 {
                     Hint = "Extend covertart search with Last.FM support"
                 };
-            lastFm.PropertyChanged += (sender, args) => SongTaggerSettings.Current.SetLastFmApiKey(((SwitchSettingViewModel) sender).Enabled);
+            lastFm.PropertyChanged += (sender, args) => SongTaggerSettings.Current.SetLastFmApiKey(((SwitchSettingViewModel)sender).Enabled);
             Items.Add(lastFm);
         }
 

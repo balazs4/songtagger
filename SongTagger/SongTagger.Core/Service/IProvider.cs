@@ -84,7 +84,7 @@ namespace SongTagger.Core.Service
             int discid = 0;
             foreach (Track track in queryResult)
             {
-                if (track.Posititon == 1)
+                if (track.Position == 1)
                     discid++;
                 track.DiscNumber = discid;
             }
@@ -205,7 +205,7 @@ namespace SongTagger.Core.Service
                 byte[] data = null;
                 if (uri.Scheme == "file")
                 {
-                    using (FileStream fs =File.Open(uri.LocalPath, FileMode.Open))
+                    using (FileStream fs = File.Open(uri.LocalPath, FileMode.Open))
                     {
                         data = new byte[fs.Length];
                         fs.Read(data, 0, (int)fs.Length);
@@ -223,15 +223,13 @@ namespace SongTagger.Core.Service
                     client.DownloadDataCompleted += (sender, args) =>
                     {
                         if (args.Cancelled)
-                            throw new OperationCanceledException();
+                            return;
 
-                        if (args.Error != null)
-                            throw args.Error;
+                        if (args.Error == null)
+                        {
+                            data = args.Result;
+                        }
 
-                        if (args.Result == null)
-                            throw new InvalidOperationException();
-
-                        data = args.Result;
                         autoEvent.Set();
                     };
 
