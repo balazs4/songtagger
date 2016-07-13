@@ -53,33 +53,32 @@ namespace SongTagger.Core.Service
 
         private static string DefaultContentDownloader(Uri url)
         {
+            for (int i = 0; i < 2; i++)
+            {
+                try
+                {
+                    return Down(url);
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(3000);
+                    continue;
+                }
+            }
+
+            return "<?xml version=\"1.0\" encoding=\"UTF - 8\"?><metadata xmlns=\"http://musicbrainz.org/ns/mmd-2.0#\"><metadata></metadata>";
+        }
+
+
+        private static string Down(Uri url)
+        {
             string content = string.Empty;
+            Thread.Sleep(5000);
+
             using (WebClient client = CreateWebClient())
             {
-                AutoResetEvent autoEvent = new AutoResetEvent(false);
-
-                client.DownloadStringCompleted += (sender, args) =>
-                    {
-                        if (args.Error != null)
-                            Trace.TraceError(args.Error.ToString());
-                        else
-                            content = args.Result;
-
-                        autoEvent.Set();
-                    };
-                client.DownloadStringAsync(url);
-
-                TimeSpan waitTime = TimeSpan.FromSeconds(30);
-                if (!autoEvent.WaitOne(waitTime))
-                {
-                    client.CancelAsync();
-                    string message =
-                        string.Format(
-                            "No respond from server in {0}. \nPlease try it later again or check your internet connection.",
-                            waitTime);
-                    throw new SongTaggerException(message);
-                }
-                //content = client.DownloadString(url);
+                client.Headers.Add("user-agent", "songtagger http://songtagger.codeplex.com");
+                content = client.DownloadString(url);
             }
             return content;
         }
