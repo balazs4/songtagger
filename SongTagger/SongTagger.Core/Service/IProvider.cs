@@ -121,10 +121,12 @@ namespace SongTagger.Core.Service
         }
         #endregion
         #region Download prepare actions
-        internal static readonly TimeSpan MINIMUM_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 0, 1, 300);
+        internal static readonly TimeSpan MINIMUM_TIME_BETWEEN_QUERIES = new TimeSpan(0, 0, 0, 5, 300);
 
         internal static void MusicBrainzPreparation(DateTime date)
         {
+            return;
+
             TimeSpan difference = DateTime.Now - date;
             if (difference < MINIMUM_TIME_BETWEEN_QUERIES)
                 Thread.Sleep(MINIMUM_TIME_BETWEEN_QUERIES - difference);
